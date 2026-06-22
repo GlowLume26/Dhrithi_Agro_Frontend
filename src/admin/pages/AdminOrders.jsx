@@ -6,13 +6,13 @@ import { ORDER_STATUSES, STATUS_COLORS } from '../utils/constants';
 import adminApi from '../services/adminApi';
 
 const MOCK = [
-  { id:1, order_number:'DA-78432', customer_name:'Ramesh Patil',    city:'Nashik',    total_amount:598,  payment_status:'Paid',   order_status:'Shipped',    placed_at:'2025-01-15T10:30:00', items:[{name:'Tomato Seeds F1',qty:2,price:299}] },
-  { id:2, order_number:'DA-78401', customer_name:'Sunita Devi',     city:'Lucknow',   total_amount:925,  payment_status:'Paid',   order_status:'Processing', placed_at:'2025-01-15T08:15:00', items:[{name:'NPK Fertilizer',qty:5,price:185}] },
-  { id:3, order_number:'DA-78389', customer_name:'Krishnamurthy',   city:'Coimbatore',total_amount:2520, payment_status:'Paid',   order_status:'Delivered',  placed_at:'2025-01-14T14:00:00', items:[{name:'Neem Oil 1L',qty:3,price:840}] },
-  { id:4, order_number:'DA-78350', customer_name:'Mohan Lal',       city:'Amritsar',  total_amount:3499, payment_status:'Paid',   order_status:'Delivered',  placed_at:'2025-01-13T11:20:00', items:[{name:'Drip Kit 1 Acre',qty:1,price:3499}] },
-  { id:5, order_number:'DA-78312', customer_name:'Priya Sharma',    city:'Jaipur',    total_amount:1044, payment_status:'Refund', order_status:'Cancelled',  placed_at:'2025-01-12T09:45:00', items:[{name:'Humic Acid 300g',qty:4,price:261}] },
-  { id:6, order_number:'DA-78290', customer_name:'Arjun Mehta',     city:'Pune',      total_amount:760,  payment_status:'Paid',   order_status:'Pending',    placed_at:'2025-01-12T07:00:00', items:[{name:'Garden Tools Set',qty:2,price:380}] },
-  { id:7, order_number:'DA-78255', customer_name:'Kavitha Reddy',   city:'Bangalore', total_amount:490,  payment_status:'COD',    order_status:'Pending',    placed_at:'2025-01-11T16:30:00', items:[{name:'Coco Peat 5kg',qty:4,price:120}] },
+  { id:1, order_number:'DA-78432', customer_name:'Ramesh Patil',    total_amount:598,  payment_status:'paid',   order_status:'shipped',    created_at:'2025-01-15T10:30:00', items:[{product_name:'Tomato Seeds F1',quantity:2,price:299,total:598}] },
+  { id:2, order_number:'DA-78401', customer_name:'Sunita Devi',     total_amount:925,  payment_status:'paid',   order_status:'confirmed',  created_at:'2025-01-15T08:15:00', items:[{product_name:'NPK Fertilizer',quantity:5,price:185,total:925}] },
+  { id:3, order_number:'DA-78389', customer_name:'Krishnamurthy',   total_amount:2520, payment_status:'paid',   order_status:'delivered',  created_at:'2025-01-14T14:00:00', items:[{product_name:'Neem Oil 1L',quantity:3,price:840,total:2520}] },
+  { id:4, order_number:'DA-78350', customer_name:'Mohan Lal',       total_amount:3499, payment_status:'paid',   order_status:'delivered',  created_at:'2025-01-13T11:20:00', items:[{product_name:'Drip Kit 1 Acre',quantity:1,price:3499,total:3499}] },
+  { id:5, order_number:'DA-78312', customer_name:'Priya Sharma',    total_amount:1044, payment_status:'pending',order_status:'cancelled',  created_at:'2025-01-12T09:45:00', items:[{product_name:'Humic Acid 300g',quantity:4,price:261,total:1044}] },
+  { id:6, order_number:'DA-78290', customer_name:'Arjun Mehta',     total_amount:760,  payment_status:'pending',order_status:'placed',     created_at:'2025-01-12T07:00:00', items:[{product_name:'Garden Tools Set',quantity:2,price:380,total:760}] },
+  { id:7, order_number:'DA-78255', customer_name:'Kavitha Reddy',   total_amount:490,  payment_status:'pending',order_status:'placed',     created_at:'2025-01-11T16:30:00', items:[{product_name:'Coco Peat 5kg',quantity:4,price:120,total:480}] },
 ];
 
 export default function AdminOrders() {
@@ -74,7 +74,7 @@ export default function AdminOrders() {
                 : orders.map((o,i) => (
                   <motion.tr key={o.id} initial={{ opacity:0, y:5 }} animate={{ opacity:1, y:0 }} transition={{ delay:i*0.04 }} style={{ cursor:'pointer' }} onClick={()=>setDetail(o)}>
                     <td style={{ fontWeight:700, color:'var(--apri)' }}>#{o.order_number}</td>
-                    <td style={{ color:'var(--atx2)', fontSize:12 }}>{new Date(o.placed_at).toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'})}</td>
+                    <td style={{ color:'var(--atx2)', fontSize:12 }}>{new Date(o.created_at).toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'})}</td>
                     <td style={{ fontWeight:600 }}>{o.customer_name}</td>
                     <td style={{ color:'var(--atx2)' }}>📍 {o.city}</td>
                     <td style={{ fontWeight:700 }}>₹{Number(o.total_amount).toLocaleString('en-IN')}</td>
@@ -108,7 +108,7 @@ export default function AdminOrders() {
               <div className="a-card a-card-p">
                 <h4 style={{ fontSize:13, fontWeight:700, color:'var(--atx2)', marginBottom:10, textTransform:'uppercase', letterSpacing:0.7 }}>Payment</h4>
                 <p style={{ fontWeight:900, fontSize:20, color:'var(--apri)' }}>₹{Number(detail.total_amount).toLocaleString('en-IN')}</p>
-                <p style={{ fontSize:12, color:'var(--atx2)', marginTop:4 }}>Status: <b>{detail.payment_status}</b></p>
+                  <p style={{ fontSize:13, color:'var(--atx2)', marginTop:4 }}>Status: <b>{detail.payment_status}</b></p>
               </div>
             </div>
 
@@ -117,9 +117,9 @@ export default function AdminOrders() {
               <div style={{ padding:'12px 16px', borderBottom:'1px solid var(--abord)', fontWeight:700, fontSize:13 }}>Order Items</div>
               {(detail.items||[]).map((item,i) => (
                 <div key={i} style={{ padding:'12px 16px', display:'flex', justifyContent:'space-between', borderBottom:'1px solid var(--abord)', fontSize:13 }}>
-                  <span>{item.name}</span>
-                  <span style={{ color:'var(--atx2)' }}>Qty: {item.qty} × ₹{item.price}</span>
-                  <span style={{ fontWeight:700, color:'var(--apri)' }}>₹{item.qty*item.price}</span>
+                  <span>{item.product_name}</span>
+                  <span style={{ color:'var(--atx2)' }}>Qty: {item.quantity} × ₹{Number(item.price).toLocaleString('en-IN')}</span>
+                  <span style={{ fontWeight:700, color:'var(--apri)' }}>₹{Number(item.total).toLocaleString('en-IN')}</span>
                 </div>
               ))}
             </div>

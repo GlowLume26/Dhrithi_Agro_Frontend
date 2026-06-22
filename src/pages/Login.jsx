@@ -119,9 +119,10 @@ export default function Login() {
     if (signupOtp.length < OTP_LEN) { showErr('Enter the complete 6-digit OTP.'); return; }
     hideMsg(); setLoading(true);
     try {
-      const res = await fetch(API_BASE + 'auth', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'register', full_name: signupName, email: signupEmail, mobile: signupPhone, otp: signupOtp }) }).then(r => r.json());
+      const [first_name, ...rest] = signupName.trim().split(' ');
+      const res = await fetch(API_BASE + 'auth', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'register', first_name, last_name: rest.join(' '), email: signupEmail, mobile: signupPhone, otp: signupOtp }) }).then(r => r.json());
       if (res.success) {
-        saveAuth(res.data.token, { mobile: signupPhone, full_name: signupName, email: signupEmail });
+        saveAuth(res.data.token, { mobile: signupPhone, first_name, last_name: rest.join(' '), email: signupEmail });
         setWelcomeName(signupName); setSignupStep(3);
       } else showErr(res.message || 'Registration failed. Try again.');
     } catch { showErr('Network error.'); }
@@ -208,21 +209,18 @@ export default function Login() {
                 <div className="auth-form">
                   <div className="form-group">
                     <label style={{ textAlign: 'center', display: 'block' }}>Enter 6-digit OTP sent to <b>{loginMode === 'phone' ? '+91 ' + loginPhone : loginEmail}</b></label>
-                    <div className="otp-group" style={{ gap: 8 }}>
-                      {Array.from({ length: 6 }, (_, i) => {
-                        const refs = [];
-                        return (
-                          <input key={i} className="otp-input" maxLength={1}
-                            onInput={e => {
-                              e.target.value = e.target.value.replace(/\D/g, '');
-                              const allInputs = document.querySelectorAll('#loginOtpGroup .otp-input');
-                              if (e.target.value && i < 5) allInputs[i + 1]?.focus();
-                              setLoginOtp(Array.from(allInputs).map(el => el.value).join(''));
-                            }}
-                            onKeyDown={e => { if (e.key === 'Backspace' && !e.target.value && i > 0) document.querySelectorAll('#loginOtpGroup .otp-input')[i - 1]?.focus(); }}
-                          />
-                        );
-                      })}
+                    <div id="loginOtpGroup" className="otp-group" style={{ gap: 8 }}>
+                      {Array.from({ length: 6 }, (_, i) => (
+                        <input key={i} className="otp-input" maxLength={1}
+                          onInput={e => {
+                            e.target.value = e.target.value.replace(/\D/g, '');
+                            const allInputs = document.querySelectorAll('#loginOtpGroup .otp-input');
+                            if (e.target.value && i < 5) allInputs[i + 1]?.focus();
+                            setLoginOtp(Array.from(allInputs).map(el => el.value).join(''));
+                          }}
+                          onKeyDown={e => { if (e.key === 'Backspace' && !e.target.value && i > 0) document.querySelectorAll('#loginOtpGroup .otp-input')[i - 1]?.focus(); }}
+                        />
+                      ))}
                     </div>
                   </div>
                   {!canResend

@@ -23,11 +23,13 @@ export const NAV_ITEMS = [
   { id:'admins',     label:'Admin Users',  icon:'RxPeople',      path:'/admin/admins'    },
 ];
 
-export const ORDER_STATUSES = ['Pending','Processing','Shipped','Delivered','Cancelled'];
+export const ORDER_STATUSES = ['placed','confirmed','packed','shipped','out_for_delivery','delivered','cancelled'];
 export const STATUS_COLORS  = {
-  Pending:    { bg:'#fff7ed', color:'#c2410c', dot:'#f97316' },
-  Processing: { bg:'#eff6ff', color:'#1d4ed8', dot:'#3b82f6' },
-  Shipped:    { bg:'#f0fdf4', color:'#15803d', dot:'#22c55e' },
-  Delivered:  { bg:'#f0fdf4', color:'#166534', dot:'#16a34a' },
-  Cancelled:  { bg:'#fef2f2', color:'#dc2626', dot:'#ef4444' },
+  placed:           { bg:'#eff6ff', color:'#1d4ed8', dot:'#3b82f6' },
+  confirmed:        { bg:'#f0fdf4', color:'#15803d', dot:'#22c55e' },
+  packed:           { bg:'#fefce8', color:'#92400e', dot:'#f59e0b' },
+  shipped:          { bg:'#f0fdf4', color:'#15803d', dot:'#22c55e' },
+  out_for_delivery: { bg:'#fdf4ff', color:'#7e22ce', dot:'#a855f7' },
+  delivered:        { bg:'#f0fdf4', color:'#166534', dot:'#16a34a' },
+  cancelled:        { bg:'#fef2f2', color:'#dc2626', dot:'#ef4444' },
 };

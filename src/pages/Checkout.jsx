@@ -14,7 +14,7 @@ export default function Checkout() {
   const [success, setSuccess] = useState(false);
   const [orderNum, setOrderNum] = useState('');
   const [loading, setLoading] = useState(false);
-  const [newAddr, setNewAddr] = useState({ full_name: '', mobile: '', address_line1: '', address_line2: '', city: '', pincode: '', state: 'Maharashtra', address_type: 'HOME' });
+  const [newAddr, setNewAddr] = useState({ full_name: '', mobile: '', address_line1: '', address_line2: '', city: '', pincode: '', state: 'Maharashtra', address_type: 'home' });
 
   useEffect(() => {
     if (!isLoggedIn) { navigate('/login'); return; }
@@ -23,25 +23,23 @@ export default function Checkout() {
   }, [isLoggedIn]);
 
   const PAYMENT_OPTS = [
-    { icon: '📱', label: 'UPI Payment', sub: 'Google Pay, PhonePe, Paytm, BHIM UPI', method: 'UPI' },
-    { icon: '💳', label: 'Credit / Debit Card', sub: 'Visa, Mastercard, RuPay', method: 'CARD' },
-    { icon: '🏦', label: 'Net Banking', sub: 'All major Indian banks', method: 'NET_BANKING' },
-    { icon: '💰', label: 'Cash on Delivery', sub: 'Pay when your order arrives', method: 'COD' },
+    { icon: '📱', label: 'UPI Payment',         sub: 'Google Pay, PhonePe, Paytm, BHIM UPI', method: 'upi' },
+    { icon: '💳', label: 'Credit / Debit Card',  sub: 'Visa, Mastercard, RuPay',              method: 'card' },
+    { icon: '🏦', label: 'Net Banking',           sub: 'All major Indian banks',               method: 'net_banking' },
+    { icon: '💰', label: 'Cash on Delivery',      sub: 'Pay when your order arrives',          method: 'cod' },
   ];
 
   async function placeOrder() {
-    const addr = addresses[selectedAddr];
-    if (!addr && addresses.length > 0) { alert('Please select a delivery address.'); return; }
+    if (!addr && !addresses.length) { alert('Please add a delivery address first.'); return; }
+    if (!addr) { alert('Please select a delivery address.'); return; }
     setLoading(true);
-    const items = (cartData?.items || []).map(i => ({ product_id: i.product_id, quantity: i.quantity, unit_price: i.selling_price }));
     const res = await api.post('orders', {
-      address_id: addr?.id,
+      address_id: addr.id,
       payment_method: PAYMENT_OPTS[selectedPayment].method,
-      items,
-      total_amount: cartData?.total,
       coupon_code: localStorage.getItem('da_coupon') || '',
     });
     setLoading(false);
+    localStorage.removeItem('da_coupon');
     if (res.success) { setOrderNum(res.data?.order_number || 'DA-' + Date.now()); setSuccess(true); }
     else alert(res.message || 'Failed to place order.');
   }

@@ -5,7 +5,7 @@ import { PageHeader, Modal, ConfirmModal, Pagination, RowActions, StatusBadge, S
 import adminApi from '../services/adminApi';
 
 const FALLBACK = 'https://images.unsplash.com/photo-1574943320219-553eb213f72d?w=200&q=80';
-const EMPTY_FORM = { name:'', category_id:'', brand:'', sku:'', selling_price:'', mrp:'', stock_quantity:'', description:'', status:'active' };
+const EMPTY_FORM = { name:'', category_id:'', brand:'', sku:'', selling_price:'', mrp:'', stock_qty:'', description:'', is_active:true };
 
 export default function AdminProducts() {
   const [products, setProducts]   = useState([]);
@@ -39,7 +39,7 @@ export default function AdminProducts() {
   }
 
   function openAdd() { setForm(EMPTY_FORM); setVariants([{qty:'',price:''}]); setImages([]); setEditId(null); setModal(true); }
-  function openEdit(p) { setForm({ name:p.name, category_id:p.category_id||'', brand:p.brand_name||'', sku:p.sku||'', selling_price:p.selling_price, mrp:p.mrp||'', stock_quantity:p.stock_quantity, description:p.description||'', status:p.status||'active' }); setVariants(p.variants||[{qty:'',price:''}]); setImages(p.images||[]); setEditId(p.id); setModal(true); }
+  function openEdit(p) { setForm({ name:p.name, category_id:p.category_id||'', brand:p.brand_name||'', sku:p.sku||'', selling_price:p.selling_price, mrp:p.mrp||'', stock_qty:p.stock_qty, description:p.description||'', is_active: p.is_active !== false }); setVariants(p.variants||[{qty:'',price:''}]); setImages(p.images||[]); setEditId(p.id); setModal(true); }
 
   async function save() {
     try {
@@ -99,11 +99,15 @@ export default function AdminProducts() {
                     <td style={{ color:'var(--atx2)' }}>{p.category_name||'—'}</td>
                     <td style={{ fontWeight:700, color:'var(--apri)' }}>₹{Number(p.selling_price).toLocaleString('en-IN')}</td>
                     <td>
-                      <span style={{ fontWeight:700, color: p.stock_quantity<=0?'#dc2626':p.stock_quantity<=10?'#ea580c':'var(--atx)' }}>
-                        {p.stock_quantity}
+                      <span style={{ fontWeight:700, color: p.stock_qty<=0?'#dc2626':p.stock_qty<=10?'#ea580c':'var(--atx)' }}>
+                        {p.stock_qty ?? 0}
                       </span>
                     </td>
-                    <td><StatusBadge status={p.status==='active'?'Delivered':'Cancelled'} /></td>
+                    <td>
+                      <span style={{ fontSize:12, fontWeight:700, padding:'3px 10px', borderRadius:20, background: p.is_active!==false?'#f0fdf4':'#fef2f2', color: p.is_active!==false?'#16a34a':'#dc2626' }}>
+                        {p.is_active!==false?'Active':'Inactive'}
+                      </span>
+                    </td>
                     <td><RowActions onEdit={()=>openEdit(p)} onDelete={()=>setDelId(p.id)} /></td>
                   </motion.tr>
                 ))
@@ -128,10 +132,10 @@ export default function AdminProducts() {
             <div className="a-fg"><label>Brand</label><input className="a-input" value={form.brand} onChange={e=>f('brand',e.target.value)} placeholder="Brand name" /></div>
             <div className="a-fg"><label>SKU</label><input className="a-input" value={form.sku} onChange={e=>f('sku',e.target.value)} placeholder="SKU code" /></div>
             <div className="a-fg"><label>Selling Price (₹) *</label><input className="a-input" type="number" value={form.selling_price} onChange={e=>f('selling_price',e.target.value)} /></div>
-            <div className="a-fg"><label>Stock Quantity *</label><input className="a-input" type="number" value={form.stock_quantity} onChange={e=>f('stock_quantity',e.target.value)} /></div>
+            <div className="a-fg"><label>Stock Quantity *</label><input className="a-input" type="number" value={form.stock_qty} onChange={e=>f('stock_qty',e.target.value)} /></div>
             <div className="a-fg full"><label>Description</label><textarea className="a-input" rows={3} value={form.description} onChange={e=>f('description',e.target.value)} style={{ resize:'vertical' }} /></div>
             <div className="a-fg"><label>Status</label>
-              <select className="a-input a-select" value={form.status} onChange={e=>f('status',e.target.value)}>
+              <select className="a-input a-select" value={form.is_active ? 'active' : 'inactive'} onChange={e=>f('is_active', e.target.value==='active')}>
                 <option value="active">Active</option><option value="inactive">Inactive</option>
               </select>
             </div>
@@ -186,14 +190,14 @@ export default function AdminProducts() {
 }
 
 const MOCK_PRODUCTS = [
-  { id:1, name:'Hybrid Tomato Seeds F1 (10g)', brand_name:'Syngenta', category_name:'Seeds', selling_price:299, stock_quantity:48, sku:'SYN-TOM-F1', status:'active', primary_image:'' },
-  { id:2, name:'NPK 19:19:19 Fertilizer 1kg', brand_name:'IFFCO', category_name:'Fertilizers', selling_price:185, stock_quantity:8, sku:'IFFCO-NPK', status:'active', primary_image:'' },
-  { id:3, name:'Neem Oil 10000 PPM 1L', brand_name:'Anand Agro', category_name:'Organic', selling_price:840, stock_quantity:32, sku:'AA-NEEM', status:'active', primary_image:'' },
-  { id:4, name:'Imidacloprid 17.8% SL 500ml', brand_name:'Bayer', category_name:'Pesticides', selling_price:420, stock_quantity:0, sku:'BAY-IMI', status:'inactive', primary_image:'' },
-  { id:5, name:'Drip Irrigation Kit 1 Acre', brand_name:'Jain Irrigation', category_name:'Irrigation', selling_price:3499, stock_quantity:3, sku:'JI-DRIP', status:'active', primary_image:'' },
-  { id:6, name:'Humic Acid 98% 300g', brand_name:'Noble Crop', category_name:'Organic', selling_price:261, stock_quantity:22, sku:'NC-HUM', status:'active', primary_image:'' },
-  { id:7, name:'Sprinkler Set 16mm', brand_name:'Netafim', category_name:'Irrigation', selling_price:580, stock_quantity:15, sku:'NF-SPR', status:'active', primary_image:'' },
-  { id:8, name:'Garden Trowel Set', brand_name:'Kisan', category_name:'Tools', selling_price:199, stock_quantity:40, sku:'KS-TRW', status:'active', primary_image:'' },
-  { id:9, name:'Coco Peat 5kg Brick', brand_name:'AgriGold', category_name:'Organic', selling_price:120, stock_quantity:60, sku:'AG-CP5', status:'active', primary_image:'' },
-  { id:10, name:'Bird Food Mix 1kg', brand_name:'PetVet', category_name:'Animal Care', selling_price:95, stock_quantity:25, sku:'PV-BF1', status:'active', primary_image:'' },
+  { id:1, name:'Hybrid Tomato Seeds F1 (10g)', brand_name:'Syngenta', category_name:'Seeds', selling_price:299, stock_qty:48, sku:'SYN-TOM-F1', is_active:true, primary_image:'' },
+  { id:2, name:'NPK 19:19:19 Fertilizer 1kg', brand_name:'IFFCO', category_name:'Fertilizers', selling_price:185, stock_qty:8, sku:'IFFCO-NPK', is_active:true, primary_image:'' },
+  { id:3, name:'Neem Oil 10000 PPM 1L', brand_name:'Anand Agro', category_name:'Organic', selling_price:840, stock_qty:32, sku:'AA-NEEM', is_active:true, primary_image:'' },
+  { id:4, name:'Imidacloprid 17.8% SL 500ml', brand_name:'Bayer', category_name:'Pesticides', selling_price:420, stock_qty:0, sku:'BAY-IMI', is_active:false, primary_image:'' },
+  { id:5, name:'Drip Irrigation Kit 1 Acre', brand_name:'Jain Irrigation', category_name:'Irrigation', selling_price:3499, stock_qty:3, sku:'JI-DRIP', is_active:true, primary_image:'' },
+  { id:6, name:'Humic Acid 98% 300g', brand_name:'Noble Crop', category_name:'Organic', selling_price:261, stock_qty:22, sku:'NC-HUM', is_active:true, primary_image:'' },
+  { id:7, name:'Sprinkler Set 16mm', brand_name:'Netafim', category_name:'Irrigation', selling_price:580, stock_qty:15, sku:'NF-SPR', is_active:true, primary_image:'' },
+  { id:8, name:'Garden Trowel Set', brand_name:'Kisan', category_name:'Tools', selling_price:199, stock_qty:40, sku:'KS-TRW', is_active:true, primary_image:'' },
+  { id:9, name:'Coco Peat 5kg Brick', brand_name:'AgriGold', category_name:'Organic', selling_price:120, stock_qty:60, sku:'AG-CP5', is_active:true, primary_image:'' },
+  { id:10, name:'Bird Food Mix 1kg', brand_name:'PetVet', category_name:'Animal Care', selling_price:95, stock_qty:25, sku:'PV-BF1', is_active:true, primary_image:'' },
 ];

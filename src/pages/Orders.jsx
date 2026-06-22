@@ -4,9 +4,9 @@ import { useAuth } from '../context/AuthContext';
 import { useToast } from '../components/Toast';
 import api from '../api';
 
-const STATUS_STEPS = ['PLACED','CONFIRMED','PACKED','SHIPPED','OUT_FOR_DELIVERY','DELIVERED'];
-const STATUS_LABELS = { PLACED:'🛒 Order Placed', CONFIRMED:'✅ Order Confirmed', PACKED:'📦 Packed & Ready', SHIPPED:'🚚 Shipped', OUT_FOR_DELIVERY:'🛵 Out for Delivery', DELIVERED:'🎉 Delivered', CANCELLED:'❌ Cancelled', RETURNED:'↩️ Returned' };
-const STATUS_CSS = { PLACED:'status-PLACED', CONFIRMED:'status-CONFIRMED', PACKED:'status-PACKED', SHIPPED:'status-SHIPPED', OUT_FOR_DELIVERY:'status-OUT_FOR_DELIVERY', DELIVERED:'status-DELIVERED', CANCELLED:'status-CANCELLED', RETURNED:'status-RETURNED' };
+const STATUS_STEPS = ['placed','confirmed','packed','shipped','out_for_delivery','delivered'];
+const STATUS_LABELS = { placed:'🛒 Order Placed', confirmed:'✅ Order Confirmed', packed:'📦 Packed & Ready', shipped:'🚚 Shipped', out_for_delivery:'🛵 Out for Delivery', delivered:'🎉 Delivered', cancelled:'❌ Cancelled', returned:'↩️ Returned' };
+const STATUS_CSS = { placed:'status-PLACED', confirmed:'status-CONFIRMED', packed:'status-PACKED', shipped:'status-SHIPPED', out_for_delivery:'status-OUT_FOR_DELIVERY', delivered:'status-DELIVERED', cancelled:'status-CANCELLED', returned:'status-RETURNED' };
 const FALLBACK_IMG = 'https://images.unsplash.com/photo-1574943320219-553eb213f72d?w=200&q=80';
 
 export default function Orders() {
@@ -50,7 +50,7 @@ export default function Orders() {
       <h1>📦 My Orders</h1>
 
       <div className="order-filter">
-        {['', 'PLACED', 'CONFIRMED', 'SHIPPED', 'DELIVERED', 'CANCELLED'].map(s => (
+        {['', 'placed', 'confirmed', 'shipped', 'delivered', 'cancelled'].map(s => (
           <button key={s} className={'of-btn' + (statusFilter === s ? ' active' : '')} onClick={() => { setStatusFilter(s); loadOrders(s); }}>
             {s || 'All'}
           </button>
@@ -68,8 +68,8 @@ export default function Orders() {
         </div>
       ) : (
         orders.map(o => {
-          const date = new Date(o.placed_at).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
-          const canCancel = ['PLACED', 'CONFIRMED'].includes(o.order_status);
+          const date = new Date(o.created_at).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
+          const canCancel = ['placed', 'confirmed'].includes(o.order_status);
           return (
             <div key={o.id} className="order-card">
               <div className="order-card-header">
@@ -83,20 +83,20 @@ export default function Orders() {
                 {(o.items || []).map((item, i) => (
                   <div key={i} className="order-item-row">
                     <img src={item.product_image || FALLBACK_IMG} alt={item.product_name} onError={e => e.target.src = FALLBACK_IMG} />
-                    <div><h5>{item.product_name}</h5><span>Qty: {item.quantity} • ₹{Number(item.unit_price).toLocaleString('en-IN')} each</span></div>
-                    <span className="item-price">₹{Number(item.total_price).toLocaleString('en-IN')}</span>
+                    <div><h5>{item.product_name}</h5><span>Qty: {item.quantity} • ₹{Number(item.price).toLocaleString('en-IN')} each</span></div>
+                    <span className="item-price">₹{Number(item.total).toLocaleString('en-IN')}</span>
                   </div>
                 ))}
               </div>
               <div className="order-card-footer">
                 <div>
                   <div className="order-total">Total: ₹{Number(o.total_amount).toLocaleString('en-IN')}</div>
-                  <div style={{ fontSize: 12, color: '#888', marginTop: 2 }}>{o.payment_method} • {o.payment_status}</div>
+                  <div style={{ fontSize: 12, color: '#888', marginTop: 2 }}>{o.payment_status}</div>
                 </div>
                 <div className="order-actions">
                   <button className="oa-btn primary" onClick={() => setTrackOrder(o)}>📍 Track</button>
                   {canCancel && <button className="oa-btn danger" onClick={() => cancelOrder(o.id)}>✕ Cancel</button>}
-                  {o.order_status === 'DELIVERED' && <button className="oa-btn primary" onClick={() => navigate('/categories')}>🔄 Buy Again</button>}
+                  {o.order_status === 'delivered' && <button className="oa-btn primary" onClick={() => navigate('/categories')}>🔄 Buy Again</button>}
                 </div>
               </div>
             </div>
@@ -115,7 +115,7 @@ export default function Orders() {
             <div style={{ background: '#e8f5e9', borderRadius: 10, padding: '12px 16px', marginBottom: 20, fontSize: 13 }}>
               <b>{trackOrder.order_number}</b> • ₹{Number(trackOrder.total_amount).toLocaleString('en-IN')}
             </div>
-            {trackOrder.order_status === 'CANCELLED' ? (
+            {trackOrder.order_status === 'cancelled' ? (
               <div className="track-step">
                 <div className="track-left"><div className="track-dot" style={{ background: '#e53935' }} /></div>
                 <div className="track-info"><h5>❌ Order Cancelled</h5><p>This order has been cancelled.</p></div>

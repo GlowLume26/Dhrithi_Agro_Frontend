@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import { AreaChart, Area, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import AdminLayout from '../layouts/AdminLayout';
 import { KpiCard, Skel, StatusBadge, PageHeader } from '../components/AdminUI';
+import adminApi from '../services/adminApi';
 
 const REVENUE_DATA = [
   { month:'Aug', revenue:280000 }, { month:'Sep', revenue:320000 }, { month:'Oct', revenue:290000 },
@@ -38,7 +39,32 @@ const KPIS = [
 export default function AdminDashboard() {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
-  useEffect(() => { setTimeout(() => setLoading(false), 800); }, []);
+  const [stats, setStats]     = useState(null);
+  const [recentOrders, setRecentOrders] = useState(RECENT_ORDERS);
+  const [revenue, setRevenue]           = useState(REVENUE_DATA);
+
+  useEffect(() => {
+    adminApi.getDashboard()
+      .then(res => {
+        if (res.success && res.data) {
+          const d = res.data;
+          if (d.stats) setStats(d.stats);
+          if (d.recentOrders?.length) setRecentOrders(d.recentOrders);
+          if (d.monthlyRevenue?.length) setRevenue(d.monthlyRevenue.map(r => ({ month: r.month, revenue: Number(r.revenue) })));
+        }
+      })
+      .catch(() => {})
+      .finally(() => setLoading(false));
+  }, []);
+
+  const kpis = [
+    { icon:'📦', label:'Total Products',   value: stats ? Number(stats.total_products).toLocaleString('en-IN')   : KPIS[0].value, change: KPIS[0].change, changeUp:true,  iconBg:'#f0fdf4' },
+    { icon:'🛒', label:'Total Orders',     value: stats ? Number(stats.total_orders).toLocaleString('en-IN')     : KPIS[1].value, change: KPIS[1].change, changeUp:true,  iconBg:'#eff6ff' },
+    { icon:'💰', label:'Revenue',          value: stats ? '₹' + Number(stats.total_revenue).toLocaleString('en-IN') : KPIS[3].value, change: KPIS[3].change, changeUp:true, iconBg:'#f0fdf4' },
+    { icon:'👥', label:'Total Customers',  value: stats ? Number(stats.total_customers).toLocaleString('en-IN')  : KPIS[4].value, change: KPIS[4].change, changeUp:true,  iconBg:'#fdf4ff' },
+    { icon:'🏪', label:'Active Vendors',   value: stats ? Number(stats.total_vendors).toLocaleString('en-IN')    : '—',            change: '',              changeUp:true,  iconBg:'#f0fdf4' },
+    { icon:'⏳', label:'Pending Vendors',  value: stats ? Number(stats.pending_vendors).toLocaleString('en-IN')  : '—',            change: 'Awaiting review', changeUp:false, iconBg:'#fff7ed' },
+  ];
 
   return (
     <AdminLayout>
@@ -48,7 +74,7 @@ export default function AdminDashboard() {
       <div className="a-kpi-grid">
         {loading
           ? [0,1,2,3,4,5].map(i => <div key={i} className="a-kpi"><Skel h={60} /><Skel h={46} w={46} r={12} /></div>)
-          : KPIS.map((k,i) => <KpiCard key={k.label} {...k} delay={i*0.06} />)
+          : kpis.map((k,i) => <KpiCard key={k.label} {...k} delay={i*0.06} />)
         }
       </div>
 
@@ -63,7 +89,7 @@ export default function AdminDashboard() {
           </div>
           <div className="a-chart-wrap">
             <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={REVENUE_DATA}>
+              <AreaChart data={revenue}>
                 <defs>
                   <linearGradient id="revGrad" x1="0" y1="0" x2="0" y2="1">
                     <stop offset="5%" stopColor="#2e7d32" stopOpacity={0.25}/>
@@ -110,13 +136,13 @@ export default function AdminDashboard() {
             <table className="a-table">
               <thead><tr><th>Order ID</th><th>Customer</th><th>Amount</th><th>Status</th><th>Date</th></tr></thead>
               <tbody>
-                {RECENT_ORDERS.map(o => (
-                  <tr key={o.id} style={{ cursor:'pointer' }} onClick={()=>navigate('/admin/orders')}>
-                    <td style={{ fontWeight:700, color:'var(--apri)' }}>{o.id}</td>
-                    <td>{o.customer}</td>
-                    <td style={{ fontWeight:700 }}>{o.amount}</td>
-                    <td><StatusBadge status={o.status} /></td>
-                    <td style={{ color:'var(--atx2)' }}>{o.date}</td>
+                {recentOrders.map(o => (
+                  <tr key={o.id || o.order_number} style={{ cursor:'pointer' }} onClick={()=>navigate('/admin/orders')}>
+                    <td style={{ fontWeight:700, color:'var(--apri)' }}>#{o.order_number}</td>
+                    <td>{o.customer_name || o.customer}</td>
+                    <td style={{ fontWeight:700 }}>₹{Number(o.final_amount || o.amount?.replace(/[₹,]/g,'')||0).toLocaleString('en-IN')}</td>
+                    <td><StatusBadge status={o.order_status || o.status} /></td>
+                    <td style={{ color:'var(--atx2)' }}>{o.created_at ? new Date(o.created_at).toLocaleDateString('en-IN',{day:'numeric',month:'short'}) : o.date}</td>
                   </tr>
                 ))}
               </tbody>

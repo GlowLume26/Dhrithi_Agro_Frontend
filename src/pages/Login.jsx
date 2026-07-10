@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import '../auth.css';
 
-const API_BASE = import.meta.env.VITE_API_BASE || 'http://localhost/drithi-agro-latest/Dhrithi_Agro_Backend/index.php?route=';
+const API_BASE = import.meta.env.VITE_API_BASE || '/drithi-agro-backend/index.php?route=';
 export default function Login() {
   const navigate = useNavigate();
   const { saveAuth } = useAuth();   // ← removed isLoggedIn

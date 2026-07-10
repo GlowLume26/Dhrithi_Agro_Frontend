@@ -1,51 +1,40 @@
 import axios from 'axios';
 
-const BASE = import.meta.env.VITE_API_BASE || 'http://localhost:8001/index.php?route=';
+const BASE = import.meta.env.VITE_API_BASE || '/drithi-agro-backend/index.php?route=';
 
-const http = axios.create({ baseURL: BASE });
+const url = (route) => BASE + route;
 
-http.interceptors.request.use(cfg => {
+const authHeader = () => {
   const token = localStorage.getItem('da_admin_token');
-  if (token) cfg.headers.Authorization = `Bearer ${token}`;
-  return cfg;
-});
+  return token ? { Authorization: `Bearer ${token}` } : {};
+};
 
-http.interceptors.response.use(
-  r => r.data,
-  err => Promise.reject(err?.response?.data || err)
-);
+const cfg = () => ({ headers: authHeader() });
 
 const qs = p => new URLSearchParams(p).toString();
 
 export const adminApi = {
-  // Admin login with email/mobile + password
-  login: (email, password) => http.post(`auth`, { action: 'admin_login', email, password }),
+  login: (email, password) => fetch(url('auth'), { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'admin_login', email, password }) }).then(r => r.json()),
 
-  // Dashboard
-  getDashboard: () => http.get(`admin&section=dashboard`),
+  getDashboard: () => axios.get(url('admin&section=dashboard'), cfg()).then(r => r.data),
 
-  // Vendors
-  getVendors:    (params={}) => http.get(`admin&section=vendors&${qs(params)}`),
-  approveVendor: (id)        => http.put(`admin&action=approve&id=${id}`, {}),
-  rejectVendor:  (id, reason)=> http.put(`admin&action=reject&id=${id}`, { reason }),
+  getVendors:    (params={}) => axios.get(url(`admin&section=vendors&${qs(params)}`), cfg()).then(r => r.data),
+  approveVendor: (id)        => axios.put(url(`admin&action=approve&id=${id}`), {}, cfg()).then(r => r.data),
+  rejectVendor:  (id, reason)=> axios.put(url(`admin&action=reject&id=${id}`), { reason }, cfg()).then(r => r.data),
 
-  // Products
-  getProducts:   (params={}) => http.get(`products&${qs(params)}`),
-  getProduct:    (id)        => http.get(`products&id=${id}`),
-  createProduct: (data)      => http.post(`products`, data),
-  updateProduct: (id, data)  => http.put(`products&id=${id}`, data),
-  deleteProduct: (id)        => http.delete(`products&id=${id}`),
+  getProducts:   (params={}) => axios.get(url(`products&${qs(params)}`), cfg()).then(r => r.data),
+  getProduct:    (id)        => axios.get(url(`products&id=${id}`), cfg()).then(r => r.data),
+  createProduct: (data)      => axios.post(url('products'), data, cfg()).then(r => r.data),
+  updateProduct: (id, data)  => axios.put(url(`products&id=${id}`), data, cfg()).then(r => r.data),
+  deleteProduct: (id)        => axios.delete(url(`products&id=${id}`), cfg()).then(r => r.data),
 
-  // Orders (admin)
-  getOrders:         (params={}) => http.get(`admin&section=orders&${qs(params)}`),
-  updateOrderStatus: (id, status)=> http.put(`admin&section=orders&id=${id}`, { status }),
+  getOrders:         (params={}) => axios.get(url(`admin&section=orders&${qs(params)}`), cfg()).then(r => r.data),
+  updateOrderStatus: (id, status)=> axios.put(url(`admin&section=orders&id=${id}`), { status }, cfg()).then(r => r.data),
 
-  // Customers
-  getCustomers: (params={}) => http.get(`admin&section=customers&${qs(params)}`),
+  getCustomers: (params={}) => axios.get(url(`admin&section=customers&${qs(params)}`), cfg()).then(r => r.data),
 
-  // Categories & Brands
-  getCategories: () => http.get(`categories`),
-  getBrands:     () => http.get(`brands`),
+  getCategories: () => axios.get(url('categories'), cfg()).then(r => r.data),
+  getBrands:     () => axios.get(url('brands'), cfg()).then(r => r.data),
 };
 
 export default adminApi;

@@ -7,7 +7,7 @@ export default defineConfig({
   server: {
     port: 3000,
     proxy: {
-      '/drithi-agro/backend': {
+      '/drithi-agro-backend': {
         target: 'http://localhost',
         changeOrigin: true,
       }

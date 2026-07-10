@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 const CARDS = [
@@ -90,27 +90,10 @@ function StatItem({ icon, target, suffix, label, decimal, active }) {
 
 export default function EverythingWeOffer() {
   const navigate = useNavigate();
-  const [cur, setCur] = useState(0);
   const [statsVisible, setStatsVisible] = useState(false);
   const [cardVisible, setCardVisible] = useState(false);
-  const timerRef = useRef(null);
   const sectionRef = useRef(null);
   const statsRef = useRef(null);
-  const total = CARDS.length;
-
-  const go = useCallback((n) => setCur((n + total) % total), [total]);
-
-  // Auto-slide
-  useEffect(() => {
-    timerRef.current = setInterval(() => setCur(c => (c + 1) % total), 4000);
-    return () => clearInterval(timerRef.current);
-  }, [total]);
-
-  const resetTimer = (n) => {
-    clearInterval(timerRef.current);
-    go(n);
-    timerRef.current = setInterval(() => setCur(c => (c + 1) % total), 4000);
-  };
 
   // Scroll reveal — cards
   useEffect(() => {
@@ -126,8 +109,6 @@ export default function EverythingWeOffer() {
     return () => obs.disconnect();
   }, []);
 
-  const c = CARDS[cur];
-
   return (
     <section className="ewo-section" aria-label="Everything We Offer" ref={sectionRef}>
       {/* Background decorations */}
@@ -142,93 +123,61 @@ export default function EverythingWeOffer() {
         <p className="ewo-subtitle">Grow, sell and succeed — all in one marketplace for Indian farmers</p>
       </div>
 
-      {/* Slider wrapper */}
-      <div className="ewo-slider-wrap" role="region" aria-label="Offer cards slider">
-        <div
-          className="ewo-slider"
-          style={{ transform: `translateX(-${cur * 100}%)` }}
-        >
-          {CARDS.map((card, i) => (
+      {/* Cards grid */}
+      <div className="ewo-cards-grid" role="region" aria-label="Offer cards">
+        {CARDS.map((card, i) => (
+          <div
+            key={card.id}
+            className={`ewo-card-wrapper${cardVisible ? ' ewo-fade-up' : ''}`}
+            style={{ animationDelay: `${i * 0.12}s` }}
+          >
             <div
-              key={card.id}
-              className={`ewo-slide${cardVisible ? ' ewo-fade-up' : ''}`}
-              style={{ animationDelay: `${i * 0.12}s` }}
-              aria-hidden={i !== cur}
+              className="ewo-card"
+              style={{ background: card.grad }}
+              tabIndex={0}
+              role="article"
+              aria-label={card.title}
+              onKeyDown={e => e.key === 'Enter' && navigate(card.to)}
             >
-              <div
-                className="ewo-card"
-                style={{ background: card.grad }}
-                tabIndex={0}
-                role="article"
-                aria-label={card.title}
-                onKeyDown={e => e.key === 'Enter' && navigate(card.to)}
-              >
-                {/* Floating circles */}
-                <div className="ewo-circle ewo-circle-1" style={{ background: card.c1 }} aria-hidden="true" />
-                <div className="ewo-circle ewo-circle-2" style={{ background: card.c2 }} aria-hidden="true" />
-                <div className="ewo-circle ewo-circle-3" style={{ background: card.c1 }} aria-hidden="true" />
+              {/* Floating circles */}
+              <div className="ewo-circle ewo-circle-1" style={{ background: card.c1 }} aria-hidden="true" />
+              <div className="ewo-circle ewo-circle-2" style={{ background: card.c2 }} aria-hidden="true" />
+              <div className="ewo-circle ewo-circle-3" style={{ background: card.c1 }} aria-hidden="true" />
 
-                {/* Ribbon */}
-                {card.ribbon && (
-                  <div className="ewo-ribbon" aria-label="Limited Time offer">{card.ribbon}</div>
-                )}
+              {/* Ribbon */}
+              {card.ribbon && (
+                <div className="ewo-ribbon" aria-label="Limited Time offer">{card.ribbon}</div>
+              )}
 
-                {/* Badge */}
-                <div className={`ewo-badge${card.id === 1 ? ' ewo-badge-pulse' : ''}`}>
-                  {card.badgeIcon && <span>{card.badgeIcon}</span>}
-                  {card.badge}
+              {/* Badge */}
+              <div className={`ewo-badge${card.id === 1 ? ' ewo-badge-pulse' : ''}`}>
+                {card.badgeIcon && <span>{card.badgeIcon}</span>}
+                {card.badge}
+              </div>
+
+              {/* Content */}
+              <div className="ewo-card-body">
+                <div className={`ewo-icon${card.id === 1 ? ' ewo-icon-float' : ''}`} aria-hidden="true">
+                  {card.icon}
                 </div>
-
-                {/* Content */}
-                <div className="ewo-card-body">
-                  <div className={`ewo-icon${card.id === 1 ? ' ewo-icon-float' : ''}`} aria-hidden="true">
-                    {card.icon}
-                  </div>
-                  <h3 className="ewo-card-title">{card.title}</h3>
-                  <p className="ewo-card-desc">{card.desc}</p>
-                  <ul className="ewo-benefits" aria-label="Benefits">
-                    {card.benefits.map((b, j) => (
-                      <li key={j} style={{ animationDelay: `${j * 0.08 + 0.3}s` }}>{b}</li>
-                    ))}
-                  </ul>
-                  <button
-                    className="ewo-btn"
-                    style={{ '--glow': card.glow }}
-                    onClick={() => navigate(card.to)}
-                    aria-label={`${card.btnTxt} - ${card.title}`}
-                  >
-                    {card.btnTxt}
-                  </button>
-                </div>
+                <h3 className="ewo-card-title">{card.title}</h3>
+                <p className="ewo-card-desc">{card.desc}</p>
+                <ul className="ewo-benefits" aria-label="Benefits">
+                  {card.benefits.map((b, j) => (
+                    <li key={j} style={{ animationDelay: `${j * 0.08 + 0.3}s` }}>{b}</li>
+                  ))}
+                </ul>
+                <button
+                  className="ewo-btn"
+                  style={{ '--glow': card.glow }}
+                  onClick={() => navigate(card.to)}
+                  aria-label={`${card.btnTxt} - ${card.title}`}
+                >
+                  {card.btnTxt}
+                </button>
               </div>
             </div>
-          ))}
-        </div>
-
-        {/* Arrows */}
-        <button
-          className="ewo-arrow ewo-arrow-prev"
-          onClick={() => resetTimer(cur - 1)}
-          aria-label="Previous offer"
-        >‹</button>
-        <button
-          className="ewo-arrow ewo-arrow-next"
-          onClick={() => resetTimer(cur + 1)}
-          aria-label="Next offer"
-        >›</button>
-      </div>
-
-      {/* Dots */}
-      <div className="ewo-dots" role="tablist" aria-label="Slide navigation">
-        {CARDS.map((_, i) => (
-          <button
-            key={i}
-            className={`ewo-dot${cur === i ? ' active' : ''}`}
-            onClick={() => resetTimer(i)}
-            role="tab"
-            aria-selected={cur === i}
-            aria-label={`Go to slide ${i + 1}`}
-          />
+          </div>
         ))}
       </div>
 

@@ -1,4 +1,4 @@
-const API_BASE = 'http://localhost/drithi-agro/backend/index.php?route=';
+const API_BASE = '/drithi-agro-backend/index.php?route=';
 
 const token = () => localStorage.getItem('da_token');
 

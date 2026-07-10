@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useAdminAuth } from '../context/AdminAuthContext';
+import { adminApi } from '../services/adminApi';
 import '../admin.css';
 
 export default function AdminLogin() {
@@ -19,17 +20,17 @@ export default function AdminLogin() {
     if (!email || !pass) { setErr('Please enter email and password.'); return; }
     setLoading(true); setErr('');
     try {
-      // Demo bypass — real API: adminApi.login(email,pass)
-      if (email === 'owner@drithiagro.com' && pass === 'admin123') {
-        login('demo-jwt-token', { name:'Admin Owner', email, role:'owner' });
-        navigate('/admin/dashboard');
-      } else if (email === 'admin@drithiagro.com' && pass === 'admin123') {
-        login('demo-jwt-token', { name:'Admin', email, role:'admin' });
+      const res = await adminApi.login(email, pass);
+      console.log(res);
+      if (res.success) {
+        login(res.data.token, res.data.user);
         navigate('/admin/dashboard');
       } else {
-        setErr('Invalid credentials. Try owner@drithiagro.com / admin123');
+        setErr(res.message || 'Invalid credentials.');
       }
-    } catch { setErr('Login failed. Please try again.'); }
+    } catch (err) {
+      setErr(err.message || 'Login failed. Please try again.');
+    }
     setLoading(false);
   }
 
@@ -60,8 +61,8 @@ export default function AdminLogin() {
           )}
 
           <div>
-            <label style={{ fontSize:12, fontWeight:700, color:'#94a3b8', textTransform:'uppercase', letterSpacing:0.8, display:'block', marginBottom:6 }}>Email Address</label>
-            <input value={email} onChange={e=>setEmail(e.target.value)} type="email" placeholder="admin@drithiagro.com"
+            <label style={{ fontSize:12, fontWeight:700, color:'#94a3b8', textTransform:'uppercase', letterSpacing:0.8, display:'block', marginBottom:6 }}>Email or Mobile</label>
+            <input value={email} onChange={e=>setEmail(e.target.value)} type="text" placeholder="admin@drithiagro.com or 9999999999"
               style={{ width:'100%', padding:'11px 14px', background:'rgba(255,255,255,0.06)', border:'1.5px solid rgba(255,255,255,0.1)', borderRadius:10, color:'#f8fafc', fontSize:14, outline:'none' }}
               onFocus={e=>e.target.style.borderColor='#4caf50'} onBlur={e=>e.target.style.borderColor='rgba(255,255,255,0.1)'} />
           </div>
@@ -90,10 +91,6 @@ export default function AdminLogin() {
         </form>
 
         <p style={{ textAlign:'center', fontSize:11, color:'#475569', marginTop:20 }}>🔒 Secured with JWT Authentication · All access is logged</p>
-        <div style={{ marginTop:16, padding:'12px 14px', background:'rgba(46,125,50,0.1)', borderRadius:10, fontSize:12, color:'#86efac' }}>
-          <b>Demo:</b> owner@drithiagro.com / admin123 (full access)<br/>
-          <b>Demo:</b> admin@drithiagro.com / admin123 (limited)
-        </div>
       </motion.div>
     </div>
   );

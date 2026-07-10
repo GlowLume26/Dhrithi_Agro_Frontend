@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const BASE = 'http://localhost/drithi-agro/backend/index.php?route=';
+const BASE = import.meta.env.VITE_API_BASE || 'http://localhost:8001/index.php?route=';
 
 const http = axios.create({ baseURL: BASE });
 
@@ -18,8 +18,8 @@ http.interceptors.response.use(
 const qs = p => new URLSearchParams(p).toString();
 
 export const adminApi = {
-  // Auth — demo bypass in AdminLogin, no real endpoint needed
-  login: (email, password) => http.post(`auth`, { action: 'verify_otp', email, otp: password }),
+  // Admin login with email/mobile + password
+  login: (email, password) => http.post(`auth`, { action: 'admin_login', email, password }),
 
   // Dashboard
   getDashboard: () => http.get(`admin&section=dashboard`),

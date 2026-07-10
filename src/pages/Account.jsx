@@ -13,8 +13,31 @@ export default function Account() {
   const [saving, setSaving] = useState(false);
   const [saveMsg, setSaveMsg] = useState(null);
   const [showAddForm, setShowAddForm] = useState(false);
-  const [form, setForm] = useState({ full_name: '', email: '', dob: '', gender: '', occupation: '', farm_size: '', primary_crop: '' });
-  const [addrForm, setAddrForm] = useState({ full_name: '', mobile: '', address_line1: '', address_line2: '', city: '', state: '', pincode: '', address_type: 'HOME' });
+
+  // Initialize form using values from localStorage (da_user) as a fallback
+  const [form, setForm] = useState(() => {
+    const stored = JSON.parse(localStorage.getItem('da_user') || '{}');
+    return {
+      full_name: stored.name || stored.full_name || '',
+      email: stored.email || '',
+      dob: '',
+      gender: '',
+      occupation: '',
+      farm_size: '',
+      primary_crop: ''
+    };
+  });
+
+  const [addrForm, setAddrForm] = useState({
+    full_name: '',
+    mobile: '',
+    address_line1: '',
+    address_line2: '',
+    city: '',
+    state: '',
+    pincode: '',
+    address_type: 'HOME'
+  });
 
   useEffect(() => {
     if (!isLoggedIn) return;
@@ -23,18 +46,61 @@ export default function Account() {
       const d = res.data;
       setProfile(d);
       setStats(d.stats || {});
-      setForm({ full_name: d.full_name || '', email: d.email || '', dob: d.dob || '', gender: d.gender || '', occupation: d.occupation || '', farm_size: d.farm_size || '', primary_crop: d.primary_crop || '' });
+      setForm({
+        full_name: d.full_name || '',
+        email: d.email || '',
+        dob: d.dob || '',
+        gender: d.gender || '',
+        occupation: d.occupation || '',
+        farm_size: d.farm_size || '',
+        primary_crop: d.primary_crop || ''
+      });
     });
     api.get('customer', { section: 'addresses' }).then(res => res.success && setAddresses(res.data || []));
   }, [isLoggedIn]);
+
+  // Dynamic Profile Completion Calculation Helper
+  const getCompletionPercentage = () => {
+    const fields = [
+      form.full_name,
+      form.email,
+      profile?.mobile || user?.mobile,
+      form.dob,
+      form.gender,
+      form.occupation,
+      form.farm_size,
+      form.primary_crop
+    ];
+    const filledFields = fields.filter(val => val !== null && val !== undefined && String(val).trim() !== '');
+    return Math.round((filledFields.length / fields.length) * 100);
+  };
 
   async function saveProfile() {
     setSaving(true);
     const res = await api.put('customer', form, { section: 'profile' });
     setSaveMsg(res.success ? { t: 'ok', m: '✅ Profile updated successfully!' } : { t: 'err', m: '❌ ' + (res.message || 'Update failed.') });
     if (res.success) {
+      if (res.data) {
+        setProfile(res.data);
+      } else {
+        // Safe UI fallback state sync if backend returns null
+        setProfile(prev => ({
+          ...prev,
+          full_name: form.full_name,
+          email: form.email,
+          dob: form.dob,
+          gender: form.gender,
+          occupation: form.occupation,
+          farm_size: form.farm_size,
+          primary_crop: form.primary_crop
+        }));
+      }
+
+      // Update localStorage (da_user) to stay persistent
       const u = JSON.parse(localStorage.getItem('da_user') || '{}');
+      u.name = form.full_name;
       u.full_name = form.full_name;
+      u.email = form.email;
       localStorage.setItem('da_user', JSON.stringify(u));
     }
     setTimeout(() => setSaveMsg(null), 3000);
@@ -42,10 +108,18 @@ export default function Account() {
   }
 
   async function saveAddress() {
-    if (!addrForm.full_name || !addrForm.mobile || !addrForm.address_line1 || !addrForm.city || !addrForm.state || !addrForm.pincode) { alert('Please fill all required fields.'); return; }
+    if (!addrForm.full_name || !addrForm.mobile || !addrForm.address_line1 || !addrForm.city || !addrForm.state || !addrForm.pincode) {
+      alert('Please fill all required fields.');
+      return;
+    }
     const res = await api.post('customer', addrForm, { section: 'addresses' });
-    if (res.success) { setShowAddForm(false); api.get('customer', { section: 'addresses' }).then(r => r.success && setAddresses(r.data || [])); }
-    else alert(res.message || 'Failed to save address.');
+    if (res.success) {
+      setShowAddForm(false);
+      setAddrForm({ full_name: '', mobile: '', address_line1: '', address_line2: '', city: '', state: '', pincode: '', address_type: 'HOME' });
+      api.get('customer', { section: 'addresses' }).then(r => r.success && setAddresses(r.data || []));
+    } else {
+      alert(res.message || 'Failed to save address.');
+    }
   }
 
   async function deleteAddress(id) {
@@ -68,7 +142,7 @@ export default function Account() {
     </div>
   );
 
-  const initial = (profile?.full_name || user?.full_name || '?').charAt(0).toUpperCase();
+  const initial = (profile?.full_name || user?.name || user?.full_name || '?').charAt(0).toUpperCase();
 
   return (
     <>
@@ -80,16 +154,16 @@ export default function Account() {
         <div className="account-sidebar">
           <div className="profile-card">
             <div className="profile-avatar">{initial}</div>
-            <div className="profile-name">{profile?.full_name || '—'}</div>
-            <div className="profile-phone">📱 +91 {profile?.mobile || ''}</div>
+            <div className="profile-name">{profile?.full_name || user?.name || user?.full_name || '—'}</div>
+            <div className="profile-phone">📱 +91 {profile?.mobile || user?.mobile || ''}</div>
             <div className="profile-since">🌾 Member since {profile?.created_at ? new Date(profile.created_at).toLocaleDateString('en-IN', { month: 'short', year: 'numeric' }) : '—'}</div>
           </div>
           <div className="sidebar-nav">
             {[['👤', 'My Profile', () => setSection('profile'), section === 'profile'],
-              ['📦', 'My Orders', () => navigate('/orders'), false],
-              ['❤️', 'Wishlist', () => navigate('/wishlist'), false],
-              ['🛒', 'My Cart', () => navigate('/cart'), false],
-              ['📍', 'Addresses', () => setSection('addresses'), section === 'addresses'],
+            ['📦', 'My Orders', () => navigate('/orders'), false],
+            ['❤️', 'Wishlist', () => navigate('/wishlist'), false],
+            ['🛒', 'My Cart', () => navigate('/cart'), false],
+            ['📍', 'Addresses', () => setSection('addresses'), section === 'addresses'],
             ].map(([icon, label, fn, active]) => (
               <div key={label} className={'nav-item' + (active ? ' active' : '')} onClick={fn}>
                 <span className="ni">{icon}</span> {label}
@@ -113,26 +187,42 @@ export default function Account() {
           {/* PROFILE */}
           {section === 'profile' && (
             <div className="card">
+              {/* Profile Completion Progress Bar */}
+              {(() => {
+                const pct = getCompletionPercentage();
+                return (
+                  <div style={{ marginBottom: 24 }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8, fontSize: 13, fontWeight: 700, color: '#2e7d32' }}>
+                      <span>🌾 Profile Completion</span>
+                      <span>{pct}%</span>
+                    </div>
+                    <div style={{ width: '100%', height: 6, background: '#e8f5e9', borderRadius: 3, overflow: 'hidden' }}>
+                      <div style={{ width: `${pct}%`, height: '100%', background: '#2e7d32', borderRadius: 3, transition: 'width 0.4s ease' }} />
+                    </div>
+                  </div>
+                );
+              })()}
+
               <h3>👤 Personal Information</h3>
               <div className="form-grid">
                 <div className="form-group"><label>Full Name</label><input type="text" value={form.full_name} onChange={e => setForm(f => ({ ...f, full_name: e.target.value }))} /></div>
-                <div className="form-group"><label>Mobile Number</label><input type="tel" value={'+91 ' + (profile?.mobile || '')} readOnly /></div>
+                <div className="form-group"><label>Mobile Number</label><input type="tel" value={'+91 ' + (profile?.mobile || user?.mobile || '')} readOnly /></div>
                 <div className="form-group"><label>Email Address</label><input type="email" value={form.email} onChange={e => setForm(f => ({ ...f, email: e.target.value }))} /></div>
                 <div className="form-group"><label>Date of Birth</label><input type="date" value={form.dob} onChange={e => setForm(f => ({ ...f, dob: e.target.value }))} /></div>
                 <div className="form-group"><label>Gender</label>
-                  <select value={form.gender} onChange={e => setForm(f => ({ ...f, gender: e.target.value }))}>
+                  <select value={form.gender?.toLowerCase() || ''} onChange={e => setForm(f => ({ ...f, gender: e.target.value }))}>
                     <option value="">Select gender</option>
-                    <option value="MALE">Male</option><option value="FEMALE">Female</option><option value="OTHER">Other</option>
+                    <option value="male">Male</option><option value="female">Female</option><option value="other">Other</option>
                   </select>
                 </div>
                 <div className="form-group"><label>Occupation</label>
-                  <select value={form.occupation} onChange={e => setForm(f => ({ ...f, occupation: e.target.value }))}>
+                  <select value={form.occupation || ''} onChange={e => setForm(f => ({ ...f, occupation: e.target.value }))}>
                     <option value="">Select occupation</option>
-                    <option>Farmer</option><option>Agri Dealer</option><option>Agronomist</option><option>Other</option>
+                    <option value="Farmer">Farmer</option><option value="Agri Dealer">Agri Dealer</option><option value="Agronomist">Agronomist</option><option value="Other">Other</option>
                   </select>
                 </div>
-                <div className="form-group"><label>Farm Size (Acres)</label><input type="number" value={form.farm_size} onChange={e => setForm(f => ({ ...f, farm_size: e.target.value }))} /></div>
-                <div className="form-group"><label>Primary Crop</label><input type="text" value={form.primary_crop} onChange={e => setForm(f => ({ ...f, primary_crop: e.target.value }))} /></div>
+                <div className="form-group"><label>Farm Size (Acres)</label><input type="text" value={form.farm_size || ''} onChange={e => setForm(f => ({ ...f, farm_size: e.target.value }))} /></div>
+                <div className="form-group"><label>Primary Crop</label><input type="text" value={form.primary_crop || ''} onChange={e => setForm(f => ({ ...f, primary_crop: e.target.value }))} /></div>
               </div>
               <button className="save-btn" disabled={saving} onClick={saveProfile}>{saving ? '⏳ Saving...' : '💾 Save Changes'}</button>
               {saveMsg && <div className="save-msg" style={{ display: 'block', background: saveMsg.t === 'ok' ? '#e8f5e9' : '#ffebee', color: saveMsg.t === 'ok' ? '#1b5e20' : '#c62828' }}>{saveMsg.m}</div>}
@@ -160,15 +250,15 @@ export default function Account() {
                 <div style={{ marginTop: 20, borderTop: '2px solid #e8f5e9', paddingTop: 20 }}>
                   <h4 style={{ fontSize: 15, fontWeight: 700, color: '#1b5e20', marginBottom: 14 }}>New Address</h4>
                   <div className="form-grid">
-                    {[['Full Name','full_name','text'],['Mobile','mobile','tel'],['Address Line 1','address_line1','text'],['Address Line 2','address_line2','text'],['City','city','text'],['State','state','text'],['Pincode','pincode','text']].map(([l,k,t]) => (
-                      <div key={k} className={'form-group' + (['address_line1','address_line2'].includes(k) ? ' full' : '')}>
+                    {[['Full Name', 'full_name', 'text'], ['Mobile', 'mobile', 'tel'], ['Address Line 1', 'address_line1', 'text'], ['Address Line 2', 'address_line2', 'text'], ['City', 'city', 'text'], ['State', 'state', 'text'], ['Pincode', 'pincode', 'text']].map(([l, k, t]) => (
+                      <div key={k} className={'form-group' + (['address_line1', 'address_line2'].includes(k) ? ' full' : '')}>
                         <label>{l}</label>
                         <input type={t} value={addrForm[k]} onChange={e => setAddrForm(f => ({ ...f, [k]: e.target.value }))} />
                       </div>
                     ))}
                     <div className="form-group"><label>Address Type</label>
                       <select value={addrForm.address_type} onChange={e => setAddrForm(f => ({ ...f, address_type: e.target.value }))}>
-                        <option value="HOME">🏠 Home</option><option value="FARM">🌾 Farm</option><option value="OFFICE">🏢 Office</option><option value="OTHER">📍 Other</option>
+                        <option value="HOME">🏠 Home</option><option value="WORK">💼 Work</option><option value="OTHER">📍 Other</option>
                       </select>
                     </div>
                   </div>

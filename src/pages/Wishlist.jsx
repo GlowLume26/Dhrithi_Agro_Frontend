@@ -73,7 +73,7 @@ export default function Wishlist() {
               const sp = Number(item.selling_price || item.price);
               const mrp = Number(item.mrp);
               const disc = mrp > sp ? Math.round((mrp - sp) / mrp * 100) : 0;
-              const inStock = (item.stock_quantity || item.stock_qty || 0) > 0;
+              const inStock = (item.stock_qty || 0) > 0;
               return (
                 <div key={item.id} className="wish-card">
                   <button className="wish-remove" onClick={() => removeWish(item.id)} title="Remove">✕</button>

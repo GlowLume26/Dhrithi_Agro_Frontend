@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useCart } from '../context/CartContext';
@@ -11,8 +12,23 @@ export default function ProductCard({ p }) {
   const { isLoggedIn } = useAuth();
   const { setCartCount } = useCart();
   const toast = useToast();
+  const [wished, setWished] = useState(false);
   const disc = p.mrp > p.selling_price ? Math.round((p.mrp - p.selling_price) / p.mrp * 100) : 0;
   const img = p.primary_image || FALLBACK;
+
+  async function toggleWish(e) {
+    e.stopPropagation();
+    if (!isLoggedIn) { toast('🔐 Please login to save items'); navigate('/login'); return; }
+    if (wished) {
+      await api.delete('wishlist', { product_id: p.id });
+      setWished(false);
+      toast('💔 Removed from wishlist');
+    } else {
+      const res = await api.post('wishlist', { product_id: p.id });
+      if (res.success) { setWished(true); toast('❤️ Added to wishlist!'); }
+      else toast('❌ ' + (res.message || 'Failed'));
+    }
+  }
 
   async function addToCart(e) {
     e.stopPropagation();
@@ -25,7 +41,10 @@ export default function ProductCard({ p }) {
   return (
     <div className="product-card" onClick={() => navigate('/product/' + p.id)} style={{ cursor: 'pointer' }}>
       {disc > 0 && <span className="product-badge">{disc}% OFF</span>}
-      <button className="product-wish" onClick={e => e.stopPropagation()}>🤍</button>
+      <button className="product-wish" onClick={toggleWish} title={wished ? 'Remove from wishlist' : 'Add to wishlist'}
+        style={{ color: wished ? '#e53935' : undefined }}>
+        {wished ? '❤️' : '🤍'}
+      </button>
       <div className="product-img">
         <img src={img} alt={p.name} onError={e => e.target.src = FALLBACK} />
       </div>

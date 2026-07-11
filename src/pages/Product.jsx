@@ -170,8 +170,8 @@ export default function Product() {
                 ₹{sp.toLocaleString('en-IN')}
               </div>
               <div style={{ fontSize: 11, color: '#888', marginTop: 4 }}>Inclusive of all taxes · Free delivery above ₹499</div>
-              <div style={{ marginTop: 8, display: 'inline-flex', alignItems: 'center', gap: 6, background: p?.stock_quantity > 0 ? '#e8f5e9' : '#ffebee', padding: '3px 10px', borderRadius: 20, fontSize: 12, fontWeight: 700, color: p?.stock_quantity > 0 ? '#2e7d32' : '#c62828' }}>
-                {p?.stock_quantity > 0 ? `✅ In Stock — ${p.stock_quantity} units` : '❌ Out of Stock'}
+              <div style={{ marginTop: 8, display: 'inline-flex', alignItems: 'center', gap: 6, background: p?.stock_qty > 0 ? '#e8f5e9' : '#ffebee', padding: '3px 10px', borderRadius: 20, fontSize: 12, fontWeight: 700, color: p?.stock_qty > 0 ? '#2e7d32' : '#c62828' }}>
+                {p?.stock_qty > 0 ? `✅ In Stock — ${p.stock_qty} units` : '❌ Out of Stock'}
               </div>
             </motion.div>
 
@@ -194,7 +194,7 @@ export default function Product() {
             {/* ACTION BUTTONS */}
             <motion.div {...fadeUp(0.28)} style={{ display: 'flex', gap: 10, marginBottom: 18 }}>
               <motion.button whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}
-                disabled={busy || p?.stock_quantity === 0} onClick={addToCart}
+                disabled={busy || p?.stock_qty === 0} onClick={addToCart}
                 style={{ flex: 1, background: 'linear-gradient(135deg,#ff6f00,#ff8f00)', color: 'white', border: 'none', padding: '13px 0', borderRadius: 12, fontSize: 14, fontWeight: 800, cursor: 'pointer', boxShadow: '0 4px 18px rgba(255,111,0,0.28)', opacity: busy ? 0.72 : 1 }}
               >{busy ? '⏳ Adding...' : '🛒 Add to Cart'}</motion.button>
 
@@ -242,7 +242,7 @@ export default function Product() {
                   {tab === 'specs' && (
                     <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
                       <tbody>
-                        {[['Brand', p?.brand_name || p?.vendor_name || 'N/A'],['Category', p?.category_name || 'N/A'],['SKU', p?.sku || 'N/A'],['Weight', p?.weight ? p.weight + ' g' : 'N/A'],['Stock', p?.stock_quantity ?? 'N/A']].map(([k,v],i) => (
+                        {[['Brand', p?.brand_name || p?.vendor_name || 'N/A'],['Category', p?.category_name || 'N/A'],['SKU', p?.sku || 'N/A'],['Weight', p?.weight ? p.weight + ' g' : 'N/A'],['Stock', p?.stock_qty ?? 'N/A']].map(([k,v],i) => (
                           <tr key={k} style={{ background: i%2===0 ? '#f9fbe7' : 'white' }}>
                             <td style={{ padding: '8px 12px', fontWeight: 700, color: '#333', width: '40%', border: '1px solid #e8f5e9' }}>{k}</td>
                             <td style={{ padding: '8px 12px', border: '1px solid #e8f5e9' }}>{v}</td>

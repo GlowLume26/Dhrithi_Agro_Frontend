@@ -33,8 +33,12 @@ export const adminApi = {
 
   getCustomers: (params={}) => axios.get(url(`admin&section=customers&${qs(params)}`), cfg()).then(r => r.data),
 
-  getCategories: () => axios.get(url('categories'), cfg()).then(r => r.data),
-  getBrands:     () => axios.get(url('brands'), cfg()).then(r => r.data),
+  getCategories:   ()         => axios.get(url('categories'), cfg()).then(r => r.data),
+  createCategory:  (data)     => axios.post(url('categories'), data, cfg()).then(r => r.data),
+  updateCategory:  (id, data) => axios.put(url(`categories&id=${id}`), data, cfg()).then(r => r.data),
+  deleteCategory:  (id)       => axios.delete(url(`categories&id=${id}`), cfg()).then(r => r.data),
+
+  getBrands: () => axios.get(url('brands'), cfg()).then(r => r.data),
 };
 
 export default adminApi;

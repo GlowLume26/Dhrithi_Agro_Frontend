@@ -6,21 +6,22 @@ export const ROLES = {
 
 // Modules accessible per role
 export const ROLE_MODULES = {
-  owner: ['dashboard','products','orders','customers','inventory','offers','reports','settings','admins'],
-  admin: ['dashboard','products','orders','customers'],
+  owner: ['dashboard','products','orders','customers','categories','inventory','offers','reports','settings','admins'],
+  admin: ['dashboard','products','orders','customers','categories'],
 };
 
 // Sidebar nav items
 export const NAV_ITEMS = [
-  { id:'dashboard',  label:'Dashboard',    icon:'RxDashboard',   path:'/admin/dashboard' },
-  { id:'products',   label:'Products',     icon:'RxCube',        path:'/admin/products'  },
-  { id:'orders',     label:'Orders',       icon:'RxListBullet',  path:'/admin/orders'    },
-  { id:'customers',  label:'Customers',    icon:'RxPerson',      path:'/admin/customers' },
-  { id:'inventory',  label:'Inventory',    icon:'RxArchive',     path:'/admin/inventory' },
-  { id:'offers',     label:'Offers',       icon:'RxTag',         path:'/admin/offers'    },
-  { id:'reports',    label:'Reports',      icon:'RxBarChart',    path:'/admin/reports'   },
-  { id:'settings',   label:'Settings',     icon:'RxGear',        path:'/admin/settings'  },
-  { id:'admins',     label:'Admin Users',  icon:'RxPeople',      path:'/admin/admins'    },
+  { id:'dashboard',   label:'Dashboard',    icon:'RxDashboard',   path:'/admin/dashboard'  },
+  { id:'products',    label:'Products',     icon:'RxCube',        path:'/admin/products'   },
+  { id:'orders',      label:'Orders',       icon:'RxListBullet',  path:'/admin/orders'     },
+  { id:'customers',   label:'Customers',    icon:'RxPerson',      path:'/admin/customers'  },
+  { id:'categories',  label:'Categories',   icon:'RxGrid',        path:'/admin/categories' },
+  { id:'inventory',   label:'Inventory',    icon:'RxArchive',     path:'/admin/inventory'  },
+  { id:'offers',      label:'Offers',       icon:'RxTag',         path:'/admin/offers'     },
+  { id:'reports',     label:'Reports',      icon:'RxBarChart',    path:'/admin/reports'    },
+  { id:'settings',    label:'Settings',     icon:'RxGear',        path:'/admin/settings'   },
+  { id:'admins',      label:'Admin Users',  icon:'RxPeople',      path:'/admin/admins'     },
 ];
 
 export const ORDER_STATUSES = ['placed','confirmed','packed','shipped','out_for_delivery','delivered','cancelled'];

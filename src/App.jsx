@@ -37,6 +37,7 @@ import AdminOffers    from './admin/pages/AdminOffers';
 import AdminReports   from './admin/pages/AdminReports';
 import AdminSettings  from './admin/pages/AdminSettings';
 import AdminUsers     from './admin/pages/AdminUsers';
+import AdminCategories from './admin/pages/AdminCategories';
 
 // Pages that don't use shared Header/Footer
 const STANDALONE = [
@@ -79,7 +80,8 @@ function Layout() {
         <Route path="/admin/offers"    element={<AdminProtected module="offers"><AdminOffers /></AdminProtected>} />
         <Route path="/admin/reports"   element={<AdminProtected module="reports"><AdminReports /></AdminProtected>} />
         <Route path="/admin/settings"  element={<AdminProtected module="settings"><AdminSettings /></AdminProtected>} />
-        <Route path="/admin/admins"    element={<AdminProtected module="admins"><AdminUsers /></AdminProtected>} />
+        <Route path="/admin/admins"      element={<AdminProtected module="admins"><AdminUsers /></AdminProtected>} />
+        <Route path="/admin/categories"   element={<AdminProtected module="categories"><AdminCategories /></AdminProtected>} />
 
         <Route path="*" element={<NotFound />} />
       </Routes>

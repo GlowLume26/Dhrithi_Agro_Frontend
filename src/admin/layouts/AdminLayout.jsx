@@ -141,5 +141,5 @@ export default function AdminLayout({ children }) {
 }
 
 function navIcon(id) {
-  return { dashboard:'📊', products:'📦', orders:'🛒', customers:'👥', inventory:'🗄️', offers:'🏷️', reports:'📈', settings:'⚙️', admins:'🛡️' }[id] || '📌';
+  return { dashboard:'📊', products:'📦', orders:'🛒', customers:'👥', categories:'🗂️', inventory:'🗄️', offers:'🏷️', reports:'📈', settings:'⚙️', admins:'🛡️' }[id] || '📌';
 }

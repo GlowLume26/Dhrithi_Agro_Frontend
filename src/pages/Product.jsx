@@ -41,6 +41,8 @@ export default function Product() {
   const [price, setPrice]      = useState(null);
   const [qty, setQty]          = useState(1);
   const [busy, setBusy]        = useState(false);
+  const [wished, setWished]    = useState(false);
+  const [wishBusy, setWishBusy] = useState(false);
 
   useEffect(() => {
     if (!id) return;
@@ -65,10 +67,35 @@ export default function Product() {
     });
   }, [id]);
 
+  // load wishlist status for this product
+  useEffect(() => {
+    if (!isLoggedIn || !id) return;
+    api.get('wishlist').then(res => {
+      if (res.success && res.data) {
+        setWished(res.data.some(w => String(w.product_id) === String(id)));
+      }
+    });
+  }, [isLoggedIn, id]);
+
+  async function toggleWish() {
+    if (!isLoggedIn) { toast('🔐 Please login to save items'); navigate('/login'); return; }
+    setWishBusy(true);
+    if (wished) {
+      await api.delete('wishlist', { product_id: id });
+      setWished(false);
+      toast('💔 Removed from wishlist');
+    } else {
+      const res = await api.post('wishlist', { product_id: id });
+      if (res.success) { setWished(true); toast('❤️ Added to wishlist!'); }
+      else toast('❌ ' + (res.message || 'Failed'));
+    }
+    setWishBusy(false);
+  }
+
   async function addToCart() {
     if (!isLoggedIn) { toast('🔐 Please login first'); navigate('/login'); return; }
     setBusy(true);
-    const res = await api.post('cart', { product_id: +id, quantity: qty });
+    const res = await api.post('cart', { product_id: id, quantity: qty });
     if (res.success) { toast(`✅ ${product.name} added to cart!`); setCartCount(c => c + qty); }
     else toast('❌ ' + (res.message || 'Failed'));
     setBusy(false);
@@ -203,9 +230,11 @@ export default function Product() {
                 style={{ flex: 1, background: 'linear-gradient(135deg,#1b5e20,#2e7d32)', color: 'white', border: 'none', padding: '13px 0', borderRadius: 12, fontSize: 14, fontWeight: 800, cursor: 'pointer', boxShadow: '0 4px 18px rgba(27,94,32,0.28)' }}
               >⚡ Buy Now</motion.button>
 
-              <motion.button whileHover={{ scale: 1.08, backgroundColor: '#ffebee' }} whileTap={{ scale: 0.94 }}
-                style={{ width: 46, height: 46, borderRadius: 12, border: '2px solid #e0e0e0', background: 'white', fontSize: 20, cursor: 'pointer', flexShrink: 0 }}
-              >🤍</motion.button>
+              <motion.button whileHover={{ scale: 1.08 }} whileTap={{ scale: 0.94 }}
+                onClick={toggleWish} disabled={wishBusy}
+                title={wished ? 'Remove from wishlist' : 'Add to wishlist'}
+                style={{ width: 46, height: 46, borderRadius: 12, border: `2px solid ${wished ? '#ffcdd2' : '#e0e0e0'}`, background: wished ? '#ffebee' : 'white', fontSize: 20, cursor: 'pointer', flexShrink: 0, transition: 'all 0.2s' }}
+              >{wishBusy ? '⏳' : wished ? '❤️' : '🤍'}</motion.button>
             </motion.div>
 
             {/* DELIVERY INFO */}

@@ -23,8 +23,12 @@ export function AdminAuthProvider({ children }) {
     setAdmin(null);
   }
 
+  // custom permissions stored in user object override role defaults
   function can(module) {
     if (!admin) return false;
+    if (admin.role === 'owner') return true;
+    const perms = admin.permissions;
+    if (Array.isArray(perms) && perms.length > 0) return perms.includes(module);
     return ROLE_MODULES[admin.role]?.includes(module) ?? false;
   }
 

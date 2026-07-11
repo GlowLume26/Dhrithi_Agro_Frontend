@@ -31,14 +31,29 @@ export const adminApi = {
   getOrders:         (params={}) => axios.get(url(`admin&section=orders&${qs(params)}`), cfg()).then(r => r.data),
   updateOrderStatus: (id, status)=> axios.put(url(`admin&section=orders&id=${id}`), { status }, cfg()).then(r => r.data),
 
-  getCustomers: (params={}) => axios.get(url(`admin&section=customers&${qs(params)}`), cfg()).then(r => r.data),
+  getCustomers:    (params={}) => axios.get(url(`admin&section=customers&${qs(params)}`), cfg()).then(r => r.data),
+  updateCustomer:  (id, data) => axios.put(url(`admin&section=customers&id=${id}`), data, cfg()).then(r => r.data),
+  deleteCustomer:  (id)       => axios.delete(url(`admin&section=customers&id=${id}`), cfg()).then(r => r.data),
 
   getCategories:   ()         => axios.get(url('categories'), cfg()).then(r => r.data),
   createCategory:  (data)     => axios.post(url('categories'), data, cfg()).then(r => r.data),
   updateCategory:  (id, data) => axios.put(url(`categories&id=${id}`), data, cfg()).then(r => r.data),
   deleteCategory:  (id)       => axios.delete(url(`categories&id=${id}`), cfg()).then(r => r.data),
 
+  getInventory:    (params={}) => axios.get(url(`admin&section=inventory&${qs(params)}`), cfg()).then(r => r.data),
+  restockProduct:  (id, qty)   => axios.put(url(`admin&section=inventory&id=${id}`), { qty }, cfg()).then(r => r.data),
+
+  getOffers:    ()         => axios.get(url('admin&section=offers'), cfg()).then(r => r.data),
+  createOffer:  (data)     => axios.post(url('admin&section=offers'), data, cfg()).then(r => r.data),
+  updateOffer:  (id, data) => axios.put(url(`admin&section=offers&id=${id}`), data, cfg()).then(r => r.data),
+  deleteOffer:  (id)       => axios.delete(url(`admin&section=offers&id=${id}`), cfg()).then(r => r.data),
+
   getBrands: () => axios.get(url('brands'), cfg()).then(r => r.data),
+
+  getAdmins:    ()         => axios.get(url('admin&section=admins'), cfg()).then(r => r.data),
+  createAdmin:  (data)     => axios.post(url('admin&section=admins'), data, cfg()).then(r => r.data),
+  updateAdmin:  (id, data) => axios.put(url(`admin&section=admins&id=${id}`), data, cfg()).then(r => r.data),
+  deleteAdmin:  (id)       => axios.delete(url(`admin&section=admins&id=${id}`), cfg()).then(r => r.data),
 };
 
 export default adminApi;

@@ -4,10 +4,13 @@ export const ROLES = {
   ADMIN: 'admin',
 };
 
-// Modules accessible per role
+// All available modules
+export const ALL_MODULES = ['dashboard','products','orders','customers','categories','inventory','offers','reports','settings','admins'];
+
+// Default modules per role (used when no custom permissions set)
 export const ROLE_MODULES = {
-  owner: ['dashboard','products','orders','customers','categories','inventory','offers','reports','settings','admins'],
-  admin: ['dashboard','products','orders','customers','categories'],
+  owner: ALL_MODULES,
+  admin: ['dashboard','products','orders','customers'],
 };
 
 // Sidebar nav items

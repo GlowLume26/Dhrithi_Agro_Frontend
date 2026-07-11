@@ -1,51 +1,82 @@
 import { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import AdminLayout from '../layouts/AdminLayout';
-import { PageHeader, Modal, ConfirmModal, Pagination, RowActions, StatusBadge, Skel, Empty } from '../components/AdminUI';
+import { PageHeader, Modal, ConfirmModal, Pagination, RowActions, Skel, Empty } from '../components/AdminUI';
 import adminApi from '../services/adminApi';
 
 const FALLBACK = 'https://images.unsplash.com/photo-1574943320219-553eb213f72d?w=200&q=80';
-const EMPTY_FORM = { name:'', category_id:'', brand:'', sku:'', selling_price:'', mrp:'', stock_qty:'', description:'', is_active:true };
+
+function genCode() {
+  return 'PRD-' + Date.now().toString(36).toUpperCase().slice(-6) + Math.random().toString(36).slice(2,5).toUpperCase();
+}
+
+const EMPTY_FORM = { name:'', category_id:'', subcategory_id:'', brand:'', sku:'', product_code:'', selling_price:'', mrp:'', stock_qty:'', description:'', is_active:true };
 
 export default function AdminProducts() {
-  const [products, setProducts]   = useState([]);
-  const [total, setTotal]         = useState(0);
-  const [loading, setLoading]     = useState(true);
-  const [page, setPage]           = useState(1);
-  const [limit, setLimit]         = useState(10);
-  const [search, setSearch]       = useState('');
-  const [form, setForm]           = useState(EMPTY_FORM);
-  const [variants, setVariants]   = useState([{ qty:'', price:'' }]);
-  const [images, setImages]       = useState([]);
-  const [editId, setEditId]       = useState(null);
-  const [modal, setModal]         = useState(false);
-  const [delId, setDelId]         = useState(null);
-  const [dragOver, setDragOver]   = useState(false);
+  const [products, setProducts]     = useState([]);
+  const [total, setTotal]           = useState(0);
+  const [loading, setLoading]       = useState(true);
+  const [page, setPage]             = useState(1);
+  const [limit, setLimit]           = useState(10);
+  const [search, setSearch]         = useState('');
+  const [filterCat, setFilterCat]   = useState('');
+  const [filterSub, setFilterSub]   = useState('');
+  const [categories, setCategories] = useState([]);
+  const [form, setForm]             = useState(EMPTY_FORM);
+  const [variants, setVariants]     = useState([{ qty:'', price:'' }]);
+  const [images, setImages]         = useState([]);
+  const [editId, setEditId]         = useState(null);
+  const [modal, setModal]           = useState(false);
+  const [delId, setDelId]           = useState(null);
+  const [dragOver, setDragOver]     = useState(false);
   const fileRef = useRef();
 
-  useEffect(() => { load(); }, [page, limit, search]);
+  const parentCats       = categories.filter(c => !c.parent_id);
+  const allSubs          = categories.filter(c => !!c.parent_id);
+  const filterSubOptions = filterCat ? allSubs.filter(c => c.parent_id === filterCat) : allSubs;
+  const modalSubOptions  = form.category_id ? allSubs.filter(c => c.parent_id === form.category_id) : [];
+
+  useEffect(() => {
+    adminApi.getCategories().then(res => { if (res.success) setCategories(res.data || []); });
+  }, []);
+
+  useEffect(() => { load(); }, [page, limit, search, filterCat, filterSub]);
 
   async function load() {
     setLoading(true);
     try {
-      const res = await adminApi.getProducts({ page, limit, search });
+      const params = { page, limit, search };
+      if (filterSub)      params.category_id = filterSub;
+      else if (filterCat) params.category_id = filterCat;
+      const res = await adminApi.getProducts(params);
       if (res.success) { setProducts(res.data); setTotal(res.meta?.total || 0); }
     } catch {
-      // fallback mock
       setProducts(MOCK_PRODUCTS.slice((page-1)*limit, page*limit));
       setTotal(MOCK_PRODUCTS.length);
     }
     setLoading(false);
   }
 
-  function openAdd() { setForm(EMPTY_FORM); setVariants([{qty:'',price:''}]); setImages([]); setEditId(null); setModal(true); }
-  function openEdit(p) { setForm({ name:p.name, category_id:p.category_id||'', brand:p.brand_name||'', sku:p.sku||'', selling_price:p.selling_price, mrp:p.mrp||'', stock_qty:p.stock_qty, description:p.description||'', is_active: p.is_active !== false }); setVariants(p.variants||[{qty:'',price:''}]); setImages(p.images||[]); setEditId(p.id); setModal(true); }
+  function openAdd() {
+    setForm({ ...EMPTY_FORM, product_code: genCode() });
+    setVariants([{qty:'',price:''}]); setImages([]); setEditId(null); setModal(true);
+  }
+
+  function openEdit(p) {
+    setForm({
+      name: p.name, category_id: p.category_id||'', subcategory_id: p.subcategory_id||'',
+      brand: p.brand_name||'', sku: p.sku||'', product_code: p.product_code||p.sku||'',
+      selling_price: p.selling_price, mrp: p.mrp||'', stock_qty: p.stock_qty,
+      description: p.description||'', is_active: p.is_active !== false
+    });
+    setVariants(p.variants||[{qty:'',price:''}]); setImages(p.images||[]); setEditId(p.id); setModal(true);
+  }
 
   async function save() {
     try {
       const payload = { ...form, variants, images };
       if (editId) await adminApi.updateProduct(editId, payload);
-      else await adminApi.createProduct(payload);
+      else        await adminApi.createProduct(payload);
     } catch {}
     setModal(false); load();
   }
@@ -54,14 +85,13 @@ export default function AdminProducts() {
 
   function handleFiles(files) {
     const newImgs = [...images];
-    Array.from(files).slice(0, 8 - images.length).forEach(f => {
-      const url = URL.createObjectURL(f);
-      newImgs.push({ url, file: f });
+    Array.from(files).slice(0, 8 - images.length).forEach(file => {
+      newImgs.push({ url: URL.createObjectURL(file), file });
     });
     setImages(newImgs);
   }
 
-  const f = (k, v) => setForm(x => ({ ...x, [k]: v }));
+  const f  = (k, v) => setForm(x => ({ ...x, [k]: v }));
   const vf = (i, k, v) => setVariants(vs => vs.map((x, idx) => idx === i ? { ...x, [k]: v } : x));
 
   return (
@@ -73,8 +103,24 @@ export default function AdminProducts() {
       <div className="a-card">
         {/* Filter bar */}
         <div className="a-filter-bar">
-          <input className="a-input" placeholder="🔍 Search products..." value={search} onChange={e=>{setSearch(e.target.value);setPage(1);}} style={{ maxWidth:280 }} />
-          <select className="a-input a-select" style={{ maxWidth:140 }} onChange={e=>setLimit(+e.target.value)} value={limit}>
+          <input className="a-input" placeholder="🔍 Search products..." value={search}
+            onChange={e=>{ setSearch(e.target.value); setPage(1); }} style={{ maxWidth:220 }} />
+
+          <select className="a-input a-select" style={{ maxWidth:160 }} value={filterCat}
+            onChange={e=>{ setFilterCat(e.target.value); setFilterSub(''); setPage(1); }}>
+            <option value="">All Categories</option>
+            {parentCats.map(c=><option key={c.id} value={c.id}>{c.icon} {c.name}</option>)}
+          </select>
+
+          <select className="a-input a-select" style={{ maxWidth:160 }} value={filterSub}
+            onChange={e=>{ setFilterSub(e.target.value); setPage(1); }}
+            disabled={filterSubOptions.length === 0}>
+            <option value="">All Subcategories</option>
+            {filterSubOptions.map(c=><option key={c.id} value={c.id}>{c.name}</option>)}
+          </select>
+
+          <select className="a-input a-select" style={{ maxWidth:130 }} value={limit}
+            onChange={e=>setLimit(+e.target.value)}>
             {[10,25,50,100].map(n=><option key={n} value={n}>{n} per page</option>)}
           </select>
         </div>
@@ -82,21 +128,38 @@ export default function AdminProducts() {
         {/* Table */}
         <div className="a-table-wrap">
           <table className="a-table">
-            <thead><tr><th>Image</th><th>Product</th><th>Brand</th><th>Category</th><th>Price</th><th>Stock</th><th>Status</th><th>Actions</th></tr></thead>
+            <thead>
+              <tr>
+                <th style={{ width:44 }}>#</th>
+                <th>Image</th>
+                <th>Product</th>
+                <th>Product Code</th>
+                <th>Brand</th>
+                <th>Category</th>
+                <th>Subcategory</th>
+                <th>Price</th>
+                <th>Stock</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
             <tbody>
               {loading
-                ? [0,1,2,3,4].map(i=><tr key={i}><td colSpan={8}><Skel h={44} /></td></tr>)
+                ? [0,1,2,3,4].map(i=><tr key={i}><td colSpan={11}><Skel h={44} /></td></tr>)
                 : products.length === 0
-                ? <tr><td colSpan={8}><Empty icon="📦" title="No products found" /></td></tr>
+                ? <tr><td colSpan={11}><Empty icon="📦" title="No products found" /></td></tr>
                 : products.map((p,i) => (
                   <motion.tr key={p.id} initial={{ opacity:0, y:6 }} animate={{ opacity:1, y:0 }} transition={{ delay:i*0.04 }}>
+                    <td style={{ color:'var(--atx3)', fontWeight:600, fontSize:13, textAlign:'center' }}>{(page-1)*limit + i + 1}</td>
                     <td><img src={p.primary_image||FALLBACK} alt={p.name} onError={e=>e.target.src=FALLBACK} /></td>
                     <td>
-                      <div style={{ fontWeight:700, fontSize:13, color:'var(--atx)', maxWidth:220 }}>{p.name}</div>
+                      <div style={{ fontWeight:700, fontSize:13, color:'var(--atx)', maxWidth:200 }}>{p.name}</div>
                       <div style={{ fontSize:11, color:'var(--atx3)', marginTop:2 }}>SKU: {p.sku||'—'}</div>
                     </td>
-                    <td style={{ color:'var(--atx2)' }}>{p.brand_name||'—'}</td>
-                    <td style={{ color:'var(--atx2)' }}>{p.category_name||'—'}</td>
+                    <td style={{ fontSize:12, fontWeight:600, color:'var(--apri)', fontFamily:'monospace' }}>{p.product_code||'—'}</td>
+                    <td style={{ color:'var(--atx2)', fontSize:13 }}>{p.brand_name||'—'}</td>
+                    <td style={{ color:'var(--atx2)', fontSize:13 }}>{p.category_name||'—'}</td>
+                    <td style={{ color:'var(--atx2)', fontSize:13 }}>{p.subcategory_name||'—'}</td>
                     <td style={{ fontWeight:700, color:'var(--apri)' }}>₹{Number(p.selling_price).toLocaleString('en-IN')}</td>
                     <td>
                       <span style={{ fontWeight:700, color: p.stock_qty<=0?'#dc2626':p.stock_qty<=10?'#ea580c':'var(--atx)' }}>
@@ -104,7 +167,9 @@ export default function AdminProducts() {
                       </span>
                     </td>
                     <td>
-                      <span style={{ fontSize:12, fontWeight:700, padding:'3px 10px', borderRadius:20, background: p.is_active!==false?'#f0fdf4':'#fef2f2', color: p.is_active!==false?'#16a34a':'#dc2626' }}>
+                      <span style={{ fontSize:12, fontWeight:700, padding:'3px 10px', borderRadius:20,
+                        background: p.is_active!==false?'#f0fdf4':'#fef2f2',
+                        color: p.is_active!==false?'#16a34a':'#dc2626' }}>
                         {p.is_active!==false?'Active':'Inactive'}
                       </span>
                     </td>
@@ -128,17 +193,49 @@ export default function AdminProducts() {
         <div style={{ display:'flex', flexDirection:'column', gap:20 }}>
           <div className="a-form-grid">
             <div className="a-fg full"><label>Product Name *</label><input className="a-input" value={form.name} onChange={e=>f('name',e.target.value)} placeholder="Enter product name" /></div>
-            <div className="a-fg"><label>Category</label><input className="a-input" value={form.category_id} onChange={e=>f('category_id',e.target.value)} placeholder="Category" /></div>
+
+            <div className="a-fg">
+              <label>Category</label>
+              <select className="a-input a-select" value={form.category_id}
+                onChange={e=>{ f('category_id', e.target.value); f('subcategory_id',''); }}>
+                <option value="">Select category</option>
+                {parentCats.map(c=><option key={c.id} value={c.id}>{c.icon} {c.name}</option>)}
+              </select>
+            </div>
+
+            <div className="a-fg">
+              <label>Subcategory</label>
+              <select className="a-input a-select" value={form.subcategory_id}
+                onChange={e=>f('subcategory_id', e.target.value)}
+                disabled={!form.category_id || modalSubOptions.length === 0}>
+                <option value="">Select subcategory</option>
+                {modalSubOptions.map(c=><option key={c.id} value={c.id}>{c.name}</option>)}
+              </select>
+            </div>
+
             <div className="a-fg"><label>Brand</label><input className="a-input" value={form.brand} onChange={e=>f('brand',e.target.value)} placeholder="Brand name" /></div>
+
+            <div className="a-fg">
+              <label>Product Code</label>
+              <div style={{ display:'flex', gap:6 }}>
+                <input className="a-input" value={form.product_code} onChange={e=>f('product_code',e.target.value)} placeholder="e.g. PRD-ABC123" style={{ flex:1 }} />
+                <button type="button" className="a-btn a-btn-sm a-btn-sec" title="Regenerate" onClick={()=>f('product_code', genCode())}>🔄</button>
+              </div>
+            </div>
+
             <div className="a-fg"><label>SKU</label><input className="a-input" value={form.sku} onChange={e=>f('sku',e.target.value)} placeholder="SKU code" /></div>
             <div className="a-fg"><label>Selling Price (₹) *</label><input className="a-input" type="number" value={form.selling_price} onChange={e=>f('selling_price',e.target.value)} /></div>
+            <div className="a-fg"><label>MRP (₹)</label><input className="a-input" type="number" value={form.mrp} onChange={e=>f('mrp',e.target.value)} /></div>
             <div className="a-fg"><label>Stock Quantity *</label><input className="a-input" type="number" value={form.stock_qty} onChange={e=>f('stock_qty',e.target.value)} /></div>
-            <div className="a-fg full"><label>Description</label><textarea className="a-input" rows={3} value={form.description} onChange={e=>f('description',e.target.value)} style={{ resize:'vertical' }} /></div>
-            <div className="a-fg"><label>Status</label>
+
+            <div className="a-fg">
+              <label>Status</label>
               <select className="a-input a-select" value={form.is_active ? 'active' : 'inactive'} onChange={e=>f('is_active', e.target.value==='active')}>
                 <option value="active">Active</option><option value="inactive">Inactive</option>
               </select>
             </div>
+
+            <div className="a-fg full"><label>Description</label><textarea className="a-input" rows={3} value={form.description} onChange={e=>f('description',e.target.value)} style={{ resize:'vertical' }} /></div>
           </div>
 
           {/* Image Upload */}
@@ -190,14 +287,9 @@ export default function AdminProducts() {
 }
 
 const MOCK_PRODUCTS = [
-  { id:1, name:'Hybrid Tomato Seeds F1 (10g)', brand_name:'Syngenta', category_name:'Seeds', selling_price:299, stock_qty:48, sku:'SYN-TOM-F1', is_active:true, primary_image:'' },
-  { id:2, name:'NPK 19:19:19 Fertilizer 1kg', brand_name:'IFFCO', category_name:'Fertilizers', selling_price:185, stock_qty:8, sku:'IFFCO-NPK', is_active:true, primary_image:'' },
-  { id:3, name:'Neem Oil 10000 PPM 1L', brand_name:'Anand Agro', category_name:'Organic', selling_price:840, stock_qty:32, sku:'AA-NEEM', is_active:true, primary_image:'' },
-  { id:4, name:'Imidacloprid 17.8% SL 500ml', brand_name:'Bayer', category_name:'Pesticides', selling_price:420, stock_qty:0, sku:'BAY-IMI', is_active:false, primary_image:'' },
-  { id:5, name:'Drip Irrigation Kit 1 Acre', brand_name:'Jain Irrigation', category_name:'Irrigation', selling_price:3499, stock_qty:3, sku:'JI-DRIP', is_active:true, primary_image:'' },
-  { id:6, name:'Humic Acid 98% 300g', brand_name:'Noble Crop', category_name:'Organic', selling_price:261, stock_qty:22, sku:'NC-HUM', is_active:true, primary_image:'' },
-  { id:7, name:'Sprinkler Set 16mm', brand_name:'Netafim', category_name:'Irrigation', selling_price:580, stock_qty:15, sku:'NF-SPR', is_active:true, primary_image:'' },
-  { id:8, name:'Garden Trowel Set', brand_name:'Kisan', category_name:'Tools', selling_price:199, stock_qty:40, sku:'KS-TRW', is_active:true, primary_image:'' },
-  { id:9, name:'Coco Peat 5kg Brick', brand_name:'AgriGold', category_name:'Organic', selling_price:120, stock_qty:60, sku:'AG-CP5', is_active:true, primary_image:'' },
-  { id:10, name:'Bird Food Mix 1kg', brand_name:'PetVet', category_name:'Animal Care', selling_price:95, stock_qty:25, sku:'PV-BF1', is_active:true, primary_image:'' },
+  { id:1, name:'Hybrid Tomato Seeds F1 (10g)', brand_name:'Syngenta', category_name:'Seeds', subcategory_name:'Vegetable Seeds', selling_price:299, stock_qty:48, sku:'SYN-TOM-F1', is_active:true, primary_image:'' },
+  { id:2, name:'NPK 19:19:19 Fertilizer 1kg', brand_name:'IFFCO', category_name:'Fertilizers', subcategory_name:'Water Soluble', selling_price:185, stock_qty:8, sku:'IFFCO-NPK', is_active:true, primary_image:'' },
+  { id:3, name:'Neem Oil 10000 PPM 1L', brand_name:'Anand Agro', category_name:'Organic', subcategory_name:'Bio Pesticides', selling_price:840, stock_qty:32, sku:'AA-NEEM', is_active:true, primary_image:'' },
+  { id:4, name:'Imidacloprid 17.8% SL 500ml', brand_name:'Bayer', category_name:'Pesticides', subcategory_name:'Insecticides', selling_price:420, stock_qty:0, sku:'BAY-IMI', is_active:false, primary_image:'' },
+  { id:5, name:'Drip Irrigation Kit 1 Acre', brand_name:'Jain Irrigation', category_name:'Irrigation', subcategory_name:'Drip Systems', selling_price:3499, stock_qty:3, sku:'JI-DRIP', is_active:true, primary_image:'' },
 ];

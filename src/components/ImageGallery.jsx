@@ -40,93 +40,73 @@ export default function ImageGallery({ images = [] }) {
 
   return (
     <>
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-        {/* MAIN FRAME */}
-        <div
-          style={{ position: 'relative', borderRadius: 22, overflow: 'hidden', background: '#f1f8e9', aspectRatio: '4/2.4', boxShadow: '0 12px 50px rgba(0,0,0,0.13)', cursor: 'zoom-in' }}
-          onTouchStart={e => { touchX.current = e.touches[0].clientX; pause(); }}
-          onTouchEnd={e => { if (touchX.current === null) return; const d = touchX.current - e.changedTouches[0].clientX; if (Math.abs(d) > 40) go(cur + (d > 0 ? 1 : -1)); touchX.current = null; }}
-          onClick={() => setFull(true)}
-        >
-          {/* shimmer until loaded */}
-          {!imgLoaded && (
-            <div style={{ position: 'absolute', inset: 0, zIndex: 2, background: 'linear-gradient(90deg,#e8f5e9 25%,#f1f8e9 50%,#e8f5e9 75%)', backgroundSize: '300% 100%', animation: 'shimmer 1.4s infinite' }} />
-          )}
+      <div style={{ display: 'flex', gap: 10 }}>
 
-          <AnimatePresence custom={dir} initial={false}>
-            <motion.img
-              key={cur}
-              src={imgs[cur]}
-              alt={`product-${cur + 1}`}
-              custom={dir}
-              variants={variants}
-              initial="enter"
-              animate="center"
-              exit="exit"
-              onLoad={() => setImgLoaded(true)}
-              onError={e => { e.target.src = FB; setImgLoaded(true); }}
-              loading="lazy"
-              style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', transition: 'transform 0.4s ease' }}
-              whileHover={{ scale: 1.06 }}
-            />
-          </AnimatePresence>
-
-          {/* glass prev/next */}
-          {['left', 'right'].map(side => (
-            <button key={side}
-              onClick={e => { e.stopPropagation(); go(cur + (side === 'right' ? 1 : -1)); pause(); }}
-              style={{
-                position: 'absolute', top: '50%', transform: 'translateY(-50%)',
-                [side]: 14, zIndex: 4,
-                width: 42, height: 42, borderRadius: '50%',
-                background: 'rgba(255,255,255,0.18)',
-                backdropFilter: 'blur(14px)',
-                WebkitBackdropFilter: 'blur(14px)',
-                border: '1.5px solid rgba(255,255,255,0.45)',
-                color: 'white', fontSize: 22, cursor: 'pointer',
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                boxShadow: '0 4px 20px rgba(0,0,0,0.18)',
-                transition: 'background 0.2s',
-              }}
-            >
-              {side === 'left' ? '‹' : '›'}
-            </button>
-          ))}
-
-          {/* counter badge */}
-          <div style={{ position: 'absolute', bottom: 14, right: 16, zIndex: 4, background: 'rgba(0,0,0,0.42)', backdropFilter: 'blur(10px)', color: 'white', fontSize: 12, fontWeight: 700, padding: '4px 12px', borderRadius: 20 }}>
-            {cur + 1} / {imgs.length}
-          </div>
-
-          {/* fullscreen icon */}
-          <button
-            onClick={e => { e.stopPropagation(); setFull(true); }}
-            style={{ position: 'absolute', top: 14, right: 14, zIndex: 4, width: 36, height: 36, borderRadius: '50%', background: 'rgba(255,255,255,0.18)', backdropFilter: 'blur(12px)', border: '1.5px solid rgba(255,255,255,0.4)', color: 'white', fontSize: 15, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
-          >⛶</button>
-
-          {/* dot indicators */}
-          <div style={{ position: 'absolute', bottom: 14, left: '50%', transform: 'translateX(-50%)', display: 'flex', gap: 6, zIndex: 4 }}>
-            {imgs.map((_, i) => (
-              <button key={i} onClick={e => { e.stopPropagation(); go(i); pause(); }}
-                style={{ padding: 0, border: 'none', cursor: 'pointer', borderRadius: 4, height: 8, width: i === cur ? 24 : 8, background: i === cur ? '#f9a825' : 'rgba(255,255,255,0.55)', transition: 'all 0.3s' }}
-              />
-            ))}
-          </div>
-        </div>
-
-        {/* THUMBNAILS */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 10 }}>
+        {/* THUMBNAILS — vertical strip on left */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 8, flexShrink: 0 }}>
           {imgs.map((src, i) => (
             <motion.div key={i}
-              whileHover={{ scale: 1.06, y: -3 }} whileTap={{ scale: 0.97 }}
+              whileHover={{ scale: 1.06 }} whileTap={{ scale: 0.97 }}
               onClick={() => { go(i); pause(); }}
-              style={{ aspectRatio: '1', borderRadius: 13, overflow: 'hidden', cursor: 'pointer', border: i === cur ? '2.5px solid #2e7d32' : '2.5px solid transparent', boxShadow: i === cur ? '0 0 0 3px rgba(46,125,50,0.2)' : '0 2px 8px rgba(0,0,0,0.07)', transition: 'border 0.2s, box-shadow 0.2s' }}
+              style={{ width: 64, height: 64, borderRadius: 10, overflow: 'hidden', cursor: 'pointer', border: i === cur ? '2.5px solid #2e7d32' : '2.5px solid #e8f5e9', boxShadow: i === cur ? '0 0 0 3px rgba(46,125,50,0.18)' : '0 2px 6px rgba(0,0,0,0.07)', transition: 'all 0.2s' }}
             >
               <img src={src} alt={`thumb-${i}`} loading="lazy" onError={e => e.target.src = FB}
                 style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
             </motion.div>
           ))}
         </div>
+
+        {/* MAIN IMAGE */}
+        <div
+          style={{ flex: 1, position: 'relative', borderRadius: 18, overflow: 'hidden', background: '#f1f8e9', aspectRatio: '1/1', boxShadow: '0 8px 32px rgba(0,0,0,0.11)', cursor: 'zoom-in' }}
+          onTouchStart={e => { touchX.current = e.touches[0].clientX; pause(); }}
+          onTouchEnd={e => { if (touchX.current === null) return; const d = touchX.current - e.changedTouches[0].clientX; if (Math.abs(d) > 40) go(cur + (d > 0 ? 1 : -1)); touchX.current = null; }}
+          onClick={() => setFull(true)}
+        >
+          {!imgLoaded && (
+            <div style={{ position: 'absolute', inset: 0, zIndex: 2, background: 'linear-gradient(90deg,#e8f5e9 25%,#f1f8e9 50%,#e8f5e9 75%)', backgroundSize: '300% 100%', animation: 'shimmer 1.4s infinite' }} />
+          )}
+
+          <AnimatePresence custom={dir} initial={false}>
+            <motion.img
+              key={cur} src={imgs[cur]} alt={`product-${cur + 1}`}
+              custom={dir} variants={variants} initial="enter" animate="center" exit="exit"
+              onLoad={() => setImgLoaded(true)}
+              onError={e => { e.target.src = FB; setImgLoaded(true); }}
+              loading="lazy"
+              style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }}
+              whileHover={{ scale: 1.04 }}
+            />
+          </AnimatePresence>
+
+          {/* prev/next */}
+          {['left','right'].map(side => (
+            <button key={side}
+              onClick={e => { e.stopPropagation(); go(cur + (side === 'right' ? 1 : -1)); pause(); }}
+              style={{ position: 'absolute', top: '50%', transform: 'translateY(-50%)', [side]: 10, zIndex: 4, width: 34, height: 34, borderRadius: '50%', background: 'rgba(255,255,255,0.22)', backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)', border: '1.5px solid rgba(255,255,255,0.45)', color: 'white', fontSize: 18, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+            >{side === 'left' ? '‹' : '›'}</button>
+          ))}
+
+          {/* fullscreen */}
+          <button onClick={e => { e.stopPropagation(); setFull(true); }}
+            style={{ position: 'absolute', top: 10, right: 10, zIndex: 4, width: 30, height: 30, borderRadius: '50%', background: 'rgba(255,255,255,0.18)', backdropFilter: 'blur(10px)', border: '1.5px solid rgba(255,255,255,0.4)', color: 'white', fontSize: 13, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+          >⛶</button>
+
+          {/* counter */}
+          <div style={{ position: 'absolute', bottom: 10, right: 12, zIndex: 4, background: 'rgba(0,0,0,0.4)', backdropFilter: 'blur(8px)', color: 'white', fontSize: 11, fontWeight: 700, padding: '3px 10px', borderRadius: 20 }}>
+            {cur + 1} / {imgs.length}
+          </div>
+
+          {/* dots */}
+          <div style={{ position: 'absolute', bottom: 10, left: '50%', transform: 'translateX(-50%)', display: 'flex', gap: 5, zIndex: 4 }}>
+            {imgs.map((_, i) => (
+              <button key={i} onClick={e => { e.stopPropagation(); go(i); pause(); }}
+                style={{ padding: 0, border: 'none', cursor: 'pointer', borderRadius: 4, height: 6, width: i === cur ? 20 : 6, background: i === cur ? '#f9a825' : 'rgba(255,255,255,0.55)', transition: 'all 0.3s' }}
+              />
+            ))}
+          </div>
+        </div>
+
       </div>
 
       {/* FULLSCREEN */}

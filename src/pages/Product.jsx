@@ -125,9 +125,12 @@ export default function Product() {
       <style>{`
         @keyframes shimmer{0%{background-position:300% 0}100%{background-position:-300% 0}}
         @keyframes pricePulse{0%,100%{opacity:1}50%{opacity:.78}}
-        .prod-grid{display:grid;grid-template-columns:1fr;gap:28px;max-width:860px;margin:0 auto;padding:28px 24px 48px;}
-        .prod-right-col{display:flex;flex-direction:column;gap:14px;}
-        @media(max-width:600px){.prod-grid{padding:16px;gap:20px;}}
+        .prod-grid{display:grid;grid-template-columns:380px 1fr;gap:32px;align-items:stretch;max-width:1200px;margin:0 auto;padding:24px 32px 48px;}
+        .prod-right-col{display:flex;flex-direction:column;gap:12px;}
+        .prod-img-col{display:flex;flex-direction:column;}
+        .prod-img-col>div{flex:1;}
+        .prod-img-col>div>div{height:100%;}
+        @media(max-width:860px){.prod-grid{grid-template-columns:1fr!important;gap:20px;padding:16px;}}
       `}</style>
 
       {/* BREADCRUMB */}
@@ -141,14 +144,14 @@ export default function Product() {
       {/* PRODUCT CONTAINER — 60/40 on desktop, stacked on mobile */}
       <div className="prod-grid">
 
-        {/* ── IMAGE (top, smaller) ── */}
-        <motion.div {...fadeUp(0.05)}>
+        {/* ── IMAGE COLUMN ── */}
+        <motion.div {...fadeUp(0.05)} className="prod-img-col">
           {loading ? (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-              <Skel h={260} r={18} />
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 8 }}>
-                {[0,1,2,3].map(i => <Skel key={i} h={60} r={10} />)}
+            <div style={{ display: 'flex', gap: 10, height: 380 }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                {[0,1,2,3].map(i => <Skel key={i} h={64} w={64} r={10} />)}
               </div>
+              <Skel h={380} r={18} />
             </div>
           ) : (
             <ImageGallery images={images} />

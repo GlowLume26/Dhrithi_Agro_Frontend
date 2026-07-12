@@ -81,6 +81,7 @@ header {
   min-width: 38px; min-height: 38px; font-size: 18px;
 }
 .action-btn:hover { background: rgba(249,168,37,0.15); transform: translateY(-1px); }
+.action-btn.hdr-active { background: rgba(249,168,37,0.25); border-radius: 50%; box-shadow: 0 0 0 2px rgba(249,168,37,0.4); }
 .action-btn .icon { font-size: 20px; }
 .action-btn.sell {
   background: linear-gradient(135deg, #f9a825, #f57f17); color: white !important;

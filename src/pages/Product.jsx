@@ -125,9 +125,9 @@ export default function Product() {
       <style>{`
         @keyframes shimmer{0%{background-position:300% 0}100%{background-position:-300% 0}}
         @keyframes pricePulse{0%,100%{opacity:1}50%{opacity:.78}}
-        .prod-grid{display:grid;grid-template-columns:48% 1fr;gap:40px;align-items:start;max-width:1200px;margin:0 auto;padding:28px 24px 48px;}
-        .prod-right-col{position:sticky;top:80px;display:flex;flex-direction:column;gap:14px;}
-        @media(max-width:860px){.prod-grid{grid-template-columns:1fr!important;gap:20px;padding:16px;}.prod-right-col{position:static;}}
+        .prod-grid{display:grid;grid-template-columns:1fr;gap:28px;max-width:860px;margin:0 auto;padding:28px 24px 48px;}
+        .prod-right-col{display:flex;flex-direction:column;gap:14px;}
+        @media(max-width:600px){.prod-grid{padding:16px;gap:20px;}}
       `}</style>
 
       {/* BREADCRUMB */}
@@ -142,7 +142,7 @@ export default function Product() {
       <div className="prod-grid">
 
         {/* ── IMAGE (top, smaller) ── */}
-        <motion.div {...fadeUp(0.05)} style={{ marginBottom: 24 }}>
+        <motion.div {...fadeUp(0.05)}>
           {loading ? (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
               <Skel h={260} r={18} />

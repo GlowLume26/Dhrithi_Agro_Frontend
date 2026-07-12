@@ -40,11 +40,11 @@ export default function ImageGallery({ images = [] }) {
 
   return (
     <>
-      <div style={{ width: 340 }}>
+      <div style={{ width: '100%' }}>
 
-        {/* MAIN IMAGE — fixed 340×340 */}
+        {/* MAIN IMAGE — fills column width, square */}
         <div
-          style={{ width: 340, height: 340, position: 'relative', borderRadius: 16, overflow: 'hidden', background: '#f1f8e9', boxShadow: '0 4px 20px rgba(0,0,0,0.1)', cursor: 'zoom-in', marginBottom: 10 }}
+          style={{ width: '100%', paddingBottom: '100%', position: 'relative', borderRadius: 16, overflow: 'hidden', background: '#f1f8e9', boxShadow: '0 4px 20px rgba(0,0,0,0.1)', cursor: 'zoom-in', marginBottom: 10 }}
           onTouchStart={e => { touchX.current = e.touches[0].clientX; pause(); }}
           onTouchEnd={e => { if (touchX.current === null) return; const d = touchX.current - e.changedTouches[0].clientX; if (Math.abs(d) > 40) go(cur + (d > 0 ? 1 : -1)); touchX.current = null; }}
           onClick={() => setFull(true)}

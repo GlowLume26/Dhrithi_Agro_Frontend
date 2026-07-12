@@ -125,9 +125,9 @@ export default function Product() {
       <style>{`
         @keyframes shimmer{0%{background-position:300% 0}100%{background-position:-300% 0}}
         @keyframes pricePulse{0%,100%{opacity:1}50%{opacity:.78}}
-        .prod-grid{display:grid;grid-template-columns:340px 1fr;gap:32px;align-items:start;max-width:1100px;margin:0 auto;padding:24px 32px 48px;}
-        .prod-right-col{display:flex;flex-direction:column;gap:12px;}
-        @media(max-width:860px){.prod-grid{grid-template-columns:1fr!important;gap:20px;padding:16px;}}
+        .prod-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px;align-items:start;max-width:900px;margin:0 auto;padding:24px 24px 40px;}
+        .prod-right-col{display:flex;flex-direction:column;gap:10px;overflow:hidden;}
+        @media(max-width:760px){.prod-grid{grid-template-columns:1fr!important;padding:16px;}}
       `}</style>
 
       {/* BREADCRUMB */}
@@ -169,79 +169,75 @@ export default function Product() {
         ) : (
           <>
             {/* VENDOR BADGE */}
-            <motion.div {...fadeUp(0.1)} style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: 'linear-gradient(135deg,#e8f5e9,#f9fbe7)', border: '1.5px solid #c8e6c9', borderRadius: 50, padding: '5px 14px 5px 5px', marginBottom: 14, width: 'fit-content' }}>
-              <div style={{ width: 28, height: 28, borderRadius: '50%', background: 'linear-gradient(135deg,#1b5e20,#66bb6a)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14, flexShrink: 0 }}>🌿</div>
+            <motion.div {...fadeUp(0.1)} style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: 'linear-gradient(135deg,#e8f5e9,#f9fbe7)', border: '1.5px solid #c8e6c9', borderRadius: 50, padding: '4px 12px 4px 4px', width: 'fit-content' }}>
+              <div style={{ width: 24, height: 24, borderRadius: '50%', background: 'linear-gradient(135deg,#1b5e20,#66bb6a)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, flexShrink: 0 }}>🌿</div>
               <div>
-                <div style={{ fontSize: 12, fontWeight: 800, color: '#1b5e20' }}>{p?.vendor_name || p?.brand_name || 'Drithi Agro'}</div>
+                <div style={{ fontSize: 11, fontWeight: 800, color: '#1b5e20' }}>{p?.vendor_name || p?.brand_name || 'Drithi Agro'}</div>
                 <div style={{ fontSize: 10, color: '#66bb6a', fontWeight: 700 }}>✅ Verified Seller</div>
               </div>
             </motion.div>
 
             {/* PRODUCT NAME */}
-            <motion.h1 {...fadeUp(0.13)} style={{ fontSize: 'clamp(16px,2.5vw,22px)', fontWeight: 900, color: '#0d1f0d', lineHeight: 1.3, letterSpacing: '0.04em', textTransform: 'uppercase', margin: '0 0 10px' }}>
+            <motion.h1 {...fadeUp(0.13)} style={{ fontSize: 18, fontWeight: 900, color: '#0d1f0d', lineHeight: 1.3, margin: 0 }}>
               {p?.name}
             </motion.h1>
 
             {/* STARS */}
-            <motion.div {...fadeUp(0.16)} style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 16 }}>
+            <motion.div {...fadeUp(0.16)} style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
               <div style={{ display: 'flex', gap: 2 }}>
-                {[1,2,3,4,5].map(s => <span key={s} style={{ fontSize: 14, color: s <= Math.round(rating) ? '#f9a825' : '#ddd' }}>★</span>)}
+                {[1,2,3,4,5].map(s => <span key={s} style={{ fontSize: 13, color: s <= Math.round(rating) ? '#f9a825' : '#ddd' }}>★</span>)}
               </div>
-              <span style={{ fontSize: 13, fontWeight: 800, color: '#444' }}>{rating.toFixed(1)}</span>
-              <span style={{ fontSize: 12, color: '#999' }}>({p?.review_count || 0} reviews)</span>
+              <span style={{ fontSize: 12, fontWeight: 800, color: '#444' }}>{rating.toFixed(1)}</span>
+              <span style={{ fontSize: 11, color: '#999' }}>({p?.review_count || 0} reviews)</span>
             </motion.div>
 
-            {/* PRICE — selling price only, no MRP */}
-            <motion.div {...fadeUp(0.19)} style={{ background: 'linear-gradient(135deg,#f9fbe7,#fff)', borderRadius: 14, padding: '14px 18px', border: '1.5px solid #c8e6c9', marginBottom: 16 }}>
-              <div style={{ fontSize: 34, fontWeight: 900, color: '#1b5e20', letterSpacing: '-1px', animation: 'pricePulse 3.5s ease-in-out infinite' }}>
-                ₹{sp.toLocaleString('en-IN')}
-              </div>
-              <div style={{ fontSize: 11, color: '#888', marginTop: 4 }}>Inclusive of all taxes · Free delivery above ₹499</div>
-              <div style={{ marginTop: 8, display: 'inline-flex', alignItems: 'center', gap: 6, background: p?.stock_qty > 0 ? '#e8f5e9' : '#ffebee', padding: '3px 10px', borderRadius: 20, fontSize: 12, fontWeight: 700, color: p?.stock_qty > 0 ? '#2e7d32' : '#c62828' }}>
+            {/* PRICE */}
+            <motion.div {...fadeUp(0.19)} style={{ background: 'linear-gradient(135deg,#f9fbe7,#fff)', borderRadius: 12, padding: '10px 14px', border: '1.5px solid #c8e6c9' }}>
+              <div style={{ fontSize: 28, fontWeight: 900, color: '#1b5e20', letterSpacing: '-1px' }}>₹{sp.toLocaleString('en-IN')}</div>
+              <div style={{ fontSize: 11, color: '#888', marginTop: 2 }}>Incl. taxes · Free delivery above ₹499</div>
+              <div style={{ marginTop: 6, display: 'inline-flex', alignItems: 'center', gap: 6, background: p?.stock_qty > 0 ? '#e8f5e9' : '#ffebee', padding: '2px 10px', borderRadius: 20, fontSize: 11, fontWeight: 700, color: p?.stock_qty > 0 ? '#2e7d32' : '#c62828' }}>
                 {p?.stock_qty > 0 ? `✅ In Stock — ${p.stock_qty} units` : '❌ Out of Stock'}
               </div>
             </motion.div>
 
             {/* VARIANTS */}
-            <motion.div {...fadeUp(0.22)} style={{ marginBottom: 16 }}>
+            <motion.div {...fadeUp(0.22)}>
               <QuantityVariants variants={MOCK_VARIANTS} selected={selVar} onSelect={(i, pr) => { setSelVar(i); setPrice(pr); }} />
             </motion.div>
 
             {/* QTY STEPPER */}
-            <motion.div {...fadeUp(0.25)} style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 16 }}>
-              <span style={{ fontSize: 13, fontWeight: 700, color: '#555' }}>Quantity:</span>
-              <div style={{ display: 'flex', alignItems: 'center', border: '2px solid #e0e0e0', borderRadius: 10, overflow: 'hidden' }}>
-                <button onClick={() => setQty(q => Math.max(1, q - 1))} style={{ width: 34, height: 34, border: 'none', background: '#f5f5f5', fontSize: 18, cursor: 'pointer' }}>−</button>
-                <span style={{ width: 38, textAlign: 'center', fontSize: 15, fontWeight: 800 }}>{qty}</span>
-                <button onClick={() => setQty(q => Math.min(10, q + 1))} style={{ width: 34, height: 34, border: 'none', background: '#f5f5f5', fontSize: 18, cursor: 'pointer' }}>+</button>
+            <motion.div {...fadeUp(0.25)} style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+              <span style={{ fontSize: 12, fontWeight: 700, color: '#555' }}>Qty:</span>
+              <div style={{ display: 'flex', alignItems: 'center', border: '2px solid #e0e0e0', borderRadius: 8, overflow: 'hidden' }}>
+                <button onClick={() => setQty(q => Math.max(1, q - 1))} style={{ width: 30, height: 30, border: 'none', background: '#f5f5f5', fontSize: 16, cursor: 'pointer' }}>−</button>
+                <span style={{ width: 34, textAlign: 'center', fontSize: 14, fontWeight: 800 }}>{qty}</span>
+                <button onClick={() => setQty(q => Math.min(10, q + 1))} style={{ width: 30, height: 30, border: 'none', background: '#f5f5f5', fontSize: 16, cursor: 'pointer' }}>+</button>
               </div>
-              <span style={{ fontSize: 11, color: '#aaa' }}>Max 10</span>
             </motion.div>
 
             {/* ACTION BUTTONS */}
-            <motion.div {...fadeUp(0.28)} style={{ display: 'flex', gap: 10, marginBottom: 18 }}>
+            <motion.div {...fadeUp(0.28)} style={{ display: 'flex', gap: 8 }}>
               <motion.button whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}
                 disabled={busy || p?.stock_qty === 0} onClick={addToCart}
-                style={{ flex: 1, background: 'linear-gradient(135deg,#ff6f00,#ff8f00)', color: 'white', border: 'none', padding: '13px 0', borderRadius: 12, fontSize: 14, fontWeight: 800, cursor: 'pointer', boxShadow: '0 4px 18px rgba(255,111,0,0.28)', opacity: busy ? 0.72 : 1 }}
+                style={{ flex: 1, background: 'linear-gradient(135deg,#ff6f00,#ff8f00)', color: 'white', border: 'none', padding: '11px 0', borderRadius: 10, fontSize: 13, fontWeight: 800, cursor: 'pointer', opacity: busy ? 0.72 : 1 }}
               >{busy ? '⏳ Adding...' : '🛒 Add to Cart'}</motion.button>
 
               <motion.button whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}
                 onClick={() => navigate('/checkout')}
-                style={{ flex: 1, background: 'linear-gradient(135deg,#1b5e20,#2e7d32)', color: 'white', border: 'none', padding: '13px 0', borderRadius: 12, fontSize: 14, fontWeight: 800, cursor: 'pointer', boxShadow: '0 4px 18px rgba(27,94,32,0.28)' }}
+                style={{ flex: 1, background: 'linear-gradient(135deg,#1b5e20,#2e7d32)', color: 'white', border: 'none', padding: '11px 0', borderRadius: 10, fontSize: 13, fontWeight: 800, cursor: 'pointer' }}
               >⚡ Buy Now</motion.button>
 
               <motion.button whileHover={{ scale: 1.08 }} whileTap={{ scale: 0.94 }}
                 onClick={toggleWish} disabled={wishBusy}
-                title={wished ? 'Remove from wishlist' : 'Add to wishlist'}
-                style={{ width: 46, height: 46, borderRadius: 12, border: `2px solid ${wished ? '#ffcdd2' : '#e0e0e0'}`, background: wished ? '#ffebee' : 'white', fontSize: 20, cursor: 'pointer', flexShrink: 0, transition: 'all 0.2s' }}
+                style={{ width: 42, height: 42, borderRadius: 10, border: `2px solid ${wished ? '#ffcdd2' : '#e0e0e0'}`, background: wished ? '#ffebee' : 'white', fontSize: 18, cursor: 'pointer', flexShrink: 0 }}
               >{wishBusy ? '⏳' : wished ? '❤️' : '🤍'}</motion.button>
             </motion.div>
 
             {/* DELIVERY INFO */}
-            <motion.div {...fadeUp(0.31)} style={{ background: 'white', border: '1.5px solid #e8f5e9', borderRadius: 14, padding: '14px 16px', display: 'flex', flexDirection: 'column', gap: 9, marginBottom: 20 }}>
-              {[['🚚','Free delivery by','Tomorrow, 5 PM'],['🔄','7-day','easy return & replacement'],['🛡️','100% Genuine','product — Verified by Drithi Agro']].map(([ic,b,rest]) => (
-                <div key={ic} style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, color: '#444' }}>
-                  <span style={{ fontSize: 16 }}>{ic}</span>
+            <motion.div {...fadeUp(0.31)} style={{ background: 'white', border: '1.5px solid #e8f5e9', borderRadius: 12, padding: '10px 14px', display: 'flex', flexDirection: 'column', gap: 6 }}>
+              {[['🚚','Free delivery','Tomorrow, 5 PM'],['🔄','7-day','easy returns'],['🛡️','100% Genuine','Verified by Drithi Agro']].map(([ic,b,rest]) => (
+                <div key={ic} style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 12, color: '#444' }}>
+                  <span>{ic}</span>
                   <span><b style={{ color: '#1b5e20' }}>{b}</b> {rest}</span>
                 </div>
               ))}
@@ -252,47 +248,40 @@ export default function Product() {
               <div style={{ display: 'flex', borderBottom: '2px solid #eee' }}>
                 {['desc','specs','reviews'].map(t => (
                   <button key={t} onClick={() => setTab(t)}
-                    style={{ padding: '9px 16px', fontSize: 13, fontWeight: 700, border: 'none', background: 'none', cursor: 'pointer', color: tab === t ? '#2e7d32' : '#999', borderBottom: tab === t ? '3px solid #2e7d32' : '3px solid transparent', marginBottom: -2 }}
+                    style={{ padding: '7px 12px', fontSize: 12, fontWeight: 700, border: 'none', background: 'none', cursor: 'pointer', color: tab === t ? '#2e7d32' : '#999', borderBottom: tab === t ? '3px solid #2e7d32' : '3px solid transparent', marginBottom: -2 }}
                   >
-                    {t === 'desc' ? 'Description' : t === 'specs' ? 'Specifications' : `Reviews (${p?.review_count || 3})`}
+                    {t === 'desc' ? 'Description' : t === 'specs' ? 'Specs' : `Reviews (${p?.review_count || 3})`}
                   </button>
                 ))}
               </div>
-
               <AnimatePresence mode="wait">
-                <motion.div key={tab}
-                  initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -6 }}
-                  transition={{ duration: 0.2 }}
-                  style={{ paddingTop: 14, fontSize: 14, color: '#555', lineHeight: 1.75 }}
+                <motion.div key={tab} initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} transition={{ duration: 0.18 }}
+                  style={{ paddingTop: 10, fontSize: 13, color: '#555', lineHeight: 1.7, maxHeight: 160, overflowY: 'auto' }}
                 >
-                  {tab === 'desc' && (
-                    <p>{p?.description || 'Premium quality agricultural product sourced directly from verified manufacturers. Trusted by 5 lakh+ farmers across India.'}</p>
-                  )}
+                  {tab === 'desc' && <p style={{ margin: 0 }}>{p?.description || 'Premium quality agricultural product sourced directly from verified manufacturers. Trusted by 5 lakh+ farmers across India.'}</p>}
                   {tab === 'specs' && (
-                    <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
+                    <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 12 }}>
                       <tbody>
-                        {[['Brand', p?.brand_name || p?.vendor_name || 'N/A'],['Category', p?.category_name || 'N/A'],['SKU', p?.sku || 'N/A'],['Weight', p?.weight ? p.weight + ' g' : 'N/A'],['Stock', p?.stock_qty ?? 'N/A']].map(([k,v],i) => (
+                        {[['Brand', p?.brand_name || p?.vendor_name || 'N/A'],['Category', p?.category_name || 'N/A'],['SKU', p?.sku || 'N/A'],['Stock', p?.stock_qty ?? 'N/A']].map(([k,v],i) => (
                           <tr key={k} style={{ background: i%2===0 ? '#f9fbe7' : 'white' }}>
-                            <td style={{ padding: '8px 12px', fontWeight: 700, color: '#333', width: '40%', border: '1px solid #e8f5e9' }}>{k}</td>
-                            <td style={{ padding: '8px 12px', border: '1px solid #e8f5e9' }}>{v}</td>
+                            <td style={{ padding: '6px 10px', fontWeight: 700, color: '#333', width: '40%', border: '1px solid #e8f5e9' }}>{k}</td>
+                            <td style={{ padding: '6px 10px', border: '1px solid #e8f5e9' }}>{v}</td>
                           </tr>
                         ))}
                       </tbody>
                     </table>
                   )}
                   {tab === 'reviews' && (
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                       {REVIEWS.map((r, i) => (
-                        <motion.div key={i} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.06 }}
-                          style={{ background: '#f9fbe7', borderRadius: 12, padding: '12px 14px' }}
-                        >
-                          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 7 }}>
-                            <div style={{ width: 32, height: 32, borderRadius: '50%', background: 'linear-gradient(135deg,#2e7d32,#66bb6a)', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, fontSize: 13 }}>{r.init}</div>
-                            <div><div style={{ fontWeight: 700, fontSize: 13 }}>{r.name}</div><div style={{ fontSize: 11, color: '#999' }}>📍 {r.loc}</div></div>
-                            <div style={{ marginLeft: 'auto', color: '#f9a825', fontSize: 12 }}>{'★'.repeat(r.stars)}{'☆'.repeat(5-r.stars)}</div>
+                        <div key={i} style={{ background: '#f9fbe7', borderRadius: 10, padding: '10px 12px' }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 5 }}>
+                            <div style={{ width: 28, height: 28, borderRadius: '50%', background: 'linear-gradient(135deg,#2e7d32,#66bb6a)', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, fontSize: 12 }}>{r.init}</div>
+                            <div><div style={{ fontWeight: 700, fontSize: 12 }}>{r.name}</div><div style={{ fontSize: 10, color: '#999' }}>📍 {r.loc}</div></div>
+                            <div style={{ marginLeft: 'auto', color: '#f9a825', fontSize: 11 }}>{'★'.repeat(r.stars)}</div>
                           </div>
-                          <p style={{ fontSize: 13, color: '#666', lineHeight: 1.6, margin: 0 }}>{r.text}</p>
-                        </motion.div>
+                          <p style={{ fontSize: 12, color: '#666', lineHeight: 1.5, margin: 0 }}>{r.text}</p>
+                        </div>
                       ))}
                     </div>
                   )}

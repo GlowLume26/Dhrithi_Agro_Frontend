@@ -125,11 +125,8 @@ export default function Product() {
       <style>{`
         @keyframes shimmer{0%{background-position:300% 0}100%{background-position:-300% 0}}
         @keyframes pricePulse{0%,100%{opacity:1}50%{opacity:.78}}
-        .prod-grid{display:grid;grid-template-columns:380px 1fr;gap:32px;align-items:stretch;max-width:1200px;margin:0 auto;padding:24px 32px 48px;}
+        .prod-grid{display:grid;grid-template-columns:340px 1fr;gap:32px;align-items:start;max-width:1100px;margin:0 auto;padding:24px 32px 48px;}
         .prod-right-col{display:flex;flex-direction:column;gap:12px;}
-        .prod-img-col{display:flex;flex-direction:column;}
-        .prod-img-col>div{flex:1;}
-        .prod-img-col>div>div{height:100%;}
         @media(max-width:860px){.prod-grid{grid-template-columns:1fr!important;gap:20px;padding:16px;}}
       `}</style>
 
@@ -145,13 +142,13 @@ export default function Product() {
       <div className="prod-grid">
 
         {/* ── IMAGE COLUMN ── */}
-        <motion.div {...fadeUp(0.05)} className="prod-img-col">
+        <motion.div {...fadeUp(0.05)}>
           {loading ? (
-            <div style={{ display: 'flex', gap: 10, height: 380 }}>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-                {[0,1,2,3].map(i => <Skel key={i} h={64} w={64} r={10} />)}
+            <div style={{ width: 340 }}>
+              <div style={{ width: 340, height: 340, borderRadius: 16, background: 'linear-gradient(90deg,#e8f5e9 25%,#f1f8e9 50%,#e8f5e9 75%)', backgroundSize: '300% 100%', animation: 'shimmer 1.4s infinite', marginBottom: 10 }} />
+              <div style={{ display: 'flex', gap: 8 }}>
+                {[0,1,2,3].map(i => <Skel key={i} h={74} w={74} r={10} />)}
               </div>
-              <Skel h={380} r={18} />
             </div>
           ) : (
             <ImageGallery images={images} />

@@ -58,7 +58,7 @@ export default function ImageGallery({ images = [] }) {
 
         {/* MAIN IMAGE */}
         <div
-          style={{ flex: 1, maxWidth: 280, position: 'relative', borderRadius: 18, overflow: 'hidden', background: '#f1f8e9', aspectRatio: '1/1', boxShadow: '0 8px 32px rgba(0,0,0,0.11)', cursor: 'zoom-in' }}
+          style={{ width: 280, height: 280, flexShrink: 0, position: 'relative', borderRadius: 18, overflow: 'hidden', background: '#f1f8e9', boxShadow: '0 8px 32px rgba(0,0,0,0.11)', cursor: 'zoom-in' }}
           onTouchStart={e => { touchX.current = e.touches[0].clientX; pause(); }}
           onTouchEnd={e => { if (touchX.current === null) return; const d = touchX.current - e.changedTouches[0].clientX; if (Math.abs(d) > 40) go(cur + (d > 0 ? 1 : -1)); touchX.current = null; }}
           onClick={() => setFull(true)}

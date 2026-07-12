@@ -40,7 +40,7 @@ export default function ImageGallery({ images = [] }) {
 
   return (
     <>
-      <div style={{ display: 'flex', gap: 10 }}>
+      <div style={{ display: 'inline-flex', gap: 10 }}>
 
         {/* THUMBNAILS — vertical strip on left */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: 8, flexShrink: 0 }}>
@@ -58,7 +58,7 @@ export default function ImageGallery({ images = [] }) {
 
         {/* MAIN IMAGE */}
         <div
-          style={{ flex: 1, position: 'relative', borderRadius: 18, overflow: 'hidden', background: '#f1f8e9', aspectRatio: '1/1', boxShadow: '0 8px 32px rgba(0,0,0,0.11)', cursor: 'zoom-in' }}
+          style={{ flex: 1, maxWidth: 280, position: 'relative', borderRadius: 18, overflow: 'hidden', background: '#f1f8e9', aspectRatio: '1/1', boxShadow: '0 8px 32px rgba(0,0,0,0.11)', cursor: 'zoom-in' }}
           onTouchStart={e => { touchX.current = e.touches[0].clientX; pause(); }}
           onTouchEnd={e => { if (touchX.current === null) return; const d = touchX.current - e.changedTouches[0].clientX; if (Math.abs(d) > 40) go(cur + (d > 0 ? 1 : -1)); touchX.current = null; }}
           onClick={() => setFull(true)}

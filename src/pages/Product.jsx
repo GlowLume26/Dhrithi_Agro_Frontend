@@ -125,7 +125,7 @@ export default function Product() {
       <style>{`
         @keyframes shimmer{0%{background-position:300% 0}100%{background-position:-300% 0}}
         @keyframes pricePulse{0%,100%{opacity:1}50%{opacity:.78}}
-        .prod-grid{display:grid;grid-template-columns:60% 1fr;gap:40px;align-items:start;max-width:1200px;margin:0 auto;padding:28px 24px 48px;}
+        .prod-grid{display:grid;grid-template-columns:48% 1fr;gap:40px;align-items:start;max-width:1200px;margin:0 auto;padding:28px 24px 48px;}
         .prod-right-col{position:sticky;top:80px;display:flex;flex-direction:column;gap:14px;}
         @media(max-width:860px){.prod-grid{grid-template-columns:1fr!important;gap:20px;padding:16px;}.prod-right-col{position:static;}}
       `}</style>

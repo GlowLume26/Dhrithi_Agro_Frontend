@@ -43,7 +43,7 @@ export default function ImageGallery({ images = [] }) {
       <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
         {/* MAIN FRAME */}
         <div
-          style={{ position: 'relative', borderRadius: 22, overflow: 'hidden', background: '#f1f8e9', aspectRatio: '4/3.2', boxShadow: '0 12px 50px rgba(0,0,0,0.13)', cursor: 'zoom-in' }}
+          style={{ position: 'relative', borderRadius: 22, overflow: 'hidden', background: '#f1f8e9', aspectRatio: '4/2.4', boxShadow: '0 12px 50px rgba(0,0,0,0.13)', cursor: 'zoom-in' }}
           onTouchStart={e => { touchX.current = e.touches[0].clientX; pause(); }}
           onTouchEnd={e => { if (touchX.current === null) return; const d = touchX.current - e.changedTouches[0].clientX; if (Math.abs(d) > 40) go(cur + (d > 0 ? 1 : -1)); touchX.current = null; }}
           onClick={() => setFull(true)}

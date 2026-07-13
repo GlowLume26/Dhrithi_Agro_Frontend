@@ -49,32 +49,25 @@ export default function Product() {
     setLoading(true);
     api.get('products', { id }).then(res => {
       const p = res.success && (res.data?.[0] || res.data);
-      if (p) {
-        setProduct(p);
-        setPrice(Number(p.selling_price));
-      }
+      if (p) { setProduct(p); setPrice(Number(p.selling_price)); }
       setLoading(false);
-    });
+    }).catch(() => setLoading(false));
   }, [id]);
 
-  // separate effect so similar products always load even if product fetch is slow
   useEffect(() => {
     if (!id) return;
     api.get('products', { sort: 'sold_count', order: 'desc', limit: 12 }).then(r => {
-      if (r.success && r.data?.length) {
+      if (r.success && r.data?.length)
         setSimilar(r.data.filter(x => String(x.id) !== String(id)).slice(0, 8));
-      }
-    });
+    }).catch(() => {});
   }, [id]);
 
-  // load wishlist status for this product
   useEffect(() => {
     if (!isLoggedIn || !id) return;
     api.get('wishlist').then(res => {
-      if (res.success && res.data) {
+      if (res.success && res.data)
         setWished(res.data.some(w => String(w.product_id) === String(id)));
-      }
-    });
+    }).catch(() => {});
   }, [isLoggedIn, id]);
 
   async function toggleWish() {

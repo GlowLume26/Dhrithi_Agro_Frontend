@@ -13,11 +13,15 @@ export function CartProvider({ children }) {
     try {
       const res = await api.get('cart');
       if (res.success && res.data?.items) setCartCount(res.data.items.length);
-    } catch {}
+      else if (!res.success) setCartCount(0);
+    } catch { setCartCount(0); }
   }, [token]);
 
+  // expose token so consumers can guard calls
+  const isLoggedIn = !!token;
+
   return (
-    <CartContext.Provider value={{ cartCount, setCartCount, refreshCart }}>
+    <CartContext.Provider value={{ cartCount, setCartCount, refreshCart, isLoggedIn }}>
       {children}
     </CartContext.Provider>
   );

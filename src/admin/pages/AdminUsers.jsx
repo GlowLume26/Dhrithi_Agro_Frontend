@@ -26,15 +26,21 @@ export default function AdminUsers() {
   const [editId, setEditId]   = useState(null);
   const [saving, setSaving]   = useState(false);
   const [err, setErr]         = useState('');
+  const [loadErr, setLoadErr] = useState('');
 
   useEffect(() => { load(); }, []);
 
   async function load() {
     setLoading(true);
+    setLoadErr('');
     try {
       const res = await adminApi.getAdmins();
-      setAdmins(res.data ?? res ?? []);
-    } catch { setAdmins([]); }
+      if (res.success) setAdmins(res.data ?? []);
+      else setLoadErr(res.message || 'Failed to load admins');
+    } catch (e) {
+      setLoadErr(e?.response?.data?.message || e?.message || 'Failed to load admins');
+      setAdmins([]);
+    }
     setLoading(false);
   }
 
@@ -126,6 +132,8 @@ export default function AdminUsers() {
             <tbody>
               {loading
                 ? <tr><td colSpan={8} style={{ textAlign: 'center', padding: 40, color: 'var(--atx3)' }}>Loading...</td></tr>
+                : loadErr
+                  ? <tr><td colSpan={8} style={{ textAlign: 'center', padding: 40, color: '#dc2626' }}>⚠️ {loadErr}</td></tr>
                 : admins.length === 0
                   ? <tr><td colSpan={8}><Empty icon="🛡️" title="No admin users" /></td></tr>
                   : admins.map((a, i) => (

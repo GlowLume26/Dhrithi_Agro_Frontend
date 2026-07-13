@@ -27,7 +27,7 @@ export default function Header() {
 
   const activeStyle = { background: 'rgba(249,168,37,0.22)', borderRadius: '50%' };
 
-  useEffect(() => { refreshCart(); }, [refreshCart]);
+  useEffect(() => { if (isLoggedIn) refreshCart(); }, [isLoggedIn, refreshCart]);
 
   async function loadCategories() {
     if (categories.length) return;

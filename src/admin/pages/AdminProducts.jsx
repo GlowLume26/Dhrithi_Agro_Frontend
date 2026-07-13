@@ -10,7 +10,7 @@ function genCode() {
   return 'PRD-' + Date.now().toString(36).toUpperCase().slice(-6) + Math.random().toString(36).slice(2,5).toUpperCase();
 }
 
-const EMPTY_FORM = { name:'', category_id:'', subcategory_id:'', brand:'', sku:'', product_code:'', selling_price:'', mrp:'', stock_qty:'', description:'', is_active:true };
+const EMPTY_FORM = { name:'', vendor_id:'', category_id:'', subcategory_id:'', brand:'', sku:'', product_code:'', selling_price:'', mrp:'', stock_qty:'', description:'', is_active:true };
 
 export default function AdminProducts() {
   const [products, setProducts]     = useState([]);
@@ -22,6 +22,7 @@ export default function AdminProducts() {
   const [filterCat, setFilterCat]   = useState('');
   const [filterSub, setFilterSub]   = useState('');
   const [categories, setCategories] = useState([]);
+  const [vendors, setVendors]       = useState([]);
   const [form, setForm]             = useState(EMPTY_FORM);
   const [variants, setVariants]     = useState([{ qty:'', price:'' }]);
   const [images, setImages]         = useState([]);
@@ -29,6 +30,8 @@ export default function AdminProducts() {
   const [modal, setModal]           = useState(false);
   const [delId, setDelId]           = useState(null);
   const [dragOver, setDragOver]     = useState(false);
+  const [saving, setSaving]         = useState(false);
+  const [saveErr, setSaveErr]       = useState('');
   const fileRef = useRef();
 
   const parentCats       = categories.filter(c => !c.parent_id);
@@ -38,6 +41,7 @@ export default function AdminProducts() {
 
   useEffect(() => {
     adminApi.getCategories().then(res => { if (res.success) setCategories(res.data || []); });
+    adminApi.getVendors({ status: 'approved' }).then(res => { if (res.success) setVendors(res.data || []); });
   }, []);
 
   useEffect(() => { load(); }, [page, limit, search, filterCat, filterSub]);
@@ -59,26 +63,60 @@ export default function AdminProducts() {
 
   function openAdd() {
     setForm({ ...EMPTY_FORM, product_code: genCode() });
-    setVariants([{qty:'',price:''}]); setImages([]); setEditId(null); setModal(true);
+    setVariants([{qty:'',price:''}]); setImages([]); setEditId(null); setSaveErr(''); setModal(true);
   }
 
   function openEdit(p) {
+    // p.category_id is the subcategory (leaf). Find its parent to pre-fill the category dropdown.
+    const sub = categories.find(c => c.id === p.category_id);
+    const parentId = sub?.parent_id || '';
     setForm({
-      name: p.name, category_id: p.category_id||'', subcategory_id: p.subcategory_id||'',
+      name: p.name, vendor_id: p.vendor_id||'',
+      category_id: parentId || p.category_id || '',
+      subcategory_id: parentId ? (p.category_id || '') : '',
       brand: p.brand_name||'', sku: p.sku||'', product_code: p.product_code||p.sku||'',
       selling_price: p.selling_price, mrp: p.mrp||'', stock_qty: p.stock_qty,
       description: p.description||'', is_active: p.is_active !== false
     });
-    setVariants(p.variants||[{qty:'',price:''}]); setImages(p.images||[]); setEditId(p.id); setModal(true);
+    setVariants(p.variants||[{qty:'',price:''}]); setImages(p.images||[]); setEditId(p.id); setSaveErr(''); setModal(true);
   }
 
   async function save() {
+    setSaveErr('');
+    if (!form.name.trim())        return setSaveErr('Product name is required');
+    if (!form.vendor_id)          return setSaveErr('Please select a vendor');
+    if (!form.selling_price)      return setSaveErr('Selling price is required');
+    if (!form.mrp)                return setSaveErr('MRP is required');
+    if (!form.stock_qty)          return setSaveErr('Stock quantity is required');
+
+    // Use subcategory_id as category_id if selected, else use parent category_id
+    const category_id = form.subcategory_id || form.category_id || undefined;
+
+    const payload = {
+      name:         form.name,
+      vendor_id:    form.vendor_id,
+      category_id,
+      description:  form.description,
+      sku:          form.sku,
+      product_code: form.product_code,
+      mrp:          Number(form.mrp),
+      selling_price: Number(form.selling_price),
+      stock_qty:    Number(form.stock_qty),
+      is_active:    form.is_active,
+    };
+
+    setSaving(true);
     try {
-      const payload = { ...form, variants, images };
-      if (editId) await adminApi.updateProduct(editId, payload);
-      else        await adminApi.createProduct(payload);
-    } catch {}
-    setModal(false); load();
+      const res = editId
+        ? await adminApi.updateProduct(editId, payload)
+        : await adminApi.createProduct(payload);
+      if (!res.success) { setSaveErr(res.message || 'Failed to save product'); setSaving(false); return; }
+      setModal(false);
+      load();
+    } catch (e) {
+      setSaveErr(e?.response?.data?.message || e?.message || 'Failed to save product');
+    }
+    setSaving(false);
   }
 
   async function del() { try { await adminApi.deleteProduct(delId); } catch {} setDelId(null); load(); }
@@ -184,15 +222,26 @@ export default function AdminProducts() {
       </div>
 
       {/* ADD / EDIT MODAL */}
-      <Modal open={modal} onClose={()=>setModal(false)} title={editId?'Edit Product':'Add Product'} large
+      <Modal open={modal} onClose={()=>{ setModal(false); setSaveErr(''); }} title={editId?'Edit Product':'Add Product'} large
         footer={<>
-          <button className="a-btn a-btn-sec" onClick={()=>setModal(false)}>Cancel</button>
-          <button className="a-btn a-btn-pri" onClick={save}>💾 {editId?'Update':'Create'} Product</button>
+          <button className="a-btn a-btn-sec" onClick={()=>{ setModal(false); setSaveErr(''); }}>Cancel</button>
+          <button className="a-btn a-btn-pri" onClick={save} disabled={saving}>
+            {saving ? '⏳ Saving...' : `💾 ${editId?'Update':'Create'} Product`}
+          </button>
         </>}
       >
         <div style={{ display:'flex', flexDirection:'column', gap:20 }}>
+          {saveErr && <div style={{ background:'#fef2f2', border:'1px solid #fecaca', borderRadius:8, padding:'10px 14px', color:'#dc2626', fontSize:13 }}>⚠️ {saveErr}</div>}
           <div className="a-form-grid">
             <div className="a-fg full"><label>Product Name *</label><input className="a-input" value={form.name} onChange={e=>f('name',e.target.value)} placeholder="Enter product name" /></div>
+
+            <div className="a-fg full">
+              <label>Vendor *</label>
+              <select className="a-input a-select" value={form.vendor_id} onChange={e=>f('vendor_id', e.target.value)}>
+                <option value="">Select vendor</option>
+                {vendors.map(v=><option key={v.id} value={v.id}>{v.business_name}</option>)}
+              </select>
+            </div>
 
             <div className="a-fg">
               <label>Category</label>

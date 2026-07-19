@@ -5,12 +5,12 @@ export const ROLES = {
 };
 
 // All available modules
-export const ALL_MODULES = ['dashboard','products','orders','customers','categories','inventory','offers','reports','settings','admins'];
+export const ALL_MODULES = ['dashboard','products','orders','customers','vendors','categories','inventory','offers','reports','settings','admins'];
 
 // Default modules per role (used when no custom permissions set)
 export const ROLE_MODULES = {
   owner: ALL_MODULES,
-  admin: ['dashboard','products','orders','customers'],
+  admin: ['dashboard','products','orders','customers','vendors'],
 };
 
 // Sidebar nav items
@@ -19,6 +19,7 @@ export const NAV_ITEMS = [
   { id:'products',    label:'Products',     icon:'RxCube',        path:'/admin/products'   },
   { id:'orders',      label:'Orders',       icon:'RxListBullet',  path:'/admin/orders'     },
   { id:'customers',   label:'Customers',    icon:'RxPerson',      path:'/admin/customers'  },
+  { id:'vendors',     label:'Vendors',      icon:'RxPeople',      path:'/admin/vendors'    },
   { id:'categories',  label:'Categories',   icon:'RxGrid',        path:'/admin/categories' },
   { id:'inventory',   label:'Inventory',    icon:'RxArchive',     path:'/admin/inventory'  },
   { id:'offers',      label:'Offers',       icon:'RxTag',         path:'/admin/offers'     },

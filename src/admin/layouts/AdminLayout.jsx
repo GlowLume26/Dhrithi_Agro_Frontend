@@ -79,7 +79,7 @@ export default function AdminLayout({ children }) {
         {/* TOPBAR */}
         <header className="a-topbar">
           <button className="a-icon-btn" style={{ border: 'none' }}
-            onClick={() => { setCollapsed(c => !c); setMobileOpen(o => !o); }}>
+            onClick={() => { if (window.innerWidth <= 768) setMobileOpen(o => !o); else setCollapsed(c => !c); }}>
             ☰
           </button>
 

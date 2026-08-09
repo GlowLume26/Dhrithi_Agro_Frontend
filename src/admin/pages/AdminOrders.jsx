@@ -87,11 +87,11 @@ export default function AdminOrders() {
               <tr>
                 <th style={{ width:44 }}>#</th>
                 <th>Order ID</th>
-                <th>Date</th>
+                <th className="hide-mobile">Date</th>
                 <th>Customer</th>
-                <th>Location</th>
+                <th className="hide-mobile">Location</th>
                 <th>Amount</th>
-                <th>Payment</th>
+                <th className="hide-mobile">Payment</th>
                 <th>Status</th>
                 <th>Action</th>
               </tr>
@@ -106,18 +106,18 @@ export default function AdminOrders() {
                     transition={{ delay:i*0.04 }} style={{ cursor:'pointer' }} onClick={()=>setDetail(o)}>
                     <td style={{ color:'var(--atx3)', fontWeight:600, fontSize:13, textAlign:'center' }}>{(page-1)*limit + i + 1}</td>
                     <td style={{ fontWeight:700, color:'var(--apri)' }}>#{o.order_number}</td>
-                    <td style={{ color:'var(--atx2)', fontSize:12 }}>
+                    <td className="hide-mobile" style={{ color:'var(--atx2)', fontSize:12 }}>
                       <div>{new Date(o.created_at).toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'})}</div>
                       <div style={{ fontSize:11, color:'var(--atx3)', marginTop:1 }}>{new Date(o.created_at).toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'})}</div>
                     </td>
                     <td style={{ fontWeight:600 }}>{o.customer_name}</td>
-                    <td onClick={e=>handleLocationClick(e,o)}>
+                    <td className="hide-mobile" onClick={e=>handleLocationClick(e,o)}>
                       <span style={{ color:'var(--apri)', cursor:'pointer', fontSize:13, display:'flex', alignItems:'center', gap:4 }}>
                         📍 <span style={{ textDecoration:'underline dotted' }}>{o.city || o.address?.city || '—'}</span>
                       </span>
                     </td>
                     <td style={{ fontWeight:700 }}>{amt(o)}</td>
-                    <td>
+                    <td className="hide-mobile">
                       <span style={{ fontSize:12, fontWeight:600,
                         color: o.payment_status==='paid'?'#16a34a': o.payment_status==='pending'?'#d97706':'#dc2626' }}>
                         {o.payment_status}
@@ -185,7 +185,7 @@ export default function AdminOrders() {
       <Modal open={!!detail} onClose={()=>setDetail(null)} title={`Order #${detail?.order_number}`} large>
         {detail && (
           <div style={{ display:'flex', flexDirection:'column', gap:20 }}>
-            <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:16 }}>
+            <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit,minmax(200px,1fr))', gap:16 }}>
               {/* Customer + Address */}
               <div className="a-card a-card-p">
                 <h4 style={{ fontSize:13, fontWeight:700, color:'var(--atx2)', marginBottom:10, textTransform:'uppercase', letterSpacing:0.7 }}>Customer Info</h4>

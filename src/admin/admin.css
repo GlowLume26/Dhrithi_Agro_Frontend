@@ -181,7 +181,7 @@
 
 /* ── Search / Filter bar ── */
 .a-filter-bar { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; padding: 14px 16px; border-bottom: 1px solid var(--abord); }
-.a-filter-bar .a-input { flex: 1; min-width: 180px; }
+.a-filter-bar .a-input { flex: 1; min-width: 140px; max-width: 100%; }
 
 /* ── Timeline ── */
 .a-timeline { display: flex; flex-direction: column; gap: 0; }

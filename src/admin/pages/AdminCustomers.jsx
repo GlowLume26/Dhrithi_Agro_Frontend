@@ -81,7 +81,7 @@ export default function AdminCustomers() {
 
         <div className="a-table-wrap">
           <table className="a-table">
-            <thead><tr><th style={{ width:44 }}>#</th><th>ID</th><th>Name</th><th>Phone</th><th>Email</th><th>City</th><th>Orders</th><th>Spent</th><th>Action</th></tr></thead>
+            <thead><tr><th style={{ width:44 }}>#</th><th className="hide-mobile">ID</th><th>Name</th><th>Phone</th><th className="hide-mobile">Email</th><th className="hide-mobile">City</th><th className="hide-mobile">Orders</th><th>Spent</th><th>Action</th></tr></thead>
             <tbody>
               {loading
                 ? [0, 1, 2, 3].map(i => <tr key={i}><td colSpan={9}><Skel h={40} /></td></tr>)
@@ -90,7 +90,7 @@ export default function AdminCustomers() {
                 : customers.map((c, i) => (
                   <motion.tr key={c.id} initial={{ opacity: 0, y: 5 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.04 }}>
                     <td style={{ color:'var(--atx3)', fontWeight:600, fontSize:13, textAlign:'center' }}>{(page-1)*limit + i + 1}</td>
-                    <td style={{ fontSize: 12, color: 'var(--atx3)' }}>{c.customer_code}</td>
+                    <td className="hide-mobile" style={{ fontSize: 12, color: 'var(--atx3)' }}>{c.customer_code}</td>
                     <td>
                       <div style={{ display: 'flex', alignItems: 'center', gap: 9 }}>
                         <div style={{ width: 30, height: 30, borderRadius: '50%', background: 'linear-gradient(135deg,#2e7d32,#66bb6a)', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, fontSize: 13, flexShrink: 0 }}>{c.first_name.charAt(0)}</div>
@@ -98,13 +98,13 @@ export default function AdminCustomers() {
                       </div>
                     </td>
                     <td style={{ color: 'var(--atx2)' }}>📱 {c.mobile}</td>
-                    <td style={{ color: 'var(--atx2)', fontSize: 12 }}>{c.email}</td>
-                    <td onClick={e => { e.stopPropagation(); const rect = e.currentTarget.getBoundingClientRect(); setAddrPopup({ customer: c, rect }); }}>
+                    <td className="hide-mobile" style={{ color: 'var(--atx2)', fontSize: 12 }}>{c.email}</td>
+                    <td className="hide-mobile" onClick={e => { e.stopPropagation(); const rect = e.currentTarget.getBoundingClientRect(); setAddrPopup({ customer: c, rect }); }}>
                       <span style={{ color:'var(--apri)', cursor:'pointer', fontSize:13, display:'flex', alignItems:'center', gap:4 }}>
                         📍 <span style={{ textDecoration:'underline dotted' }}>{c.city || '—'}</span>
                       </span>
                     </td>
-                    <td style={{ fontWeight: 700, textAlign: 'center' }}>{c.total_orders}</td>
+                    <td className="hide-mobile" style={{ fontWeight: 700, textAlign: 'center' }}>{c.total_orders}</td>
                     <td style={{ fontWeight: 700, color: 'var(--apri)' }}>₹{Number(c.total_spent).toLocaleString('en-IN')}</td>
                     <td><button className="a-btn a-btn-sm a-btn-sec" onClick={() => openDetail(c)}>View</button></td>
                   </motion.tr>
@@ -187,7 +187,7 @@ export default function AdminCustomers() {
                 <div className="a-fg"><label>Phone</label><input className="a-input" value={editForm.mobile} onChange={e => setEditForm(f => ({ ...f, mobile: e.target.value }))} /></div>
               </div>
             ) : (
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(140px,1fr))', gap: 12 }}>
                 {[['📧 Email', detail.email], ['📱 Phone', detail.mobile], ['🛒 Orders', detail.total_orders], ['💰 Total Spent', '₹' + Number(detail.total_spent).toLocaleString('en-IN')]].map(([l, v]) => (
                   <div key={l} style={{ background: 'var(--ab3)', borderRadius: 10, padding: '12px 14px' }}>
                     <div style={{ fontSize: 11, color: 'var(--atx3)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: 0.7, marginBottom: 4 }}>{l}</div>

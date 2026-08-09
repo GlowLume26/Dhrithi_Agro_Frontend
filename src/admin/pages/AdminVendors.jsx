@@ -222,11 +222,11 @@ export default function AdminVendors() {
                 <tr>
                   <th style={{ width: 44 }}>#</th>
                   <th>{vendorTab === 'seller' ? 'Business' : 'Name'}</th>
-                  <th>Owner</th>
-                  <th>Phone</th>
-                  <th>City</th>
-                  {vendorTab === 'seller' && <th>GST</th>}
-                  {vendorTab === 'seller' && <th>Licence</th>}
+                  <th className="hide-mobile">Owner</th>
+                  <th className="hide-mobile">Phone</th>
+                  <th className="hide-mobile">City</th>
+                  {vendorTab === 'seller' && <th className="hide-mobile">GST</th>}
+                  {vendorTab === 'seller' && <th className="hide-mobile">Licence</th>}
                   <th>Status</th>
                   <th>Action</th>
                 </tr>
@@ -240,7 +240,6 @@ export default function AdminVendors() {
                     <motion.tr key={v.id} initial={{ opacity: 0, y: 5 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.04 }}>
                       <td style={{ color: 'var(--atx3)', fontWeight: 600, fontSize: 13, textAlign: 'center' }}>{(page-1)*limit + i + 1}</td>
                       <td>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: 9 }}>
                           <div style={{ width: 32, height: 32, borderRadius: '50%', background: vendorTab === 'seller' ? 'linear-gradient(135deg,#1b5e20,#66bb6a)' : 'linear-gradient(135deg,#1565c0,#42a5f5)', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, fontSize: 13, flexShrink: 0 }}>
                             {(v.business_name || v.owner_name || '?').charAt(0).toUpperCase()}
                           </div>
@@ -250,16 +249,16 @@ export default function AdminVendors() {
                           </div>
                         </div>
                       </td>
-                      <td style={{ color: 'var(--atx2)', fontSize: 13 }}>{v.owner_name}</td>
-                      <td style={{ color: 'var(--atx2)' }}>📱 {v.mobile}</td>
-                      <td style={{ color: 'var(--atx2)', fontSize: 13 }}>📍 {v.city || '—'}</td>
+                      <td className="hide-mobile" style={{ color: 'var(--atx2)', fontSize: 13 }}>{v.owner_name}</td>
+                      <td className="hide-mobile" style={{ color: 'var(--atx2)' }}>📱 {v.mobile}</td>
+                      <td className="hide-mobile" style={{ color: 'var(--atx2)', fontSize: 13 }}>📍 {v.city || '—'}</td>
                       {vendorTab === 'seller' && (
-                        <td style={{ fontSize: 12, fontFamily: 'monospace', color: v.gst_number ? 'var(--atx2)' : '#ef4444' }}>
+                        <td className="hide-mobile" style={{ fontSize: 12, fontFamily: 'monospace', color: v.gst_number ? 'var(--atx2)' : '#ef4444' }}>
                           {v.gst_number || '⚠️ Missing'}
                         </td>
                       )}
                       {vendorTab === 'seller' && (
-                        <td style={{ fontSize: 12, color: v.licence_number ? 'var(--atx2)' : '#ef4444' }}>
+                        <td className="hide-mobile" style={{ fontSize: 12, color: v.licence_number ? 'var(--atx2)' : '#ef4444' }}>
                           {v.licence_number || '⚠️ Missing'}
                         </td>
                       )}
@@ -311,7 +310,7 @@ export default function AdminVendors() {
               </div>
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(140px,1fr))', gap: 10 }}>
               {[
                 ['👤 Owner',   detail.owner_name],
                 ['📱 Phone',   detail.mobile],

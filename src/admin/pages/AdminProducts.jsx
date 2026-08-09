@@ -169,15 +169,15 @@ export default function AdminProducts() {
             <thead>
               <tr>
                 <th style={{ width:44 }}>#</th>
-                <th>Image</th>
+                <th className="hide-mobile">Image</th>
                 <th>Product</th>
-                <th>Product Code</th>
-                <th>Brand</th>
-                <th>Category</th>
-                <th>Subcategory</th>
+                <th className="hide-mobile">Product Code</th>
+                <th className="hide-mobile">Brand</th>
+                <th className="hide-mobile">Category</th>
+                <th className="hide-mobile">Subcategory</th>
                 <th>Price</th>
                 <th>Stock</th>
-                <th>Status</th>
+                <th className="hide-mobile">Status</th>
                 <th>Actions</th>
               </tr>
             </thead>
@@ -189,15 +189,15 @@ export default function AdminProducts() {
                 : products.map((p,i) => (
                   <motion.tr key={p.id} initial={{ opacity:0, y:6 }} animate={{ opacity:1, y:0 }} transition={{ delay:i*0.04 }}>
                     <td style={{ color:'var(--atx3)', fontWeight:600, fontSize:13, textAlign:'center' }}>{(page-1)*limit + i + 1}</td>
-                    <td><img src={p.primary_image||FALLBACK} alt={p.name} onError={e=>e.target.src=FALLBACK} /></td>
+                    <td className="hide-mobile"><img src={p.primary_image||FALLBACK} alt={p.name} onError={e=>e.target.src=FALLBACK} /></td>
                     <td>
                       <div style={{ fontWeight:700, fontSize:13, color:'var(--atx)', maxWidth:200 }}>{p.name}</div>
                       <div style={{ fontSize:11, color:'var(--atx3)', marginTop:2 }}>SKU: {p.sku||'—'}</div>
                     </td>
-                    <td style={{ fontSize:12, fontWeight:600, color:'var(--apri)', fontFamily:'monospace' }}>{p.product_code||'—'}</td>
-                    <td style={{ color:'var(--atx2)', fontSize:13 }}>{p.brand_name||'—'}</td>
-                    <td style={{ color:'var(--atx2)', fontSize:13 }}>{p.category_name||'—'}</td>
-                    <td style={{ color:'var(--atx2)', fontSize:13 }}>{p.subcategory_name||'—'}</td>
+                    <td className="hide-mobile" style={{ fontSize:12, fontWeight:600, color:'var(--apri)', fontFamily:'monospace' }}>{p.product_code||'—'}</td>
+                    <td className="hide-mobile" style={{ color:'var(--atx2)', fontSize:13 }}>{p.brand_name||'—'}</td>
+                    <td className="hide-mobile" style={{ color:'var(--atx2)', fontSize:13 }}>{p.category_name||'—'}</td>
+                    <td className="hide-mobile" style={{ color:'var(--atx2)', fontSize:13 }}>{p.subcategory_name||'—'}</td>
                     <td style={{ fontWeight:700, color:'var(--apri)' }}>₹{Number(p.selling_price).toLocaleString('en-IN')}</td>
                     <td>
                       <span style={{ fontWeight:700, color: p.stock_qty<=0?'#dc2626':p.stock_qty<=10?'#ea580c':'var(--atx)' }}>

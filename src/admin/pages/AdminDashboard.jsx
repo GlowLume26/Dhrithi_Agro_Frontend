@@ -79,7 +79,7 @@ export default function AdminDashboard() {
       </div>
 
       {/* Charts row */}
-      <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:20, marginBottom:20 }}>
+      <div className="a-dash-charts">
         <motion.div className="a-card a-card-p" initial={{ opacity:0, y:16 }} animate={{ opacity:1, y:0 }} transition={{ delay:0.38 }}>
           <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:16 }}>
             <div>
@@ -126,7 +126,7 @@ export default function AdminDashboard() {
       </div>
 
       {/* Recent orders + Low stock */}
-      <div style={{ display:'grid', gridTemplateColumns:'1fr 340px', gap:20 }}>
+      <div className="a-dash-bottom">
         <motion.div className="a-card" initial={{ opacity:0, y:16 }} animate={{ opacity:1, y:0 }} transition={{ delay:0.5 }}>
           <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', padding:'16px 20px', borderBottom:'1px solid var(--abord)' }}>
             <h3 style={{ fontSize:15, fontWeight:800, color:'var(--atx)' }}>Recent Orders</h3>
@@ -168,7 +168,7 @@ export default function AdminDashboard() {
         </motion.div>
       </div>
 
-      <style>{`@media(max-width:960px){.a-kpi-grid{grid-template-columns:repeat(3,1fr)} div[style*="grid-template-columns:1fr 1fr"]{grid-template-columns:1fr} div[style*="grid-template-columns:1fr 340px"]{grid-template-columns:1fr}}`}</style>
+      <style>{``}</style>
     </AdminLayout>
   );
 }

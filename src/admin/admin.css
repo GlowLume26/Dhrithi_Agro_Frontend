@@ -202,7 +202,20 @@
 .a-skel { border-radius: 8px; background: linear-gradient(90deg,var(--ab3) 25%,var(--abord) 50%,var(--ab3) 75%); background-size: 300% 100%; animation: a-shimmer 1.4s infinite; }
 @keyframes a-shimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
 
-/* ── Upload zone ── */
+/* ── Admin layout overflow fix ── */
+.admin-root { overflow-x: hidden; }
+.a-layout { overflow-x: hidden; }
+.a-main { overflow-x: hidden; min-width: 0; }
+.a-page { overflow-x: hidden; }
+
+/* ── Dashboard responsive grids ── */
+.a-dash-charts { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px; }
+.a-dash-bottom { display: grid; grid-template-columns: 1fr 340px; gap: 20px; }
+
+@media(max-width: 900px) {
+  .a-dash-charts { grid-template-columns: 1fr; }
+  .a-dash-bottom { grid-template-columns: 1fr; }
+}
 .a-upload-zone { border: 2px dashed var(--abord); border-radius: 12px; padding: 28px; text-align: center; cursor: pointer; transition: border 0.2s, background 0.2s; }
 .a-upload-zone:hover, .a-upload-zone.drag { border-color: var(--apri); background: rgba(46,125,50,0.04); }
 .a-upload-zone p { font-size: 13px; color: var(--atx2); margin-top: 8px; }

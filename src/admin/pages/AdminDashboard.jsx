@@ -134,7 +134,7 @@ export default function AdminDashboard() {
           </div>
           <div className="a-table-wrap">
             <table className="a-table">
-              <thead><tr><th>Order ID</th><th>Customer</th><th>Amount</th><th>Status</th><th>Date</th></tr></thead>
+              <thead><tr><th>Order ID</th><th>Customer</th><th>Amount</th><th>Status</th><th className="hide-mobile">Date</th></tr></thead>
               <tbody>
                 {recentOrders.map(o => (
                   <tr key={o.id || o.order_number} style={{ cursor:'pointer' }} onClick={()=>navigate('/admin/orders')}>
@@ -142,7 +142,7 @@ export default function AdminDashboard() {
                     <td>{o.customer_name || o.customer}</td>
                     <td style={{ fontWeight:700 }}>₹{Number(o.final_amount || o.amount?.replace(/[₹,]/g,'')||0).toLocaleString('en-IN')}</td>
                     <td><StatusBadge status={o.order_status || o.status} /></td>
-                    <td style={{ color:'var(--atx2)' }}>{o.created_at ? new Date(o.created_at).toLocaleDateString('en-IN',{day:'numeric',month:'short'}) : o.date}</td>
+                    <td className="hide-mobile" style={{ color:'var(--atx2)' }}>{o.created_at ? new Date(o.created_at).toLocaleDateString('en-IN',{day:'numeric',month:'short'}) : o.date}</td>
                   </tr>
                 ))}
               </tbody>

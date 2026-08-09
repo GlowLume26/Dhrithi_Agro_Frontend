@@ -131,7 +131,7 @@
 .a-kpi-icon { width: 46px; height: 46px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0; }
 
 /* ── Table ── */
-.a-table-wrap { overflow-x: auto; }
+.a-table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
 .a-table { width: 100%; border-collapse: collapse; font-size: 13px; }
 .a-table th { padding: 11px 16px; text-align: left; font-size: 11px; font-weight: 700; color: var(--atx2); text-transform: uppercase; letter-spacing: 0.8px; border-bottom: 1px solid var(--abord); white-space: nowrap; }
 .a-table td { padding: 13px 16px; border-bottom: 1px solid var(--abord); color: var(--atx); vertical-align: middle; }
@@ -203,10 +203,10 @@
 @keyframes a-shimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
 
 /* ── Admin layout overflow fix ── */
-.admin-root { overflow-x: hidden; }
-.a-layout { overflow-x: hidden; }
-.a-main { overflow-x: hidden; min-width: 0; }
-.a-page { overflow-x: hidden; }
+.admin-root { max-width: 100vw; }
+.a-layout { max-width: 100vw; }
+.a-main { min-width: 0; max-width: 100%; }
+.a-page { max-width: 100%; }
 
 /* ── Dashboard responsive grids ── */
 .a-dash-charts { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px; }

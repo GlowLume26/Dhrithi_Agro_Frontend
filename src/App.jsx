@@ -40,6 +40,13 @@ import AdminSettings  from './admin/pages/AdminSettings';
 import AdminUsers     from './admin/pages/AdminUsers';
 import AdminCategories from './admin/pages/AdminCategories';
 import AdminVendors   from './admin/pages/AdminVendors';
+import AdminAccessControl        from './admin/pages/AdminAccessControl';
+import AdminManufacturerOrders   from './admin/pages/AdminManufacturerOrders';
+import AdminCnfCompanies         from './admin/pages/AdminCnfCompanies';
+import AdminCnfStock             from './admin/pages/AdminCnfStock';
+import AdminCnfOrders            from './admin/pages/AdminCnfOrders';
+import AdminSalesmanReports      from './admin/pages/AdminSalesmanReports';
+import AdminSalesmanOrders       from './admin/pages/AdminSalesmanOrders';
 
 // Pages that don't use shared Header/Footer
 const STANDALONE = [
@@ -86,6 +93,15 @@ function Layout() {
         <Route path="/admin/settings"  element={<AdminProtected module="settings"><AdminSettings /></AdminProtected>} />
         <Route path="/admin/admins"      element={<AdminProtected module="admins"><AdminUsers /></AdminProtected>} />
         <Route path="/admin/categories"   element={<AdminProtected module="categories"><AdminCategories /></AdminProtected>} />
+
+        {/* ── New module routes ── */}
+        <Route path="/admin/access-control"       element={<AdminProtected module="access_control"><AdminAccessControl /></AdminProtected>} />
+        <Route path="/admin/manufacturer-orders"  element={<AdminProtected module="manufacturer_orders"><AdminManufacturerOrders /></AdminProtected>} />
+        <Route path="/admin/cnf/companies"        element={<AdminProtected module="cnf"><AdminCnfCompanies /></AdminProtected>} />
+        <Route path="/admin/cnf/stock"            element={<AdminProtected module="cnf_stock"><AdminCnfStock /></AdminProtected>} />
+        <Route path="/admin/cnf/orders"           element={<AdminProtected module="cnf_invoices"><AdminCnfOrders /></AdminProtected>} />
+        <Route path="/admin/salesman/reports"     element={<AdminProtected module="salesman_reports"><AdminSalesmanReports /></AdminProtected>} />
+        <Route path="/admin/salesman/orders"      element={<AdminProtected module="salesman_orders"><AdminSalesmanOrders /></AdminProtected>} />
 
         <Route path="*" element={<NotFound />} />
       </Routes>

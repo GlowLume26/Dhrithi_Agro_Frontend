@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import AdminLayout from '../layouts/AdminLayout';
 import { PageHeader, Modal, ConfirmModal, Pagination, RowActions, Skel, Empty } from '../components/AdminUI';
 import adminApi from '../services/adminApi';
+import { compressAndUpload } from '../utils/imageUpload';
 
 const FALLBACK = 'https://images.unsplash.com/photo-1574943320219-553eb213f72d?w=200&q=80';
 
@@ -107,6 +108,19 @@ export default function AdminProducts() {
 
     setSaving(true);
     try {
+      // Upload any new local files to Cloudinary first
+      const uploadedImages = await Promise.all(
+        images.map(async (img) => {
+          if (img.file) {
+            const cloudUrl = await compressAndUpload(img.file, 'products');
+            return { image_url: cloudUrl, is_primary: false };
+          }
+          return img; // already a Cloudinary URL from existing product
+        })
+      );
+      if (uploadedImages.length > 0) uploadedImages[0].is_primary = true;
+      payload.images = uploadedImages.map(i => i.image_url || i.url);
+
       const res = editId
         ? await adminApi.updateProduct(editId, payload)
         : await adminApi.createProduct(payload);
@@ -124,7 +138,8 @@ export default function AdminProducts() {
   function handleFiles(files) {
     const newImgs = [...images];
     Array.from(files).slice(0, 8 - images.length).forEach(file => {
-      newImgs.push({ url: URL.createObjectURL(file), file });
+      // preview immediately, store file for upload
+      newImgs.push({ url: URL.createObjectURL(file), file, uploading: true });
     });
     setImages(newImgs);
   }

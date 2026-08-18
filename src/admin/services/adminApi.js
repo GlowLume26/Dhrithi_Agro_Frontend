@@ -57,6 +57,46 @@ export const adminApi = {
   createAdmin:  (data)     => axios.post(url('admin&section=admins'), data, cfg()).then(r => r.data),
   updateAdmin:  (id, data) => axios.put(url(`admin&section=admins&id=${id}`), data, cfg()).then(r => r.data),
   deleteAdmin:  (id)       => axios.delete(url(`admin&section=admins&id=${id}`), cfg()).then(r => r.data),
+
+  // Permissions
+  getPermissionUsers:  ()           => axios.get(url('permissions&section=users'), cfg()).then(r => r.data),
+  getUserPermissions:  (id)         => axios.get(url(`permissions&section=user&id=${id}`), cfg()).then(r => r.data),
+  setUserPermissions:  (userId, perms) => axios.post(url('permissions&section=set'), { user_id: userId, permissions: perms }, cfg()).then(r => r.data),
+  getPermissionAudit:  ()           => axios.get(url('permissions&section=audit'), cfg()).then(r => r.data),
+
+  // Manufacturer
+  getManufacturers:      ()           => axios.get(url('manufacturer&section=manufacturers'), cfg()).then(r => r.data),
+  getManufacturerOrders: (params={})  => axios.get(url(`manufacturer&${qs(params)}`), cfg()).then(r => r.data),
+  createManufacturerOrder:(data)      => axios.post(url('manufacturer'), data, cfg()).then(r => r.data),
+  updateManufacturerOrder:(id, data)  => axios.put(url(`manufacturer&id=${id}`), data, cfg()).then(r => r.data),
+
+  // CNF
+  getCnfCompanies:  (params={}) => axios.get(url(`cnf&section=companies&${qs(params)}`), cfg()).then(r => r.data),
+  createCnfCompany: (data)      => axios.post(url('cnf&section=companies'), data, cfg()).then(r => r.data),
+  updateCnfCompany: (id, data)  => axios.put(url(`cnf&section=companies&id=${id}`), data, cfg()).then(r => r.data),
+  deleteCnfCompany: (id)        => axios.delete(url(`cnf&section=companies&id=${id}`), cfg()).then(r => r.data),
+
+  getWarehouses:   (params={}) => axios.get(url(`cnf&section=warehouses&${qs(params)}`), cfg()).then(r => r.data),
+  createWarehouse: (data)      => axios.post(url('cnf&section=warehouses'), data, cfg()).then(r => r.data),
+  updateWarehouse: (id, data)  => axios.put(url(`cnf&section=warehouses&id=${id}`), data, cfg()).then(r => r.data),
+
+  getCnfStock:     (params={}) => axios.get(url(`cnf&section=stock&${qs(params)}`), cfg()).then(r => r.data),
+  updateCnfStock:  (data)      => axios.post(url('cnf&section=stock'), data, cfg()).then(r => r.data),
+
+  getCnfOrders:    (params={}) => axios.get(url(`cnf&section=orders&${qs(params)}`), cfg()).then(r => r.data),
+  createCnfOrder:  (data)      => axios.post(url('cnf&section=orders'), data, cfg()).then(r => r.data),
+  updateCnfOrder:  (id, data)  => axios.put(url(`cnf&section=orders&id=${id}`), data, cfg()).then(r => r.data),
+
+  getFastMoving:   (params={}) => axios.get(url(`cnf&section=fast_moving&${qs(params)}`), cfg()).then(r => r.data),
+  getExpiryReport: (params={}) => axios.get(url(`cnf&section=expiry&${qs(params)}`), cfg()).then(r => r.data),
+
+  // Salesman
+  getSalesmen:         (params={}) => axios.get(url(`salesman&section=salesmen&${qs(params)}`), cfg()).then(r => r.data),
+  createSalesman:      (data)      => axios.post(url('salesman&section=salesmen'), data, cfg()).then(r => r.data),
+  updateSalesman:      (id, data)  => axios.put(url(`salesman&section=salesmen&id=${id}`), data, cfg()).then(r => r.data),
+  deleteSalesman:      (id)        => axios.delete(url(`salesman&section=salesmen&id=${id}`), cfg()).then(r => r.data),
+  getSalesmanReport:   (params={}) => axios.get(url(`salesman&section=report&${qs(params)}`), cfg()).then(r => r.data),
+  getSalesmanOrders:   (params={}) => axios.get(url(`salesman&section=orders&${qs(params)}`), cfg()).then(r => r.data),
 };
 
 export default adminApi;

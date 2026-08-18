@@ -8,9 +8,11 @@ export default defineConfig({
     port: 3000,
     proxy: {
       '/api': {
-        target: 'http://localhost',
+        // LOCAL:  target: 'http://localhost/drithi-agro/backend',
+        // RENDER: target: 'https://dhrithi-agro-backend-2.onrender.com',
+        target: process.env.VITE_BACKEND_URL || 'http://localhost/drithi-agro/backend',
         changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/api/, '/drithi-agro-backend'),
+        rewrite: (path) => path.replace(/^\/api/, ''),
       }
     }
   }

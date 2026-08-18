@@ -27,7 +27,12 @@ export function AdminAuthProvider({ children }) {
   function can(module) {
     if (!admin) return false;
     if (admin.role === 'owner') return true;
+    // Check DB-stored permissions first (loaded at login)
     const perms = admin.permissions;
+    if (perms && typeof perms === 'object' && !Array.isArray(perms)) {
+      // Object format: { module: bool }
+      if (module in perms) return !!perms[module];
+    }
     if (Array.isArray(perms) && perms.length > 0) return perms.includes(module);
     return ROLE_MODULES[admin.role]?.includes(module) ?? false;
   }

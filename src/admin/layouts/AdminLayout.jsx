@@ -14,7 +14,18 @@ export default function AdminLayout({ children }) {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
 
-  const visibleNav = NAV_ITEMS.filter(n => can(n.id));
+  const visibleNav = NAV_ITEMS.filter(n => {
+    if (n.ownerOnly) return admin?.role === 'owner';
+    return can(n.id);
+  });
+
+  // Group nav items
+  const coreNav = visibleNav.filter(n => !n.group);
+  const groupedNav = {};
+  visibleNav.filter(n => n.group).forEach(n => {
+    if (!groupedNav[n.group]) groupedNav[n.group] = [];
+    groupedNav[n.group].push(n);
+  });
   const initial = (admin?.name || admin?.email || 'A').charAt(0).toUpperCase();
 
   function doLogout() { logout(); navigate('/admin/login'); }
@@ -38,7 +49,7 @@ export default function AdminLayout({ children }) {
 
         <nav className="a-sb-nav">
           {!collapsed && <div className="a-sb-section">Main</div>}
-          {visibleNav.slice(0, 4).map(n => (
+          {coreNav.slice(0, 4).map(n => (
             <button key={n.id}
               className={`a-nav-item${pathname.startsWith(n.path) ? ' active' : ''}`}
               onClick={() => { navigate(n.path); setMobileOpen(false); }}
@@ -49,10 +60,10 @@ export default function AdminLayout({ children }) {
             </button>
           ))}
 
-          {visibleNav.length > 4 && (
+          {coreNav.length > 4 && (
             <>
               {!collapsed && <div className="a-sb-section">Management</div>}
-              {visibleNav.slice(4).map(n => (
+              {coreNav.slice(4).map(n => (
                 <button key={n.id}
                   className={`a-nav-item${pathname.startsWith(n.path) ? ' active' : ''}`}
                   onClick={() => { navigate(n.path); setMobileOpen(false); }}
@@ -64,6 +75,22 @@ export default function AdminLayout({ children }) {
               ))}
             </>
           )}
+
+          {Object.entries(groupedNav).map(([group, items]) => (
+            <div key={group}>
+              {!collapsed && <div className="a-sb-section">{group}</div>}
+              {items.map(n => (
+                <button key={n.id}
+                  className={`a-nav-item${pathname.startsWith(n.path) ? ' active' : ''}`}
+                  onClick={() => { navigate(n.path); setMobileOpen(false); }}
+                  title={collapsed ? n.label : ''}
+                >
+                  <span style={{ fontSize: 18 }}>{navIcon(n.id)}</span>
+                  {!collapsed && <span className="a-nav-label">{n.label}</span>}
+                </button>
+              ))}
+            </div>
+          ))}
         </nav>
 
         <div className="a-sb-bottom">
@@ -141,5 +168,10 @@ export default function AdminLayout({ children }) {
 }
 
 function navIcon(id) {
-  return { dashboard:'📊', products:'📦', orders:'🛒', customers:'👥', vendors:'🏪', categories:'🗂️', inventory:'🗄️', offers:'🏷️', reports:'📈', settings:'⚙️', admins:'🛡️' }[id] || '📌';
+  return {
+    dashboard:'📊', products:'📦', orders:'🛒', customers:'👥', vendors:'🏪',
+    categories:'🗂️', inventory:'🗄️', offers:'🏷️', reports:'📈', settings:'⚙️', admins:'🛡️',
+    manufacturer_orders:'🏭', cnf:'🏢', cnf_stock:'📦', cnf_invoices:'📄',
+    salesman_reports:'📊', salesman_orders:'🧑‍💼', access_control:'🔐',
+  }[id] || '📌';
 }

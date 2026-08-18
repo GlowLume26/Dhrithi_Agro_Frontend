@@ -10,7 +10,7 @@ export default defineConfig({
       '/api': {
         // LOCAL:  target: 'http://localhost/drithi-agro/backend',
         // RENDER: target: 'https://dhrithi-agro-backend-2.onrender.com',
-        target: process.env.VITE_BACKEND_URL || 'http://localhost/drithi-agro/backend',
+        target: 'https://dhrithi-agro-backend-2.onrender.com',
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api/, ''),
       }

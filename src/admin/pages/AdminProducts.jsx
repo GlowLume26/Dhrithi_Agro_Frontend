@@ -56,8 +56,8 @@ export default function AdminProducts() {
       const res = await adminApi.getProducts(params);
       if (res.success) { setProducts(res.data); setTotal(res.meta?.total || 0); }
     } catch {
-      setProducts(MOCK_PRODUCTS.slice((page-1)*limit, page*limit));
-      setTotal(MOCK_PRODUCTS.length);
+      setProducts(MOCK_PRODUCTS.slice((page-1)*limit, page*limit) ?? []);
+      setTotal(MOCK_PRODUCTS.length ?? 0);
     }
     setLoading(false);
   }

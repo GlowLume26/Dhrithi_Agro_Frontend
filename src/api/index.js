@@ -10,11 +10,17 @@ const headers = () => {
 
 const qs = (p) => { const s = new URLSearchParams(p).toString(); return s ? '&' + s : ''; };
 
+const handle = async (res) => {
+  const json = await res.json();
+  if (res.status === 401) return { ...json, status: 401 };
+  return json;
+};
+
 export const api = {
-  get:    (route, params = {}) => fetch(API_BASE + route + qs(params), { headers: headers() }).then(r => r.json()),
-  post:   (route, body = {}, params = {}) => fetch(API_BASE + route + qs(params), { method: 'POST',   headers: headers(), body: JSON.stringify(body) }).then(r => r.json()),
-  put:    (route, body = {}, params = {}) => fetch(API_BASE + route + qs(params), { method: 'PUT',    headers: headers(), body: JSON.stringify(body) }).then(r => r.json()),
-  delete: (route, params = {})            => fetch(API_BASE + route + qs(params), { method: 'DELETE', headers: headers() }).then(r => r.json()),
+  get:    (route, params = {}) => fetch(API_BASE + route + qs(params), { headers: headers() }).then(handle),
+  post:   (route, body = {}, params = {}) => fetch(API_BASE + route + qs(params), { method: 'POST',   headers: headers(), body: JSON.stringify(body) }).then(handle),
+  put:    (route, body = {}, params = {}) => fetch(API_BASE + route + qs(params), { method: 'PUT',    headers: headers(), body: JSON.stringify(body) }).then(handle),
+  delete: (route, params = {})            => fetch(API_BASE + route + qs(params), { method: 'DELETE', headers: headers() }).then(handle),
 };
 
 export default api;

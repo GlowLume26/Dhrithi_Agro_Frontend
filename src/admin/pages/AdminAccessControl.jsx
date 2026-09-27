@@ -14,21 +14,27 @@ export default function AdminAccessControl() {
   const [saving, setSaving]     = useState(null);
   const [audit, setAudit]       = useState([]);
   const [tab, setTab]           = useState('permissions');
-  const [permsMap, setPermsMap] = useState({}); // { userId: { module: bool } }
+  const [permsMap, setPermsMap] = useState({});
+  const [loadErr, setLoadErr]   = useState('');
 
   useEffect(() => { load(); }, []);
 
   async function load() {
     setLoading(true);
+    setLoadErr('');
     try {
       const res = await adminApi.getPermissionUsers();
       if (res.success) {
-        setUsers(res.data);
+        setUsers(res.data ?? []);
         const map = {};
-        res.data.forEach(u => { map[u.id] = u.permissions || {}; });
+        (res.data ?? []).forEach(u => { map[u.id] = u.permissions || {}; });
         setPermsMap(map);
+      } else {
+        setLoadErr(res.message || 'Failed to load users');
       }
-    } catch {}
+    } catch (e) {
+      setLoadErr(e?.response?.data?.message || e?.message || 'Failed to load users');
+    }
     setLoading(false);
   }
 
@@ -49,8 +55,11 @@ export default function AdminAccessControl() {
   async function save(userId) {
     setSaving(userId);
     try {
-      await adminApi.setUserPermissions(userId, permsMap[userId] || {});
-    } catch {}
+      const res = await adminApi.setUserPermissions(userId, permsMap[userId] || {});
+      if (!res.success) alert(res.message || 'Failed to save');
+    } catch (e) {
+      alert(e?.response?.data?.message || 'Failed to save permissions');
+    }
     setSaving(null);
   }
 
@@ -75,7 +84,9 @@ export default function AdminAccessControl() {
 
       {tab === 'permissions' && (
         <div className="a-card">
-          {loading ? <div style={{padding:24}}><Skel h={40}/></div> : users.length === 0 ? <Empty icon="👥" title="No admin users found" /> : (
+          {loading ? <div style={{padding:24}}><Skel h={40}/></div> : loadErr ? (
+            <div style={{padding:32,textAlign:'center',color:'#dc2626',fontSize:14}}>⚠️ {loadErr}</div>
+          ) : users.length === 0 ? <Empty icon="👥" title="No admin users found" /> : (
             <div className="a-table-wrap">
               <table className="a-table">
                 <thead>
@@ -118,7 +129,7 @@ export default function AdminAccessControl() {
                         );
                       })}
                       <td>
-                        {u.role !== 'owner' && (
+                        {admin?.role === 'owner' && u.role !== 'owner' && (
                           <button className="a-btn a-btn-sm a-btn-pri" onClick={() => save(u.id)} disabled={saving===u.id}>
                             {saving===u.id ? '⏳' : '💾 Save'}
                           </button>

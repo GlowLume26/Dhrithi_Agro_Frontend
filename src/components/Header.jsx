@@ -208,7 +208,7 @@ export default function Header() {
               <p style={{ fontSize:13, color:'#888' }}>Choose how you want to get started</p>
             </div>
             <div style={{ display:'flex', flexDirection:'column', gap:14 }}>
-              <button onClick={() => { setBuyWithUsOpen(false); navigate('/login?role=buyer'); }}
+              <button onClick={() => { setBuyWithUsOpen(false); navigate('/vendor/register?role=buyer'); }}
                 style={{ display:'flex', alignItems:'center', gap:16, padding:'18px 20px', border:'2px solid #e0e0e0', borderRadius:14, background:'white', cursor:'pointer', textAlign:'left', transition:'border-color 0.2s' }}
                 onMouseEnter={e => e.currentTarget.style.borderColor='#2e7d32'}
                 onMouseLeave={e => e.currentTarget.style.borderColor='#e0e0e0'}>

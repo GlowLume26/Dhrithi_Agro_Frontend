@@ -52,7 +52,7 @@ export default function AdminCustomers() {
 
   async function toggleActive(customer) {
     const newStatus = !customer.is_active;
-    try { await adminApi.toggleCustomerStatus(customer.id, newStatus); } catch {}
+    try { await adminApi.updateCustomer(customer.id, { is_active: newStatus }); } catch {}
     setCustomers(cs => cs.map(c => c.id === customer.id ? { ...c, is_active: newStatus } : c));
     setDetail(d => d ? { ...d, is_active: newStatus } : d);
   }

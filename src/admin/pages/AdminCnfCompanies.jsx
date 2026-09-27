@@ -4,10 +4,12 @@ import AdminLayout from '../layouts/AdminLayout';
 import { PageHeader, Modal, ConfirmModal, Skel, Empty, RowActions } from '../components/AdminUI';
 import adminApi from '../services/adminApi';
 
+const STATES = ['Andhra Pradesh','Assam','Bihar','Chhattisgarh','Delhi','Goa','Gujarat','Haryana','Himachal Pradesh','Jharkhand','Karnataka','Kerala','Madhya Pradesh','Maharashtra','Manipur','Meghalaya','Odisha','Punjab','Rajasthan','Tamil Nadu','Telangana','Uttar Pradesh','Uttarakhand','West Bengal'];
 const EMPTY = { name:'', contact_person:'', contact_number:'', email:'', address:'', city:'', state:'', pincode:'', gst_number:'' };
 
 export default function AdminCnfCompanies() {
   const [companies, setCompanies] = useState([]);
+  const [warehouses, setWarehouses] = useState([]);
   const [loading, setLoading]     = useState(true);
   const [modal, setModal]         = useState(false);
   const [form, setForm]           = useState(EMPTY);
@@ -15,17 +17,26 @@ export default function AdminCnfCompanies() {
   const [delId, setDelId]         = useState(null);
   const [search, setSearch]       = useState('');
   const [stateF, setStateF]       = useState('');
+  const [warehouseF, setWarehouseF] = useState('');
   const [saving, setSaving]       = useState(false);
 
-  useEffect(() => { load(); }, [search, stateF]);
+  useEffect(() => { load(); }, [search, stateF, warehouseF]);
+  useEffect(() => { loadWarehouses(); }, [stateF]);
 
   async function load() {
     setLoading(true);
     try {
-      const res = await adminApi.getCnfCompanies({ search, state: stateF });
+      const res = await adminApi.getCnfCompanies({ search, state: stateF, warehouse_id: warehouseF });
       if (res.success) setCompanies(res.data);
     } catch { setCompanies([]); }
     setLoading(false);
+  }
+
+  async function loadWarehouses() {
+    try {
+      const r = await adminApi.getWarehouses({ state: stateF });
+      if (r.success) setWarehouses(r.data ?? []);
+    } catch { setWarehouses([]); }
   }
 
   function openAdd() { setForm(EMPTY); setEditId(null); setModal(true); }
@@ -54,8 +65,14 @@ export default function AdminCnfCompanies() {
         <div className="a-filter-bar">
           <input className="a-input" placeholder="🔍 Search..." value={search}
             onChange={e=>{setSearch(e.target.value);}} style={{maxWidth:220}} />
-          <input className="a-input" placeholder="Filter by state..." value={stateF}
-            onChange={e=>setStateF(e.target.value)} style={{maxWidth:160}} />
+          <select className="a-input a-select" value={stateF} onChange={e=>{ setStateF(e.target.value); setWarehouseF(''); }} style={{maxWidth:180}}>
+            <option value="">All States</option>
+            {STATES.map(s=><option key={s}>{s}</option>)}
+          </select>
+          <select className="a-input a-select" value={warehouseF} onChange={e=>setWarehouseF(e.target.value)} style={{maxWidth:200}}>
+            <option value="">All Warehouses</option>
+            {warehouses.map(w=><option key={w.id} value={w.id}>{w.name}{w.city ? ` — ${w.city}` : ''}</option>)}
+          </select>
         </div>
         <div className="a-table-wrap">
           <table className="a-table">
@@ -92,7 +109,12 @@ export default function AdminCnfCompanies() {
           <div className="a-fg"><label>Email</label><input className="a-input" type="email" value={form.email||''} onChange={e=>f('email',e.target.value)} /></div>
           <div className="a-fg"><label>GST Number</label><input className="a-input" value={form.gst_number||''} onChange={e=>f('gst_number',e.target.value)} /></div>
           <div className="a-fg"><label>City</label><input className="a-input" value={form.city||''} onChange={e=>f('city',e.target.value)} /></div>
-          <div className="a-fg"><label>State</label><input className="a-input" value={form.state||''} onChange={e=>f('state',e.target.value)} /></div>
+          <div className="a-fg"><label>State</label>
+            <select className="a-input a-select" value={form.state||''} onChange={e=>f('state',e.target.value)}>
+              <option value="">Select State</option>
+              {STATES.map(s=><option key={s}>{s}</option>)}
+            </select>
+          </div>
           <div className="a-fg"><label>Pincode</label><input className="a-input" value={form.pincode||''} onChange={e=>f('pincode',e.target.value)} /></div>
           <div className="a-fg full"><label>Address</label><textarea className="a-input" rows={2} value={form.address||''} onChange={e=>f('address',e.target.value)} /></div>
         </div>

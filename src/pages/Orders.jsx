@@ -29,7 +29,7 @@ export default function Orders() {
 
   async function cancelOrder(orderId) {
     if (!confirm('Are you sure you want to cancel this order?')) return;
-    const res = await api.put('orders', {}, { id: orderId });
+    const res = await api.put('orders', { action: 'cancel' }, { id: orderId });
     if (res.success) { toast('✅ Order cancelled successfully.'); loadOrders(statusFilter); }
     else toast('❌ ' + (res.message || 'Could not cancel order.'));
   }

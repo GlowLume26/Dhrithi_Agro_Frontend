@@ -5,12 +5,12 @@ export default defineConfig({
   plugins: [react()],
   base: '/',
   server: {
-    port: 3000,
+    port: 3001,
     proxy: {
       '/api': {
-        // LOCAL:  target: 'http://localhost/drithi-agro/backend',
+        // LOCAL:  target: 'http://localhost/drithi-agro-backend',
         // RENDER: target: 'https://dhrithi-agro-backend-2.onrender.com',
-        target: 'https://dhrithi-agro-backend-2.onrender.com',
+        target: 'http://localhost/drithi-agro-backend',
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api/, ''),
       }

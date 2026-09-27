@@ -19,12 +19,12 @@ export default function AdminLayout({ children }) {
     return can(n.id);
   });
 
-  // Group nav items
-  const coreNav = visibleNav.filter(n => !n.group);
+  // Group nav items preserving order
   const groupedNav = {};
-  visibleNav.filter(n => n.group).forEach(n => {
-    if (!groupedNav[n.group]) groupedNav[n.group] = [];
-    groupedNav[n.group].push(n);
+  visibleNav.forEach(n => {
+    const g = n.group || 'Main';
+    if (!groupedNav[g]) groupedNav[g] = [];
+    groupedNav[g].push(n);
   });
   const initial = (admin?.name || admin?.email || 'A').charAt(0).toUpperCase();
 
@@ -48,34 +48,6 @@ export default function AdminLayout({ children }) {
         </div>
 
         <nav className="a-sb-nav">
-          {!collapsed && <div className="a-sb-section">Main</div>}
-          {coreNav.slice(0, 4).map(n => (
-            <button key={n.id}
-              className={`a-nav-item${pathname.startsWith(n.path) ? ' active' : ''}`}
-              onClick={() => { navigate(n.path); setMobileOpen(false); }}
-              title={collapsed ? n.label : ''}
-            >
-              <span style={{ fontSize: 18 }}>{navIcon(n.id)}</span>
-              {!collapsed && <span className="a-nav-label">{n.label}</span>}
-            </button>
-          ))}
-
-          {coreNav.length > 4 && (
-            <>
-              {!collapsed && <div className="a-sb-section">Management</div>}
-              {coreNav.slice(4).map(n => (
-                <button key={n.id}
-                  className={`a-nav-item${pathname.startsWith(n.path) ? ' active' : ''}`}
-                  onClick={() => { navigate(n.path); setMobileOpen(false); }}
-                  title={collapsed ? n.label : ''}
-                >
-                  <span style={{ fontSize: 18 }}>{navIcon(n.id)}</span>
-                  {!collapsed && <span className="a-nav-label">{n.label}</span>}
-                </button>
-              ))}
-            </>
-          )}
-
           {Object.entries(groupedNav).map(([group, items]) => (
             <div key={group}>
               {!collapsed && <div className="a-sb-section">{group}</div>}
@@ -173,5 +145,6 @@ function navIcon(id) {
     categories:'🗂️', inventory:'🗄️', offers:'🏷️', reports:'📈', settings:'⚙️', admins:'🛡️',
     manufacturer_orders:'🏭', cnf:'🏢', cnf_stock:'📦', cnf_invoices:'📄',
     salesman_reports:'📊', salesman_orders:'🧑‍💼', access_control:'🔐',
+    manufacturers:'🏭', warehouses:'🏗️', banners:'🖼️', applications:'📋',
   }[id] || '📌';
 }

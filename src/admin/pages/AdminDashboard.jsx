@@ -42,6 +42,8 @@ export default function AdminDashboard() {
   const [stats, setStats]     = useState(null);
   const [recentOrders, setRecentOrders] = useState(RECENT_ORDERS);
   const [revenue, setRevenue]           = useState(REVENUE_DATA);
+  const [dailyOrders, setDailyOrders]   = useState(DAILY_DATA);
+  const [lowStock, setLowStock]         = useState(LOW_STOCK);
 
   useEffect(() => {
     adminApi.getDashboard()
@@ -51,6 +53,8 @@ export default function AdminDashboard() {
           if (d.stats) setStats(d.stats);
           if (d.recentOrders?.length) setRecentOrders(d.recentOrders);
           if (d.monthlyRevenue?.length) setRevenue(d.monthlyRevenue.map(r => ({ month: r.month, revenue: Number(r.revenue) })));
+          if (d.weeklyOrders?.length)  setDailyOrders(d.weeklyOrders.map(r => ({ day: r.day, orders: Number(r.orders) })));
+          if (d.lowStock?.length) setLowStock(d.lowStock);
         }
       })
       .catch(() => {})
@@ -113,7 +117,7 @@ export default function AdminDashboard() {
           </div>
           <div className="a-chart-wrap">
             <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={DAILY_DATA}>
+              <BarChart data={dailyOrders}>
                 <CartesianGrid strokeDasharray="3 3" stroke="var(--abord)" />
                 <XAxis dataKey="day" tick={{ fontSize:11, fill:'var(--atx2)' }} axisLine={false} tickLine={false} />
                 <YAxis tick={{ fontSize:11, fill:'var(--atx2)' }} axisLine={false} tickLine={false} />
@@ -153,8 +157,10 @@ export default function AdminDashboard() {
         <motion.div className="a-card a-card-p" initial={{ opacity:0, y:16 }} animate={{ opacity:1, y:0 }} transition={{ delay:0.54 }}>
           <h3 style={{ fontSize:15, fontWeight:800, color:'var(--atx)', marginBottom:16 }}>⚠️ Low Stock Alerts</h3>
           <div style={{ display:'flex', flexDirection:'column', gap:10 }}>
-            {LOW_STOCK.map(item => (
-              <div key={item.name} style={{ background:'var(--ab3)', borderRadius:10, padding:'11px 14px', border:`1px solid ${item.stock===0?'#fecaca':item.stock<5?'#fed7aa':'var(--abord)'}` }}>
+            {lowStock.length === 0
+              ? <div style={{ textAlign:'center', padding:20, color:'var(--atx3)', fontSize:13 }}>✅ All products are well stocked</div>
+              : lowStock.map(item => (
+              <div key={item.name || item.id} style={{ background:'var(--ab3)', borderRadius:10, padding:'11px 14px', border:`1px solid ${item.stock===0?'#fecaca':item.stock<5?'#fed7aa':'var(--abord)'}` }}>
                 <div style={{ fontSize:13, fontWeight:600, color:'var(--atx)', marginBottom:4 }}>{item.name}</div>
                 <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between' }}>
                   <span style={{ fontSize:12, color: item.stock===0?'#dc2626':item.stock<=3?'#ea580c':'#d97706', fontWeight:700 }}>

@@ -216,7 +216,14 @@ export default function Product() {
               >{busy ? '⏳ Adding...' : '🛒 Add to Cart'}</motion.button>
 
               <motion.button whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}
-                onClick={() => navigate('/checkout')}
+                onClick={async () => {
+                  if (!isLoggedIn) { toast('🔐 Please login first'); navigate('/login'); return; }
+                  setBusy(true);
+                  const res = await api.post('cart', { product_id: id, quantity: qty });
+                  setBusy(false);
+                  if (res.success) { setCartCount(c => c + qty); navigate('/checkout'); }
+                  else toast('❌ ' + (res.message || 'Failed'));
+                }}
                 style={{ flex: 1, background: 'linear-gradient(135deg,#1b5e20,#2e7d32)', color: 'white', border: 'none', padding: '11px 0', borderRadius: 10, fontSize: 13, fontWeight: 800, cursor: 'pointer' }}
               >⚡ Buy Now</motion.button>
 

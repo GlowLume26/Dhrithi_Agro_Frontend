@@ -47,6 +47,10 @@ import AdminCnfStock             from './admin/pages/AdminCnfStock';
 import AdminCnfOrders            from './admin/pages/AdminCnfOrders';
 import AdminSalesmanReports      from './admin/pages/AdminSalesmanReports';
 import AdminSalesmanOrders       from './admin/pages/AdminSalesmanOrders';
+import AdminManufacturers        from './admin/pages/AdminManufacturers';
+import AdminWarehouseManagement  from './admin/pages/AdminWarehouseManagement';
+import AdminBanners              from './admin/pages/AdminBanners';
+import AdminApplications         from './admin/pages/AdminApplications';
 
 // Pages that don't use shared Header/Footer
 const STANDALONE = [
@@ -102,6 +106,10 @@ function Layout() {
         <Route path="/admin/cnf/orders"           element={<AdminProtected module="cnf_invoices"><AdminCnfOrders /></AdminProtected>} />
         <Route path="/admin/salesman/reports"     element={<AdminProtected module="salesman_reports"><AdminSalesmanReports /></AdminProtected>} />
         <Route path="/admin/salesman/orders"      element={<AdminProtected module="salesman_orders"><AdminSalesmanOrders /></AdminProtected>} />
+        <Route path="/admin/manufacturers"        element={<AdminProtected module="manufacturers"><AdminManufacturers /></AdminProtected>} />
+        <Route path="/admin/warehouses"           element={<AdminProtected module="warehouses"><AdminWarehouseManagement /></AdminProtected>} />
+        <Route path="/admin/banners"              element={<AdminProtected module="banners"><AdminBanners /></AdminProtected>} />
+        <Route path="/admin/applications"         element={<AdminProtected module="applications"><AdminApplications /></AdminProtected>} />
 
         <Route path="*" element={<NotFound />} />
       </Routes>

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useAdminAuth } from '../context/AdminAuthContext';
@@ -7,7 +7,7 @@ import '../admin.css';
 
 export default function AdminLogin() {
   const navigate = useNavigate();
-  const { login } = useAdminAuth();
+  const { login, logout, isLoggedIn } = useAdminAuth();
   const [email, setEmail]       = useState('');
   const [pass, setPass]         = useState('');
   const [remember, setRemember] = useState(false);
@@ -15,13 +15,15 @@ export default function AdminLogin() {
   const [err, setErr]           = useState('');
   const [showPass, setShowPass] = useState(false);
 
+  // Only clear stale token if not already logged in
+  useEffect(() => { if (!isLoggedIn) logout(); }, []);
+
   async function handleLogin(e) {
     e.preventDefault();
     if (!email || !pass) { setErr('Please enter email and password.'); return; }
     setLoading(true); setErr('');
     try {
       const res = await adminApi.login(email, pass);
-      console.log(res);
       if (res.success) {
         login(res.data.token, res.data.user);
         navigate('/admin/dashboard');

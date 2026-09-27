@@ -5,7 +5,7 @@ import { useAuth } from './AuthContext';
 const CartContext = createContext(null);
 
 export function CartProvider({ children }) {
-  const { token } = useAuth();
+  const { token, logout } = useAuth();
   const [cartCount, setCartCount] = useState(0);
 
   const refreshCart = useCallback(async () => {
@@ -13,9 +13,10 @@ export function CartProvider({ children }) {
     try {
       const res = await api.get('cart');
       if (res.success && res.data?.items) setCartCount(res.data.items.length);
-      else if (!res.success) setCartCount(0);
+      else if (res.status === 401 || res.message?.toLowerCase().includes('unauthorized')) { logout(); setCartCount(0); }
+      else setCartCount(0);
     } catch { setCartCount(0); }
-  }, [token]);
+  }, [token, logout]);
 
   // expose token so consumers can guard calls
   const isLoggedIn = !!token;

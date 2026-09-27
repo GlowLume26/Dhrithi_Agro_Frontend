@@ -41,7 +41,7 @@ export default function Account() {
 
   useEffect(() => {
     if (!isLoggedIn) return;
-    fetch('/drithi-agro-backend/index.php?route=customer&section=profile', {
+    fetch('/api/index.php?route=customer&section=profile', {
       headers: { Authorization: 'Bearer ' + localStorage.getItem('da_token') }
     }).then(async r => {
       if (r.status === 401) { logout(); navigate('/login'); return; }

@@ -55,12 +55,31 @@ export default function Home() {
   const [categories, setCategories] = useState([]);
   const [products, setProducts] = useState([]);
   const [brands, setBrands] = useState([]);
+  const [banners, setBanners] = useState([]);
+  const [bannerCur, setBannerCur] = useState(0);
 
   useEffect(() => {
     api.get('categories', { parent_only: 1 }).then(r => r.success && setCategories(r.data.slice(0, 8)));
     api.get('products', { sort: 'sold_count', order: 'desc', limit: 4 }).then(r => r.success && setProducts(r.data));
     api.get('brands').then(r => setBrands(r.success && r.data?.length ? r.data : FALLBACK_BRANDS));
+    api.get('admin&section=offers').then(r => {
+      if (r.success) setBanners((r.data ?? []).filter(b => b.is_active));
+    }).catch(() => {});
   }, []);
+
+  // Auto-advance banners
+  useEffect(() => {
+    if (banners.length < 2) return;
+    const t = setInterval(() => setBannerCur(c => (c + 1) % banners.length), 5000);
+    return () => clearInterval(t);
+  }, [banners.length]);
+
+  function handleBannerClick(b) {
+    const url = b.redirect_url || b.link_url || '';
+    if (!url) return;
+    if (url.startsWith('http')) { window.open(url, '_blank'); return; }
+    navigate(url);
+  }
 
   const catIcons = ['🌿', '🧪', '🛡️', '💧', '💧', '🔧', '📊', '🐄'];
 
@@ -160,6 +179,61 @@ export default function Home() {
         </div>
         <Link to="/categories" className="view-all">View All Products →</Link>
       </section>
+
+      {/* DYNAMIC BANNERS */}
+      {banners.length > 0 && (
+        <section className="section" style={{ paddingTop: 0 }}>
+          <div style={{ position: 'relative', borderRadius: 16, overflow: 'hidden', boxShadow: '0 4px 24px rgba(0,0,0,0.10)', cursor: (banners[bannerCur]?.redirect_url || banners[bannerCur]?.link_url) ? 'pointer' : 'default' }}
+            onClick={() => handleBannerClick(banners[bannerCur])}>
+            <div style={{ display: 'flex', transition: 'transform 0.5s ease', transform: `translateX(-${bannerCur * 100}%)` }}>
+              {banners.map(b => (
+                <div key={b.id} style={{ minWidth: '100%', position: 'relative', flexShrink: 0 }}>
+                  <img src={b.image_url || b.image} alt={b.title || b.name || ''}
+                    style={{ width: '100%', height: 'clamp(160px,28vw,340px)', objectFit: 'cover', display: 'block' }} />
+                  {(b.title || b.name || b.subtitle) && (
+                    <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0,
+                      background: 'linear-gradient(to top,rgba(0,0,0,0.65) 0%,transparent 100%)',
+                      padding: '32px 28px 20px' }}>
+                      {(b.title || b.name) && (
+                        <div style={{ color: 'white', fontWeight: 800, fontSize: 'clamp(16px,2.5vw,26px)', textShadow: '0 2px 8px rgba(0,0,0,0.4)' }}>
+                          {b.title || b.name}
+                        </div>
+                      )}
+                      {b.subtitle && (
+                        <div style={{ color: 'rgba(255,255,255,0.85)', fontSize: 'clamp(12px,1.5vw,15px)', marginTop: 4 }}>
+                          {b.subtitle}
+                        </div>
+                      )}
+                      {(b.redirect_url || b.link_url) && (
+                        <div style={{ marginTop: 10, display: 'inline-block', background: '#2e7d32', color: 'white',
+                          padding: '6px 18px', borderRadius: 20, fontSize: 13, fontWeight: 700 }}>
+                          Shop Now →
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+            {banners.length > 1 && (
+              <>
+                <button onClick={e => { e.stopPropagation(); setBannerCur(c => (c - 1 + banners.length) % banners.length); }}
+                  style={{ position: 'absolute', top: '50%', left: 12, transform: 'translateY(-50%)', background: 'rgba(0,0,0,0.45)', color: 'white', border: 'none', borderRadius: '50%', width: 36, height: 36, fontSize: 20, cursor: 'pointer', lineHeight: '36px', textAlign: 'center' }}>‹</button>
+                <button onClick={e => { e.stopPropagation(); setBannerCur(c => (c + 1) % banners.length); }}
+                  style={{ position: 'absolute', top: '50%', right: 12, transform: 'translateY(-50%)', background: 'rgba(0,0,0,0.45)', color: 'white', border: 'none', borderRadius: '50%', width: 36, height: 36, fontSize: 20, cursor: 'pointer', lineHeight: '36px', textAlign: 'center' }}>›</button>
+                <div style={{ position: 'absolute', bottom: 12, right: 16, display: 'flex', gap: 6 }}>
+                  {banners.map((_, i) => (
+                    <button key={i} onClick={e => { e.stopPropagation(); setBannerCur(i); }}
+                      style={{ width: i === bannerCur ? 20 : 8, height: 8, borderRadius: 4, border: 'none',
+                        background: i === bannerCur ? 'white' : 'rgba(255,255,255,0.5)',
+                        cursor: 'pointer', transition: 'all 0.2s', padding: 0 }} />
+                  ))}
+                </div>
+              </>
+            )}
+          </div>
+        </section>
+      )}
 
       {/* PROMO BANNERS */}
       <section className="section">

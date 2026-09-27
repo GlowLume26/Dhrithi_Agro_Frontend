@@ -30,7 +30,8 @@ export default function Checkout() {
   ];
 
   async function placeOrder() {
-    if (!addr && !addresses.length) { alert('Please add a delivery address first.'); return; }
+    const addr = addresses[selectedAddr];
+    if (!addresses.length) { alert('Please add a delivery address first.'); return; }
     if (!addr) { alert('Please select a delivery address.'); return; }
     setLoading(true);
     const res = await api.post('orders', {

@@ -1,9 +1,11 @@
 import { Link, useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import api from '../api';
+import { useAdminAuth } from '../admin/context/AdminAuthContext';
 
 export default function Footer() {
   const navigate = useNavigate();
+  const { login: adminLogin } = useAdminAuth();
   const [showTop, setShowTop] = useState(false);
   const [adminModal, setAdminModal] = useState(false);
   const [email, setEmail] = useState('');
@@ -23,10 +25,9 @@ export default function Footer() {
     if (!email || !pass) { setErr('Enter email and password.'); return; }
     setLoading(true); setErr('');
     try {
-      const res = await api.post('auth', { identifier: email, password: pass, action: 'login' });
+      const res = await api.post('auth', { email, password: pass, action: 'admin_login' });
       if (res.success && ['admin','owner','superadmin'].includes(res.data?.user?.role)) {
-        localStorage.setItem('da_admin_token', res.data.token);
-        localStorage.setItem('da_admin_user', JSON.stringify(res.data.user));
+        adminLogin(res.data.token, res.data.user);
         setAdminModal(false);
         navigate('/admin/dashboard');
       } else if (res.success) {

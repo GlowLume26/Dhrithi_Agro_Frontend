@@ -8,6 +8,7 @@ export const ROLES = {
 export const ALL_MODULES = [
   'dashboard','products','orders','customers','vendors','categories','inventory','offers','reports','settings','admins',
   'manufacturer_orders','cnf','cnf_stock','cnf_invoices','salesman_reports','salesman_orders','access_control',
+  'manufacturers','warehouses','banners','applications',
 ];
 
 // Default modules per role
@@ -36,28 +37,35 @@ export const MODULE_LABELS = {
   salesman_reports:   'Salesman Reports',
   salesman_orders:    'Salesman Orders',
   access_control:     'Access Control',
+  manufacturers:      'Manufacturer Details',
+  warehouses:         'Warehouse Mgmt',
+  banners:            'Banners',
+  applications:       'Applications',
 };
 
 // Sidebar nav items (grouped)
 export const NAV_ITEMS = [
-  { id:'dashboard',   label:'Dashboard',    path:'/admin/dashboard'  },
-  { id:'products',    label:'Products',     path:'/admin/products'   },
-  { id:'orders',      label:'Orders',       path:'/admin/orders'     },
-  { id:'customers',   label:'Customers',    path:'/admin/customers'  },
-  { id:'vendors',     label:'Vendors',      path:'/admin/vendors'    },
-  { id:'categories',  label:'Categories',   path:'/admin/categories' },
-  { id:'inventory',   label:'Inventory',    path:'/admin/inventory'  },
-  { id:'offers',      label:'Offers',       path:'/admin/offers'     },
-  { id:'reports',     label:'Reports',      path:'/admin/reports'    },
-  { id:'settings',    label:'Settings',     path:'/admin/settings'   },
-  { id:'admins',      label:'Admin Users',  path:'/admin/admins'     },
-  // New modules
+  { id:'dashboard',   label:'Dashboard',    path:'/admin/dashboard',  group:'Main' },
+  { id:'products',    label:'Products',     path:'/admin/products',   group:'Main' },
+  { id:'orders',      label:'Orders',       path:'/admin/orders',     group:'Main' },
+  { id:'customers',   label:'Customers',    path:'/admin/customers',  group:'Main' },
+  { id:'vendors',     label:'Vendors',      path:'/admin/vendors',    group:'Management' },
+  { id:'categories',  label:'Categories',   path:'/admin/categories', group:'Management' },
+  { id:'inventory',   label:'Inventory',    path:'/admin/inventory',  group:'Management' },
+  { id:'offers',      label:'Offers',       path:'/admin/offers',     group:'Management' },
+  { id:'reports',     label:'Reports',      path:'/admin/reports',    group:'Management' },
+  { id:'settings',    label:'Settings',     path:'/admin/settings',   group:'Management' },
+  { id:'admins',      label:'Admin Users',  path:'/admin/admins',     group:'Management' },
   { id:'manufacturer_orders', label:'Manufacturer Orders', path:'/admin/manufacturer-orders', group:'Manufacturers' },
+  { id:'manufacturers',       label:'Manufacturer Details',path:'/admin/manufacturers',        group:'Manufacturers' },
   { id:'cnf',                 label:'C&F Companies',       path:'/admin/cnf/companies',        group:'C&F Management' },
   { id:'cnf_stock',           label:'C&F Stock',           path:'/admin/cnf/stock',            group:'C&F Management' },
   { id:'cnf_invoices',        label:'C&F Invoices',        path:'/admin/cnf/orders',           group:'C&F Management' },
   { id:'salesman_reports',    label:'Salesman Reports',    path:'/admin/salesman/reports',     group:'Sales' },
   { id:'salesman_orders',     label:'Salesman Orders',     path:'/admin/salesman/orders',      group:'Sales' },
+  { id:'warehouses',          label:'Warehouse Mgmt',      path:'/admin/warehouses',           group:'C&F Management' },
+  { id:'banners',             label:'Banners',             path:'/admin/banners',              group:'Management' },
+  { id:'applications',        label:'Applications',        path:'/admin/applications',         group:'Management' },
   { id:'access_control',      label:'Access Control',      path:'/admin/access-control',       group:'Owner', ownerOnly: true },
 ];
 

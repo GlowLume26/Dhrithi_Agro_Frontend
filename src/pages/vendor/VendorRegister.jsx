@@ -31,6 +31,9 @@ export default function VendorRegister() {
   const [success, setSuccess] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [submitErr, setSubmitErr] = useState('');
+  const [isCnF, setIsCnF] = useState(false);
+  // 'vendor' | 'manufacturer'
+  const [regType, setRegType] = useState('vendor');
   const [biz, setBiz] = useState({ bizName:'',ownerName:'',bizMobile:'',bizEmail:'',gstNum:'',panNum:'',bizAddr:'',bizCity:'',bizState:'',bizPin:'',bizType:'Sole Proprietorship' });
   const [store, setStore] = useState({ storeName:'',storeCategory:'Seeds & Planting',storeDesc:'',bankAcc:'',ifscCode:'',accHolder:'',bankName:'' });
 
@@ -41,9 +44,10 @@ export default function VendorRegister() {
     if (!agreed) { alert('Please agree to the Terms & Conditions to proceed.'); return; }
     setSubmitting(true); setSubmitErr('');
     try {
-      const API_BASE = import.meta.env.VITE_API_BASE || '/drithi-agro-backend/index.php?route=';
+      const API_BASE = import.meta.env.VITE_API_BASE || '/api/index.php?route=';
       const fd = new FormData();
       fd.append('vendor_type',    isSeller ? 'seller' : 'buyer');
+      fd.append('is_cnf',          isCnF ? '1' : '0');
       fd.append('owner_name',     biz.ownerName);
       fd.append('mobile',         biz.bizMobile);
       fd.append('address',        biz.bizAddr);
@@ -92,6 +96,7 @@ export default function VendorRegister() {
       <div style={{ background: '#f5f5f5', padding: '12px 40px', fontSize: 13, color: '#666' }}>
         <Link to="/" style={{ color: '#2e7d32' }}>Home</Link> › {isSeller ? 'Seller Registration' : 'Buyer Registration'}
       </div>
+
       <div className="vendor-reg-page">
         {/* HERO */}
         <div className="vendor-hero">
@@ -123,7 +128,41 @@ export default function VendorRegister() {
         {/* STEP 1 — Details */}
         {step === 1 && (
           <div className="form-section">
-            <h3>🏢 {isSeller ? 'Business' : 'Personal'} Information</h3>
+            <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:16 }}>
+              <h3 style={{ margin:0 }}>🏢 {isSeller ? 'Business' : 'Personal'} Information</h3>
+              {isSeller && (
+                <div style={{ display:'flex', alignItems:'center', gap:10 }}>
+                  {/* Vendor / Manufacturer selector */}
+                  <div style={{ display:'flex', background:'#f1f5f9', borderRadius:50, padding:3, gap:3 }}>
+                    {[['vendor','🏪 Vendor'],['manufacturer','🏭 Manufacturer']].map(([val,label])=>(
+                      <button key={val} onClick={()=>{ setRegType(val); if(val==='vendor') setIsCnF(false); }}
+                        style={{ padding:'6px 14px', borderRadius:50, border:'none', cursor:'pointer', fontSize:12, fontWeight:700, transition:'all 0.18s',
+                          background: regType===val ? '#2e7d32' : 'transparent',
+                          color: regType===val ? '#fff' : '#64748b',
+                        }}>{label}</button>
+                    ))}
+                  </div>
+                  {/* C&F toggle — only for manufacturer */}
+                  {regType === 'manufacturer' && (
+                    <div onClick={()=>setIsCnF(v=>!v)}
+                      style={{ display:'flex', alignItems:'center', gap:7,
+                        background: isCnF ? '#e8f5e9' : 'white',
+                        border: `2px solid ${isCnF ? '#2e7d32' : '#d1d5db'}`,
+                        borderRadius:50, padding:'5px 12px 5px 9px',
+                        cursor:'pointer', transition:'all 0.2s', userSelect:'none',
+                        boxShadow: isCnF ? '0 2px 8px rgba(46,125,50,0.25)' : '0 1px 4px rgba(0,0,0,0.08)',
+                      }}
+                    >
+                      <span style={{fontSize:14}}>🏭</span>
+                      <span style={{fontSize:12,fontWeight:700,color:isCnF?'#1b5e20':'#6b7280'}}>C&amp;F</span>
+                      <div style={{width:32,height:17,borderRadius:9,position:'relative',background:isCnF?'#2e7d32':'#cbd5e1',transition:'background 0.2s',flexShrink:0}}>
+                        <div style={{position:'absolute',top:2,left:isCnF?15:2,width:13,height:13,borderRadius:'50%',background:'white',boxShadow:'0 1px 3px rgba(0,0,0,0.2)',transition:'left 0.2s'}} />
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
             <div className="form-grid">
               {(isSeller
                 ? [['Business Name','bizName','text'],['Owner Name','ownerName','text'],['Mobile Number','bizMobile','tel'],['Email Address','bizEmail','email'],['GST Number','gstNum','text'],['PAN Number','panNum','text']]

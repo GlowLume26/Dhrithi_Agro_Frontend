@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import AdminLayout from '../layouts/AdminLayout';
 import { PageHeader, Skel, Empty } from '../components/AdminUI';
 import { MODULE_LABELS, ALL_MODULES } from '../utils/constants';
@@ -9,6 +10,7 @@ const MANAGEABLE = ALL_MODULES.filter(m => m !== 'dashboard' && m !== 'access_co
 
 export default function AdminAccessControl() {
   const { admin } = useAdminAuth();
+  const { pathname } = useLocation();
   const [users, setUsers]       = useState([]);
   const [loading, setLoading]   = useState(true);
   const [saving, setSaving]     = useState(null);
@@ -17,7 +19,7 @@ export default function AdminAccessControl() {
   const [permsMap, setPermsMap] = useState({});
   const [loadErr, setLoadErr]   = useState('');
 
-  useEffect(() => { load(); }, []);
+  useEffect(() => { load(); }, [pathname]);
 
   async function load() {
     setLoading(true);

@@ -61,7 +61,8 @@ export default function AdminCategories() {
     setForm({
       name: cat.name, icon: cat.icon || '📦', image_url: cat.image_url || '',
       sort_order: cat.sort_order || 0, is_featured: !!cat.is_featured,
-      is_active: cat.is_active !== false, parent_id: cat.parent_id || ''
+      is_active: cat.is_active === true || cat.is_active === 'true' || cat.is_active === '1' || cat.is_active === 1,
+      parent_id: cat.parent_id || ''
     });
     setErr(''); setModalOpen(true);
   }
@@ -91,6 +92,8 @@ export default function AdminCategories() {
       {active ? 'Active' : 'Inactive'}
     </span>
   );
+
+  const isActive = (val) => val === true || val === 'true' || val === '1' || val === 1;
 
   return (
     <AdminLayout>
@@ -146,7 +149,7 @@ export default function AdminCategories() {
                       </div>
                     </div>
 
-                    <Badge active={cat.is_active} />
+                    <Badge active={isActive(cat.is_active)} />
 
                     <div style={{ display:'flex', gap:6 }}>
                       <button className="a-btn a-btn-sm a-btn-sec" onClick={() => openAdd(cat.id)}>+ Sub</button>
@@ -169,7 +172,7 @@ export default function AdminCategories() {
                               No subcategories — <span style={{ color:'var(--apri)', cursor:'pointer', textDecoration:'underline' }} onClick={() => openAdd(cat.id)}>add one</span>
                             </div>
                           )
-                          : (q ? children.filter(s => s.name.toLowerCase().includes(q) || !matchedParentIds.has(cat.id)) : children).map(sub => (
+                          : (q ? children.filter(s => s.name.toLowerCase().includes(q)) : children).map(sub => (
                             <div key={sub.id} style={{ display:'flex', alignItems:'center', gap:12,
                               padding:'9px 20px 9px 72px', borderTop:'1px solid var(--abord)',
                               background:'var(--ab3)' }}>
@@ -178,7 +181,7 @@ export default function AdminCategories() {
                                 <div style={{ fontWeight:600, fontSize:13, color:'var(--atx)' }}>{sub.name}</div>
                                 <div style={{ fontSize:11, color:'var(--atx3)', marginTop:1 }}>Sort: {sub.sort_order ?? 0}{sub.is_featured ? ' · ⭐' : ''}</div>
                               </div>
-                              <Badge active={sub.is_active} />
+                              <Badge active={isActive(sub.is_active)} />
                               <div style={{ display:'flex', gap:6 }}>
                                 <button className="a-btn a-btn-sm a-btn-sec" onClick={() => openEdit(sub)}>✏️</button>
                                 <button className="a-btn a-btn-sm a-btn-danger" onClick={() => setConfirmId(sub.id)}>🗑</button>

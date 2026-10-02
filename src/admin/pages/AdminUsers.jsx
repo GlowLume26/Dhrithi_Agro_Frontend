@@ -73,19 +73,30 @@ export default function AdminUsers() {
     if (!editId && !form.password.trim()) return setErr('Password is required');
     setSaving(true); setErr('');
     try {
+      const perms = form.role === 'owner' ? ALL_MODULES : form.permissions;
       const payload = {
         name: form.name, email: form.email, role: form.role,
         is_active: form.status === 'active',
-        permissions: form.role === 'owner' ? ALL_MODULES : form.permissions,
         ...(form.password ? { password: form.password } : {}),
       };
       if (editId) {
         await adminApi.updateAdmin(editId, payload);
-        setAdmins(as => as.map(a => a.id === editId ? { ...a, ...payload, name: form.name } : a));
+        // Sync permissions to user_permissions table
+        if (form.role !== 'owner') {
+          const permMap = {};
+          ALL_MODULES.forEach(m => { permMap[m] = perms.includes(m); });
+          await adminApi.setUserPermissions(editId, permMap).catch(() => {});
+        }
+        await load();
       } else {
         const res = await adminApi.createAdmin(payload);
+        // After create, set permissions for the new user
+        if (res.success && res.data?.id && form.role !== 'owner') {
+          const permMap = {};
+          ALL_MODULES.forEach(m => { permMap[m] = perms.includes(m); });
+          await adminApi.setUserPermissions(res.data.id, permMap).catch(() => {});
+        }
         await load();
-        void res;
       }
       setModal(false);
     } catch (e) {

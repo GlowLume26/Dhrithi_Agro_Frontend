@@ -13,6 +13,21 @@ const cfg = () => ({ headers: authHeader() });
 
 const qs = p => new URLSearchParams(p).toString();
 
+// Global 401 interceptor — clears stale token and redirects to login
+axios.interceptors.response.use(
+  r => r,
+  err => {
+    if (err?.response?.status === 401) {
+      localStorage.removeItem('da_admin_token');
+      localStorage.removeItem('da_admin_user');
+      if (!window.location.pathname.includes('/admin/login')) {
+        window.location.href = '/admin/login';
+      }
+    }
+    return Promise.reject(err);
+  }
+);
+
 export const adminApi = {
   login: (email, password) => fetch(url('auth'), { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'admin_login', email, password }) }).then(r => r.json()),
 

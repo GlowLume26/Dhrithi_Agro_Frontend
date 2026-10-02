@@ -81,7 +81,6 @@ export default function Home() {
     navigate(url);
   }
 
-  const catIcons = ['🌿', '🧪', '🛡️', '💧', '💧', '🔧', '📊', '🐄'];
 
   return (
     <>
@@ -135,10 +134,10 @@ export default function Home() {
         <div className="categories-grid">
           {categories.length === 0
             ? <div style={{ gridColumn: '1/-1', textAlign: 'center', padding: 40, color: '#888' }}>⏳ Loading categories...</div>
-            : categories.map((cat, i) => (
-              <div key={cat.id} className="cat-card" onClick={() => navigate(`/categories?category_slug=${cat.slug}`)} style={{ cursor: 'pointer' }}>
-                <div className="cat-img"><img src={FALLBACK} alt={cat.name} /></div>
-                <div className="cat-info"><h4>{catIcons[i] || '📦'} {cat.name}</h4><span>Shop Now</span></div>
+            : categories.map((cat) => (
+              <div key={cat.id} className="cat-card" onClick={() => navigate(`/categories?category_id=${cat.id}`)} style={{ cursor: 'pointer' }}>
+                <div className="cat-img"><img src={cat.image_url || FALLBACK} alt={cat.name} onError={e => { e.target.src = FALLBACK; }} /></div>
+                <div className="cat-info"><h4>{cat.icon || '📦'} {cat.name}</h4><span>Shop Now</span></div>
               </div>
             ))
           }

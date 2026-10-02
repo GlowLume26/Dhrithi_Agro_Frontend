@@ -3,145 +3,119 @@ import { useSearchParams, useNavigate, Link } from 'react-router-dom';
 import api from '../api';
 import ProductCard from '../components/ProductCard';
 
-const CAT_NAMES = {
-  1:'💧 Irrigation',2:'🌿 Gardening',3:'🐄 Cattle & Bird Care',4:'🌧️ Sprinkler',
-  5:'💦 Drip Irrigation Accessories',6:'🔩 Pipe & Fitting',7:'🪣 Drip Irrigation Kit',
-  8:'🌂 Rain Pipe',9:'🔧 Tools',10:'🧴 Spray Pumps',11:'🌱 Lawn Mowers',12:'🪨 Pebbles',
-  13:'🎒 Accessories',14:'🌰 Seeds',15:'🧪 Fertilizer',16:'🛡️ Pesticides',
-  17:'🕸️ Garden Shade Net',18:'🥥 Coco Peat',19:'♻️ Water Compost',20:'🧰 Gardening Kit',
-  21:'🛍️ Grow Bag',22:'🌾 De Oiled Cake',23:'🌸 Flower Seeds',24:'⚗️ Fertilizer Blend',
-  25:'🪴 Transplanting Mat',26:'🌿 Fodder Seed',27:'💊 Mineral Mixture',28:'🐦 Bird Food',
-  29:'🦟 Mosquito Net',30:'🐟 Aqua Care',31:'🦐 Aquaculture Feed Additives',
-  32:'🐑 Goat & Sheep Care',33:'🐔 Poultry Feed Supplements',34:'🐷 Swine Supplement',
-  35:'🎒 Silage Bag',36:'💉 Animal Health Supplements',
-};
-
-const SIDEBAR_GROUPS = [
-  { icon: '🏷️', label: 'Brands', id: 'brands', subs: [] },
-  { icon: '🌱', label: 'Seeds', subs: [{id:14,n:'Gardening Seeds'},{id:23,n:'Flower Seeds'},{id:26,n:'Fodder Seed'},{id:2,n:'All Seeds'}] },
-  { icon: '🛡️', label: 'Crop Protection', subs: [{id:16,n:'Pesticides'},{id:10,n:'Spray Pumps'},{id:17,n:'Garden Shade Net'},{id:29,n:'Mosquito Net'}] },
-  { icon: '🧪', label: 'Crop Nutrition', subs: [{id:15,n:'Fertilizer'},{id:24,n:'Fertilizer Blend'},{id:18,n:'Coco Peat'},{id:19,n:'Water Compost'},{id:22,n:'De Oiled Cake'}] },
-  { icon: '⚙️', label: 'Equipments', subs: [{id:9,n:'Tools'},{id:11,n:'Lawn Mowers'},{id:20,n:'Gardening Kit'},{id:1,n:'Irrigation Equip'},{id:7,n:'Drip Kit'},{id:4,n:'Sprinkler'},{id:6,n:'Pipe & Fitting'}] },
-  { icon: '🐄', label: 'Animal Husbandry', subs: [{id:27,n:'Mineral Mixture'},{id:28,n:'Bird Food'},{id:32,n:'Goat & Sheep'},{id:33,n:'Poultry Feed'},{id:34,n:'Swine Supplement'},{id:36,n:'Animal Health'},{id:35,n:'Silage Bag'}] },
-  { icon: '🌿', label: 'Organic', subs: [{id:19,n:'Water Compost'},{id:18,n:'Coco Peat'},{id:22,n:'De Oiled Cake'},{id:31,n:'Aquaculture Additives'}] },
-  { icon: '⭐', label: 'TAPAS', subs: [], specials: [{label:'Top Rated',params:{sort:'avg_rating',order:'desc'}},{label:'Best Sellers',params:{sort:'sold_count',order:'desc'}},{label:'New Arrivals',params:{sort:'created_at',order:'desc'}}] },
-];
-
-const FALLBACK_BRANDS = [
-  {name:'Bayer CropScience',slug:'bayer'},{name:'IFFCO',slug:'iffco'},
-  {name:'Syngenta',slug:'syngenta'},{name:'Jain Irrigation',slug:'jain-irrigation'},
-  {name:'PI Industries',slug:'pi-industries'},{name:'UPL Limited',slug:'upl'},
-  {name:'Mahyco',slug:'mahyco'},{name:'Coromandel',slug:'coromandel'},
-  {name:'Rallis India',slug:'rallis'},{name:'Nuziveedu Seeds',slug:'nuziveedu'},
-];
-
-const BIG_CATS = [
-  { slug:'irrigation', label:'💧 Irrigation', sub:'Sprinkler • Drip • Pipe & Fitting • Rain Pipe', img:'https://images.unsplash.com/photo-1500937386664-56d1dfef3854?w=600&q=80' },
-  { slug:'gardening', label:'🌿 Gardening', sub:'Tools • Seeds • Fertilizer • Grow Bag & More', img:'https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=600&q=80' },
-  { slug:'cattle-bird-care', label:'🐄 Cattle & Bird Care', sub:'Fodder • Poultry • Aqua Care • Animal Health', img:'https://images.unsplash.com/photo-1560493676-04071c5f467b?w=600&q=80' },
-];
-
-const SUB_COLS = [
-  { parent:1, label:'💧 Irrigation', subs:[{id:4,n:'🌧️ Sprinkler'},{id:5,n:'💦 Drip Accessories'},{id:6,n:'🔩 Pipe & Fitting'},{id:7,n:'🪣 Drip Kit'},{id:8,n:'🌂 Rain Pipe'}] },
-  { parent:2, label:'🌿 Gardening', subs:[{id:9,n:'🔧 Tools'},{id:10,n:'🧴 Spray Pumps'},{id:11,n:'🌱 Lawn Mowers'},{id:14,n:'🌰 Seeds'},{id:15,n:'🧪 Fertilizer'},{id:16,n:'🛡️ Pesticides'},{id:17,n:'🕸️ Shade Net'},{id:18,n:'🥥 Coco Peat'},{id:19,n:'♻️ Compost'},{id:20,n:'🧰 Gardening Kit'},{id:21,n:'🛍️ Grow Bag'},{id:22,n:'🌾 De Oiled Cake'},{id:23,n:'🌸 Flower Seeds'},{id:24,n:'⚗️ Fertilizer Blend'},{id:25,n:'🪴 Transplanting Mat'}] },
-  { parent:3, label:'🐄 Cattle & Bird Care', subs:[{id:26,n:'🌿 Fodder Seed'},{id:27,n:'💊 Mineral Mixture'},{id:28,n:'🐦 Bird Food'},{id:29,n:'🦟 Mosquito Net'},{id:30,n:'🐟 Aqua Care'},{id:31,n:'🦐 Aquaculture Additives'},{id:32,n:'🐑 Goat & Sheep'},{id:33,n:'🐔 Poultry Feed'},{id:34,n:'🐷 Swine Supplement'},{id:35,n:'🎒 Silage Bag'},{id:36,n:'💉 Animal Health'}] },
-];
+const FALLBACK_IMG = 'https://images.unsplash.com/photo-1574943320219-553eb213f72d?w=400&q=80';
 
 export default function Categories() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const [products, setProducts] = useState([]);
-  const [total, setTotal] = useState(0);
-  const [loading, setLoading] = useState(false);
-  const [page, setPage] = useState(1);
-  const [filters, setFilters] = useState({});
-  const [sort, setSort] = useState('');
-  const [openSb, setOpenSb] = useState(null);
-  const [brands, setBrands] = useState(FALLBACK_BRANDS);
-  const [mobileSb, setMobileSb] = useState(false);
-  const [showOverview, setShowOverview] = useState(true);
-  const [productsTitle, setProductsTitle] = useState('');
-  const [banner, setBanner] = useState({ h1:'🌾 All Categories', p:'Explore 10,000+ products across all farming categories' });
-  const [catMap, setCatMap] = useState({}); // slug -> id
 
-  const search = searchParams.get('search') || '';
-  const catSlug = searchParams.get('category_slug') || '';
-  const catId  = searchParams.get('category_id') || '';
-  const offers = searchParams.get('offers') || '';
+  const [allCats, setAllCats]       = useState([]);   // all categories from API
+  const [products, setProducts]     = useState([]);
+  const [total, setTotal]           = useState(0);
+  const [loading, setLoading]       = useState(false);
+  const [catsLoading, setCatsLoading] = useState(true);
+  const [page, setPage]             = useState(1);
+  const [sort, setSort]             = useState('');
+  const [mobileSb, setMobileSb]     = useState(false);
+  const [openSb, setOpenSb]         = useState(null);
 
-  // Load real category IDs from API
+  const search    = searchParams.get('search')      || '';
+  const catId     = searchParams.get('category_id') || '';
+  const catSlug   = searchParams.get('category_slug') || '';
+  const offersMode = searchParams.get('offers')     || '';
+
+  // Load all categories once
   useEffect(() => {
+    setCatsLoading(true);
     api.get('categories').then(r => {
-      if (r.success && r.data) {
-        const map = {};
-        r.data.forEach(c => { map[c.slug] = c.id; map[c.name] = c.id; });
-        setCatMap(map);
-      }
-    });
-    api.get('brands').then(r => r.success && r.data?.length && setBrands(r.data));
+      if (r.success) setAllCats(r.data || []);
+    }).finally(() => setCatsLoading(false));
   }, []);
 
-  // Helper: navigate to category by slug
-  const goToCat = (slug, label) => navigate(`/categories?category_slug=${slug}`);
+  const parents = allCats.filter(c => !c.parent_id);
+  const subs    = allCats.filter(c => !!c.parent_id);
 
+  // Resolve current category from URL
+  const activeCat = catId
+    ? allCats.find(c => c.id === catId)
+    : catSlug
+    ? allCats.find(c => c.slug === catSlug)
+    : null;
+
+  const isParent   = activeCat && !activeCat.parent_id;
+  const isSubcat   = activeCat && !!activeCat.parent_id;
+  const subcatsOfActive = isParent ? subs.filter(s => s.parent_id === activeCat.id) : [];
+
+  // Determine what to show
+  const showOverview  = !search && !activeCat && !offersMode;
+  const showSubcats   = isParent && subcatsOfActive.length > 0;
+  const showProducts  = !!search || !!offersMode || isSubcat || (isParent && subcatsOfActive.length === 0);
+
+  // Resolve category_id to pass to products API
+  const resolvedCatId = activeCat?.id || '';
+
+  // Banner text
+  let bannerH1 = '🌾 All Categories';
+  let bannerP  = 'Explore products across all farming categories';
+  if (search)      { bannerH1 = `🔍 "${search}"`; bannerP = `Search results for: ${search}`; }
+  else if (offersMode) { bannerH1 = '🏷️ Best Offers'; bannerP = 'Products with the biggest discounts'; }
+  else if (activeCat)  { bannerH1 = `${activeCat.icon || '📦'} ${activeCat.name}`; bannerP = isParent ? `Browse subcategories of ${activeCat.name}` : `All products in ${activeCat.name}`; }
+
+  // Load products when needed
   useEffect(() => {
-    let f = {};
-    if (search) {
-      f = { search };
-      setShowOverview(false);
-      setProductsTitle(`🔍 Results for "${search}"`);
-      setBanner({ h1:'🔍 Search Results', p:`Showing results for: "${search}"` });
-    } else if (offers) {
-      f = { on_offer: 1 };
-      setShowOverview(false);
-      setProductsTitle('🏷️ Best Offers');
-      setBanner({ h1:'🏷️ Best Offers', p:'Products with the biggest discounts — limited time only!' });
-    } else if (catSlug) {
-      const resolvedId = catMap[catSlug];
-      if (resolvedId) {
-        f = { category_id: resolvedId };
-      } else {
-        // catMap not loaded yet, will re-run when catMap updates
-        f = { category_slug: catSlug };
-      }
-      const label = catSlug.replace(/-/g,' ').replace(/\b\w/g,c=>c.toUpperCase());
-      setShowOverview(false);
-      setProductsTitle(label);
-      setBanner({ h1: label, p:`Browse all products in ${label}` });
-    } else if (catId) {
-      f = { category_id: catId };
-      setShowOverview(false);
-      setProductsTitle('Category Products');
-      setBanner({ h1:'Category Products', p:'Browse products in this category' });
-    } else {
-      setShowOverview(true);
-      setProductsTitle('🔥 Featured Products');
-    }
-    setFilters(f);
-    setPage(1);
-  }, [search, catSlug, catId, offers, catMap]);
-
-  useEffect(() => { loadProducts(); }, [filters, sort, page]);
+    if (!showProducts) { setProducts([]); setTotal(0); return; }
+    loadProducts();
+  }, [showProducts, resolvedCatId, search, offersMode, sort, page]);
 
   async function loadProducts() {
     setLoading(true);
-    const sortMap = { price_asc:{sort:'selling_price',order:'asc'}, price_desc:{sort:'selling_price',order:'desc'}, newest:{sort:'created_at',order:'desc'}, rating:{sort:'avg_rating',order:'desc'} };
-    const sortParams = sortMap[sort] || { sort:'sold_count', order:'desc' };
-    const res = await api.get('products', { ...filters, ...sortParams, page, limit:8 });
-    if (res.success) { setProducts(res.data); setTotal(res.meta?.total || 0); }
-    else { setProducts([]); setTotal(0); }
+    const sortMap = {
+      price_asc:  { sort: 'selling_price', order: 'asc' },
+      price_desc: { sort: 'selling_price', order: 'desc' },
+      newest:     { sort: 'created_at',    order: 'desc' },
+      rating:     { sort: 'avg_rating',    order: 'desc' },
+    };
+    const sortParams = sortMap[sort] || { sort: 'sold_count', order: 'desc' };
+    const params = { ...sortParams, page, limit: 12 };
+    if (search)        params.search      = search;
+    if (offersMode)    params.on_offer    = 1;
+    if (resolvedCatId) params.category_id = resolvedCatId;
+
+    const res = await api.get('products', params);
+    if (res.success) { setProducts(res.data || []); setTotal(res.meta?.total || 0); }
+    else             { setProducts([]); setTotal(0); }
     setLoading(false);
   }
 
-  const pages = Math.ceil(total / 8) || 1;
+  const pages = Math.ceil(total / 12) || 1;
+
+  const goToCat = (cat) => {
+    setPage(1);
+    navigate(`/categories?category_id=${cat.id}`);
+  };
 
   return (
     <>
+      {/* BANNER */}
       <div className="page-banner">
         <div className="page-banner-content">
-          <div className="breadcrumb"><Link to="/">Home</Link> › Categories</div>
-          <h1>{banner.h1}</h1>
-          <p>{banner.p}</p>
+          <div className="breadcrumb">
+            <Link to="/">Home</Link> ›{' '}
+            {activeCat && activeCat.parent_id && (
+              <>
+                <span
+                  style={{ cursor: 'pointer', color: '#81c784' }}
+                  onClick={() => navigate(`/categories?category_id=${activeCat.parent_id}`)}
+                >
+                  {parents.find(p => p.id === activeCat.parent_id)?.name || 'Category'}
+                </span>
+                {' › '}
+              </>
+            )}
+            {activeCat ? activeCat.name : 'Categories'}
+          </div>
+          <h1>{bannerH1}</h1>
+          <p>{bannerP}</p>
         </div>
       </div>
 
@@ -149,26 +123,53 @@ export default function Categories() {
         {/* SIDEBAR */}
         <aside className={'sidebar' + (mobileSb ? ' mobile-open' : '')} id="sidebar">
           <div className="sb-search">
-            <input type="text" placeholder="Search categories..." />
+            <input
+              type="text"
+              placeholder="Search categories..."
+              onKeyDown={e => e.key === 'Enter' && navigate(`/categories?search=${encodeURIComponent(e.target.value)}`)}
+            />
             <button className="sb-search-btn">🔍</button>
           </div>
 
-          {SIDEBAR_GROUPS.map((g, gi) => (
-            <div key={gi} className="sb-item">
-              <div className={'sb-header' + (openSb === gi ? ' open' : '')} onClick={() => setOpenSb(openSb === gi ? null : gi)}>
-                <span className="sb-label"><span className="sb-icon">{g.icon}</span> {g.label}</span>
-                <span className="sb-arrow">▼</span>
-              </div>
-              <div className={'sb-sub' + (openSb === gi ? ' open' : '')}>
-                {g.id === 'brands'
-                  ? brands.map(b => <div key={b.slug} className="sb-sub-item" onClick={() => { navigate(`/categories?search=${encodeURIComponent(b.name)}`); setMobileSb(false); }}>{b.name}</div>)
-                  : g.specials
-                  ? g.specials.map(s => <div key={s.label} className="sb-sub-item" onClick={() => { setFilters(s.params); setShowOverview(false); setProductsTitle(s.label); setMobileSb(false); }}>{s.label}</div>)
-                  : g.subs.map(s => <div key={s.id} className="sb-sub-item" onClick={() => { navigate(`/categories?category_slug=${s.slug || 'gardening'}`); setMobileSb(false); }}>{s.n}</div>)
-                }
-              </div>
-            </div>
-          ))}
+          {catsLoading
+            ? <div style={{ padding: '20px', color: '#888', fontSize: 13 }}>Loading...</div>
+            : parents.map((p, gi) => {
+                const children = subs.filter(s => s.parent_id === p.id);
+                const isOpen   = openSb === p.id;
+                const isActive = activeCat?.id === p.id || activeCat?.parent_id === p.id;
+                return (
+                  <div key={p.id} className="sb-item">
+                    <div
+                      className={'sb-header' + (isOpen || isActive ? ' open' : '')}
+                      onClick={() => setOpenSb(isOpen ? null : p.id)}
+                    >
+                      <span className="sb-label">
+                        <span className="sb-icon">{p.icon || '📦'}</span> {p.name}
+                      </span>
+                      <span className="sb-arrow">▼</span>
+                    </div>
+                    <div className={'sb-sub' + (isOpen || isActive ? ' open' : '')}>
+                      <div
+                        className={'sb-sub-item' + (!activeCat || activeCat.id === p.id ? ' active' : '')}
+                        onClick={() => { goToCat(p); setMobileSb(false); }}
+                        style={{ fontWeight: 600 }}
+                      >
+                        All {p.name}
+                      </div>
+                      {children.map(s => (
+                        <div
+                          key={s.id}
+                          className={'sb-sub-item' + (activeCat?.id === s.id ? ' active' : '')}
+                          onClick={() => { goToCat(s); setMobileSb(false); }}
+                        >
+                          {s.icon || '📂'} {s.name}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                );
+              })
+          }
         </aside>
 
         {mobileSb && <div className="sb-overlay open" onClick={() => setMobileSb(false)} />}
@@ -176,80 +177,121 @@ export default function Categories() {
 
         {/* MAIN */}
         <div className="cat-main">
-          <div className="cat-toolbar">
-            <span className="result-count">Showing <b>{total}</b> products</span>
-            <div style={{ display:'flex', gap:12, alignItems:'center', flexWrap:'wrap' }}>
-              <select className="sort-select" value={sort} onChange={e => { setSort(e.target.value); setPage(1); }}>
-                <option value="">Sort: Popularity</option>
-                <option value="price_asc">Price: Low to High</option>
-                <option value="price_desc">Price: High to Low</option>
-                <option value="newest">Newest First</option>
-                <option value="rating">Best Rating</option>
-              </select>
-            </div>
-          </div>
 
+          {/* OVERVIEW — all parent categories */}
           {showOverview && (
-            <>
-              <div className="big-cats-grid">
-                {BIG_CATS.map(c => (
-                  <div key={c.slug} className="big-cat-card" onClick={() => navigate(`/categories?category_slug=${c.slug}`)}>
-                    <img src={c.img} alt={c.label} />
-                    <div className="big-cat-overlay">
-                      <div className="cat-arrow">→</div>
-                      <h3>{c.label}</h3>
-                      <span>{c.sub}</span>
-                    </div>
+            <div className="subcat-section" style={{ marginBottom: 32 }}>
+              <h2 style={{ fontSize: 20, fontWeight: 800, color: 'var(--text, #1b5e20)', marginBottom: 20 }}>
+                🗂️ Browse Categories
+              </h2>
+              {catsLoading
+                ? <div style={{ color: '#888' }}>⏳ Loading categories...</div>
+                : (
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(160px, 1fr))', gap: 16 }}>
+                    {parents.map(cat => (
+                      <div
+                        key={cat.id}
+                        onClick={() => goToCat(cat)}
+                        style={{
+                          cursor: 'pointer', borderRadius: 12, overflow: 'hidden',
+                          border: '1px solid #e8f5e9', background: '#fff',
+                          boxShadow: '0 2px 8px rgba(0,0,0,0.06)', transition: 'transform 0.18s, box-shadow 0.18s',
+                        }}
+                        onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-3px)'; e.currentTarget.style.boxShadow = '0 6px 20px rgba(0,0,0,0.12)'; }}
+                        onMouseLeave={e => { e.currentTarget.style.transform = ''; e.currentTarget.style.boxShadow = '0 2px 8px rgba(0,0,0,0.06)'; }}
+                      >
+                        <div style={{ height: 100, overflow: 'hidden', background: '#f1f8e9' }}>
+                          <img
+                            src={cat.image_url || FALLBACK_IMG}
+                            alt={cat.name}
+                            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                            onError={e => { e.target.src = FALLBACK_IMG; }}
+                          />
+                        </div>
+                        <div style={{ padding: '10px 12px' }}>
+                          <div style={{ fontSize: 22, marginBottom: 4 }}>{cat.icon || '📦'}</div>
+                          <div style={{ fontWeight: 700, fontSize: 13, color: '#1b5e20' }}>{cat.name}</div>
+                          <div style={{ fontSize: 11, color: '#888', marginTop: 2 }}>
+                            {subs.filter(s => s.parent_id === cat.id).length} subcategories
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )
+              }
+            </div>
+          )}
+
+          {/* SUBCATEGORIES — when a parent is selected */}
+          {showSubcats && (
+            <div style={{ marginBottom: 32 }}>
+              <h2 style={{ fontSize: 18, fontWeight: 800, color: '#1b5e20', marginBottom: 16 }}>
+                {activeCat.icon || '📦'} {activeCat.name} — Subcategories
+              </h2>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(140px, 1fr))', gap: 12 }}>
+                {subcatsOfActive.map(sub => (
+                  <div
+                    key={sub.id}
+                    onClick={() => goToCat(sub)}
+                    style={{
+                      cursor: 'pointer', borderRadius: 10, padding: '14px 12px', textAlign: 'center',
+                      border: '1px solid #e8f5e9', background: '#f9fbe7',
+                      boxShadow: '0 2px 6px rgba(0,0,0,0.05)', transition: 'all 0.18s',
+                    }}
+                    onMouseEnter={e => { e.currentTarget.style.background = '#e8f5e9'; e.currentTarget.style.transform = 'translateY(-2px)'; }}
+                    onMouseLeave={e => { e.currentTarget.style.background = '#f9fbe7'; e.currentTarget.style.transform = ''; }}
+                  >
+                    <div style={{ fontSize: 28, marginBottom: 6 }}>{sub.icon || '📂'}</div>
+                    <div style={{ fontWeight: 600, fontSize: 13, color: '#2e7d32' }}>{sub.name}</div>
                   </div>
                 ))}
               </div>
-
-              <div className="tips-banner">
-                <div>
-                  <h3>🌾 Free Crop Advisory</h3>
-                  <p>Talk to our agri-experts for personalized crop protection and nutrition advice — completely free!</p>
-                </div>
-                <button className="tips-btn" onClick={() => navigate('/contact')}>📞 Call Expert Now</button>
-              </div>
-
-              <div className="subcat-section">
-                <div style={{ display:'grid', gridTemplateColumns:'repeat(3,1fr)', gap:24 }}>
-                  {SUB_COLS.map(col => (
-                    <div key={col.parent}>
-                      <h2 style={{ fontSize:17, fontWeight:800, color:'#1b5e20', marginBottom:14, cursor:'pointer', display:'flex', alignItems:'center', gap:8 }} onClick={() => navigate(`/categories?category_id=${col.parent}`)}>
-                        {col.label} <span style={{ fontSize:12, color:'#888', fontWeight:400 }}>→</span>
-                      </h2>
-                      <div style={{ display:'flex', flexDirection:'column', gap:8 }}>
-                        {col.subs.map(s => <div key={s.id} className="subcat-row" onClick={() => navigate(`/categories?category_id=${s.id}`)}>{s.n}</div>)}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </>
+            </div>
           )}
 
-          <div className="products-section">
-            {productsTitle && <h2 id="productsTitle">{productsTitle}</h2>}
-            <div className="products-grid-4">
-              {loading
-                ? <div style={{ gridColumn:'1/-1', textAlign:'center', padding:40, color:'#888' }}>⏳ Loading products...</div>
-                : products.length === 0
-                ? <div style={{ gridColumn:'1/-1', textAlign:'center', padding:40, color:'#888' }}>😔 No products found.</div>
-                : products.map(p => <ProductCard key={p.id} p={p} />)
-              }
-            </div>
-
-            {pages > 1 && (
-              <div className="pagination">
-                <button className="page-btn" onClick={() => page > 1 && setPage(p => p - 1)}>‹</button>
-                {Array.from({ length: Math.min(pages, 5) }, (_, i) => (
-                  <button key={i+1} className={'page-btn' + (page === i+1 ? ' active' : '')} onClick={() => setPage(i+1)}>{i+1}</button>
-                ))}
-                <button className="page-btn" onClick={() => page < pages && setPage(p => p + 1)}>›</button>
+          {/* PRODUCTS SECTION */}
+          {showProducts && (
+            <>
+              <div className="cat-toolbar">
+                <span className="result-count">
+                  Showing <b>{total}</b> product{total !== 1 ? 's' : ''}
+                  {activeCat ? ` in ${activeCat.name}` : ''}
+                </span>
+                <select className="sort-select" value={sort} onChange={e => { setSort(e.target.value); setPage(1); }}>
+                  <option value="">Sort: Popularity</option>
+                  <option value="price_asc">Price: Low to High</option>
+                  <option value="price_desc">Price: High to Low</option>
+                  <option value="newest">Newest First</option>
+                  <option value="rating">Best Rating</option>
+                </select>
               </div>
-            )}
-          </div>
+
+              <div className="products-grid-4">
+                {loading
+                  ? <div style={{ gridColumn: '1/-1', textAlign: 'center', padding: 60, color: '#888' }}>⏳ Loading products...</div>
+                  : products.length === 0
+                  ? (
+                    <div style={{ gridColumn: '1/-1', textAlign: 'center', padding: 60 }}>
+                      <div style={{ fontSize: 48, marginBottom: 12 }}>😔</div>
+                      <div style={{ color: '#888', fontSize: 15 }}>No products found{activeCat ? ` in ${activeCat.name}` : ''}.</div>
+                    </div>
+                  )
+                  : products.map(p => <ProductCard key={p.id} p={p} />)
+                }
+              </div>
+
+              {pages > 1 && (
+                <div className="pagination">
+                  <button className="page-btn" onClick={() => page > 1 && setPage(p => p - 1)}>‹</button>
+                  {Array.from({ length: Math.min(pages, 7) }, (_, i) => (
+                    <button key={i + 1} className={'page-btn' + (page === i + 1 ? ' active' : '')} onClick={() => setPage(i + 1)}>{i + 1}</button>
+                  ))}
+                  <button className="page-btn" onClick={() => page < pages && setPage(p => p + 1)}>›</button>
+                </div>
+              )}
+            </>
+          )}
         </div>
       </div>
     </>

@@ -20,10 +20,30 @@ export default function AdminCustomers() {
   const [limit, setLimit]         = useState(10);
   const [search, setSearch]       = useState('');
   const [cityF, setCityF]         = useState('');
+  const [stateF, setStateF]       = useState('');
   const [detail, setDetail]       = useState(null);
   const [editing, setEditing]     = useState(false);
   const [editForm, setEditForm]   = useState({});
   const [addrPopup, setAddrPopup] = useState(null);
+
+  useEffect(() => { load(); }, [page, limit, search, cityF, stateF]);
+
+  async function load() {
+    setLoading(true);
+    try {
+      const res = await adminApi.getCustomers({ page, limit, search, city: cityF, state: stateF });
+      if (res.success) { setCustomers(res.data); setTotal(res.meta?.total || res.data?.length || 0); }
+    } catch {
+      const f = MOCK.filter(c =>
+        (!search || `${c.first_name} ${c.last_name}`.toLowerCase().includes(search.toLowerCase()) || c.mobile.includes(search)) &&
+        (!cityF || (c.city || '').toLowerCase().includes(cityF.toLowerCase())) &&
+        (!stateF || (c.state || '').toLowerCase().includes(stateF.toLowerCase()))
+      );
+      setCustomers(f.slice((page - 1) * limit, page * limit));
+      setTotal(f.length);
+    }
+    setLoading(false);
+  }
 
   useEffect(() => { load(); }, [page, limit, search, cityF]);
 
@@ -42,7 +62,6 @@ export default function AdminCustomers() {
     }
     setLoading(false);
   }
-
   async function saveEdit() {
     try { await adminApi.updateCustomer(detail.id, editForm); } catch {}
     setCustomers(cs => cs.map(c => c.id === detail.id ? { ...c, ...editForm } : c));
@@ -72,9 +91,11 @@ export default function AdminCustomers() {
           <input className="a-input" placeholder="🔍 Search name, phone, email..." value={search}
             onChange={e => { setSearch(e.target.value); setPage(1); }} style={{ maxWidth: 260 }} />
           <input className="a-input" placeholder="🏙️ Filter by city..." value={cityF}
-            onChange={e => { setCityF(e.target.value); setPage(1); }} style={{ maxWidth: 180 }} />
-          {cityF && <button className="a-btn a-btn-sm a-btn-sec" onClick={()=>{ setCityF(''); setPage(1); }}>✕ Clear</button>}
-          <select className="a-input a-select" value={limit} onChange={e => setLimit(+e.target.value)}>
+            onChange={e => { setCityF(e.target.value); setPage(1); }} style={{ maxWidth: 160 }} />
+          <input className="a-input" placeholder="🗺️ Filter by state..." value={stateF}
+            onChange={e => { setStateF(e.target.value); setPage(1); }} style={{ maxWidth: 160 }} />
+          {(cityF || stateF) && <button className="a-btn a-btn-sm a-btn-sec" onClick={() => { setCityF(''); setStateF(''); setPage(1); }}>✕ Clear</button>}
+          <select className="a-input a-select" value={limit} onChange={e => { setLimit(+e.target.value); setPage(1); }}>
             {[10, 25, 50, 100].map(n => <option key={n} value={n}>{n} per page</option>)}
           </select>
         </div>
@@ -187,21 +208,38 @@ export default function AdminCustomers() {
                 <div className="a-fg"><label>Phone</label><input className="a-input" value={editForm.mobile} onChange={e => setEditForm(f => ({ ...f, mobile: e.target.value }))} /></div>
               </div>
             ) : (
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(140px,1fr))', gap: 12 }}>
-                {[['📧 Email', detail.email], ['📱 Phone', detail.mobile], ['🛒 Orders', detail.total_orders], ['💰 Total Spent', '₹' + Number(detail.total_spent).toLocaleString('en-IN')]].map(([l, v]) => (
-                  <div key={l} style={{ background: 'var(--ab3)', borderRadius: 10, padding: '12px 14px' }}>
-                    <div style={{ fontSize: 11, color: 'var(--atx3)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: 0.7, marginBottom: 4 }}>{l}</div>
-                    <div style={{ fontSize: 14, fontWeight: 700 }}>{v}</div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(140px,1fr))', gap: 12 }}>
+                  {[['🪪 Customer ID', detail.customer_code || '—'], ['📧 Email', detail.email || '—'], ['📱 Phone', detail.mobile], ['🛒 Orders', detail.total_orders ?? 0], ['💰 Total Spent', '₹' + Number(detail.total_spent || 0).toLocaleString('en-IN')]].map(([l, v]) => (
+                    <div key={l} style={{ background: 'var(--ab3)', borderRadius: 10, padding: '12px 14px' }}>
+                      <div style={{ fontSize: 11, color: 'var(--atx3)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: 0.7, marginBottom: 4 }}>{l}</div>
+                      <div style={{ fontSize: 14, fontWeight: 700 }}>{v}</div>
+                    </div>
+                  ))}
+                  <div style={{ background: 'var(--ab3)', borderRadius: 10, padding: '12px 14px' }}>
+                    <div style={{ fontSize: 11, color: 'var(--atx3)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: 0.7, marginBottom: 6 }}>Account Status</div>
+                    <span style={{ fontSize: 13, fontWeight: 700, padding: '4px 12px', borderRadius: 20,
+                      background: detail.is_active ? '#f0fdf4' : '#fef2f2',
+                      color: detail.is_active ? '#16a34a' : '#dc2626' }}>
+                      {detail.is_active ? '✅ Active' : '⛔ Inactive'}
+                    </span>
                   </div>
-                ))}
-                <div style={{ background: 'var(--ab3)', borderRadius: 10, padding: '12px 14px' }}>
-                  <div style={{ fontSize: 11, color: 'var(--atx3)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: 0.7, marginBottom: 6 }}>Account Status</div>
-                  <span style={{ fontSize: 13, fontWeight: 700, padding: '4px 12px', borderRadius: 20,
-                    background: detail.is_active ? '#f0fdf4' : '#fef2f2',
-                    color: detail.is_active ? '#16a34a' : '#dc2626' }}>
-                    {detail.is_active ? '✅ Active' : '⛔ Inactive'}
-                  </span>
                 </div>
+                {(detail.address_line1 || detail.city || detail.state) && (
+                  <div style={{ background: 'var(--ab3)', borderRadius: 10, padding: '12px 14px' }}>
+                    <div style={{ fontSize: 11, color: 'var(--atx3)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: 0.7, marginBottom: 6 }}>📍 Address</div>
+                    <div style={{ fontSize: 13, color: 'var(--atx)', lineHeight: 1.8 }}>
+                      {detail.address_line1 && <div>{detail.address_line1}{detail.address_line2 ? ', ' + detail.address_line2 : ''}</div>}
+                      {(detail.city || detail.state) && <div>{[detail.city, detail.state].filter(Boolean).join(', ')}{detail.pincode ? ' — ' + detail.pincode : ''}</div>}
+                    </div>
+                  </div>
+                )}
+                {!detail.address_line1 && !detail.city && !detail.state && (
+                  <div style={{ background: 'var(--ab3)', borderRadius: 10, padding: '12px 14px' }}>
+                    <div style={{ fontSize: 11, color: 'var(--atx3)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: 0.7, marginBottom: 6 }}>📍 Address</div>
+                    <div style={{ fontSize: 13, color: 'var(--atx3)' }}>No address added yet</div>
+                  </div>
+                )}
               </div>
             )}
           </div>

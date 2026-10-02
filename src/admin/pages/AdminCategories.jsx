@@ -266,7 +266,7 @@ export default function AdminCategories() {
         open={!!confirmId}
         onClose={() => setConfirmId(null)}
         onConfirm={() => doDelete(confirmId)}
-        message="This will deactivate the category. Subcategories will remain but won't be visible."
+        message="Delete this category permanently? This cannot be undone."
       />
     </AdminLayout>
   );

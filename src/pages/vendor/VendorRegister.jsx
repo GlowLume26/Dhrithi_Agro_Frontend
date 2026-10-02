@@ -29,6 +29,7 @@ export default function VendorRegister() {
   const [uploads, setUploads] = useState({});
   const [agreed, setAgreed] = useState(false);
   const [success, setSuccess] = useState(false);
+  const [appRef, setAppRef] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [submitErr, setSubmitErr] = useState('');
   const [isCnF, setIsCnF] = useState(false);
@@ -64,8 +65,9 @@ export default function VendorRegister() {
       Object.entries(uploads).forEach(([key, val]) => {
         if (val?.file) fd.append(key, val.file);
       });
+      // Use correct URL: route=vendors&action=register
       const res = await fetch(API_BASE + 'vendors&action=register', { method: 'POST', body: fd }).then(r => r.json());
-      if (res.success) setSuccess(true);
+      if (res.success) { setAppRef(res.data?.application_ref || ''); setSuccess(true); }
       else setSubmitErr(res.message || 'Submission failed. Please try again.');
     } catch { setSubmitErr('Network error. Please check your connection.'); }
     setSubmitting(false);
@@ -84,7 +86,7 @@ export default function VendorRegister() {
       </p>
       <div style={{ background: '#e8f5e9', borderRadius: 12, padding: '16px 24px', display: 'inline-block', margin: '16px 0' }}>
         <span style={{ fontSize: 13, color: '#666', display: 'block', marginBottom: 4 }}>Application Reference ID</span>
-        <h3 style={{ fontSize: 24, fontWeight: 900, color: '#1b5e20' }}>VR-2025-DA-{Math.floor(Math.random()*9000+1000)}</h3>
+        <h3 style={{ fontSize: 24, fontWeight: 900, color: '#1b5e20' }}>{appRef || 'Submitted'}</h3>
       </div>
       <p style={{ fontSize: 13, color: '#2e7d32', fontWeight: 600 }}>📧 Confirmation sent to your email & mobile</p>
       <button onClick={() => navigate('/')} style={{ background: '#2e7d32', color: 'white', border: 'none', padding: '12px 28px', borderRadius: 10, fontSize: 14, fontWeight: 700, cursor: 'pointer', marginTop: 24 }}>🏠 Go to Home</button>

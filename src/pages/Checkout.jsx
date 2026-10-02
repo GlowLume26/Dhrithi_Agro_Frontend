@@ -98,7 +98,7 @@ export default function Checkout() {
                   </div>
                   <div className="form-group"><label>Address Type</label>
                     <select value={newAddr.address_type} onChange={e => setNewAddr(a => ({ ...a, address_type: e.target.value }))}>
-                      {['HOME', 'FARM', 'OFFICE', 'OTHER'].map(t => <option key={t}>{t}</option>)}
+                      {['home', 'work', 'other'].map(t => <option key={t} value={t}>{t.charAt(0).toUpperCase() + t.slice(1)}</option>)}
                     </select>
                   </div>
                   <div className="form-group full">

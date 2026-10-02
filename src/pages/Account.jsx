@@ -41,11 +41,8 @@ export default function Account() {
 
   useEffect(() => {
     if (!isLoggedIn) return;
-    fetch('/api/index.php?route=customer&section=profile', {
-      headers: { Authorization: 'Bearer ' + localStorage.getItem('da_token') }
-    }).then(async r => {
-      if (r.status === 401) { logout(); navigate('/login'); return; }
-      const res = await r.json();
+    api.get('customer', { section: 'profile' }).then(async res => {
+      if (res.status === 401) { logout(); navigate('/login'); return; }
       if (!res.success) return;
       const d = res.data;
       setProfile(d);

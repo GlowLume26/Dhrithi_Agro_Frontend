@@ -31,9 +31,8 @@ export default function Header() {
   useEffect(() => { if (isLoggedIn) refreshCart(); }, [isLoggedIn, refreshCart]);
 
   async function loadCategories() {
-    if (categories.length) return;
     const res = await api.get('categories');
-    if (res.success) setCategories(res.data);
+    if (res.success && res.data?.length) setCategories(res.data);
   }
 
   async function loadNotifications() {
@@ -68,7 +67,7 @@ export default function Header() {
 
   const parents = categories.filter(c => !c.parent_id);
   const kids    = categories.filter(c =>  c.parent_id);
-  const catIcons = { 'Irrigation': '💧', 'Gardening': '🌿', 'Cattle & Bird Care': '🐄', 'default': '📦' };
+
 
   return (
     <>
@@ -112,7 +111,7 @@ export default function Header() {
                             <div style={{ flex:1 }}>
                               <div className="notif-title">Order #{o.order_number}</div>
                               <div className="notif-sub">Status: <b>{o.order_status}</b> • ₹{Number(o.total_amount || o.final_amount).toLocaleString('en-IN')}</div>
-                              <div className="notif-time">{new Date(o.placed_at || o.created_at).toLocaleDateString('en-IN')}</div>
+                              <div className="notif-time">{new Date(o.created_at).toLocaleDateString('en-IN')}</div>
                             </div>
                             {!isRead && (
                               <button onClick={e => { e.preventDefault(); e.stopPropagation(); markOneRead(o.id); }}
@@ -179,14 +178,14 @@ export default function Header() {
                 return (
                   <div key={p.id} className={'cat-accordion-item' + (openCat === p.id ? ' active' : '')}>
                     <div className="cat-accordion-header" onClick={() => setOpenCat(openCat === p.id ? null : p.id)}>
-                      <span className="cat-accordion-title">{catIcons[p.name] || catIcons.default} {p.name}</span>
+                      <span className="cat-accordion-title">{p.icon || '📦'} {p.name}</span>
                       <span className="cat-accordion-icon">▼</span>
                     </div>
                     <div className="cat-accordion-content" style={{ maxHeight: openCat === p.id ? '500px' : '0' }}>
                       {children.map(k => (
-                        <Link key={k.id} to={`/categories?category_slug=${k.slug}`} onClick={() => setDrawerOpen(false)}>{k.name}</Link>
+                        <Link key={k.id} to={`/categories?category_id=${k.id}`} onClick={() => setDrawerOpen(false)}>{k.icon || '📂'} {k.name}</Link>
                       ))}
-                      <Link to={`/categories?category_slug=${p.slug}`} className="view-all-link" onClick={() => setDrawerOpen(false)}>View All {p.name} →</Link>
+                      <Link to={`/categories?category_id=${p.id}`} className="view-all-link" onClick={() => setDrawerOpen(false)}>View All {p.name} →</Link>
                     </div>
                   </div>
                 );

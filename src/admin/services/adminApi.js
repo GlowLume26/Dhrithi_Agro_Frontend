@@ -37,8 +37,9 @@ export const adminApi = {
   approveVendor:       (id)        => axios.put(url(`admin&action=approve&id=${id}`), {}, cfg()).then(r => r.data),
   rejectVendor:        (id, reason)=> axios.put(url(`admin&action=reject&id=${id}`), { reason }, cfg()).then(r => r.data),
 
-  getCommissionRates:  ()          => axios.get(url('admin&section=commission'), cfg()).then(r => r.data),
-  updateCommissionRate:(id, rate)   => axios.put(url(`admin&section=commission&id=${id}`), { rate }, cfg()).then(r => r.data),
+  // Commission rates are managed via app_settings
+  getCommissionRates:  ()          => axios.get(url('settings'), cfg()).then(r => r.data),
+  updateCommissionRate:(id, rate)   => axios.put(url('settings'), { [`commission_rate_${id}`]: rate }, cfg()).then(r => r.data),
 
   getProducts:   (params={}) => axios.get(url(`products&${qs(params)}`), cfg()).then(r => r.data),
   getProduct:    (id)        => axios.get(url(`products&id=${id}`), cfg()).then(r => r.data),
@@ -65,6 +66,11 @@ export const adminApi = {
   createOffer:  (data)     => axios.post(url('admin&section=offers'), data, cfg()).then(r => r.data),
   updateOffer:  (id, data) => axios.put(url(`admin&section=offers&id=${id}`), data, cfg()).then(r => r.data),
   deleteOffer:  (id)       => axios.delete(url(`admin&section=offers&id=${id}`), cfg()).then(r => r.data),
+
+  getReports: () => axios.get(url('admin&section=reports'), cfg()).then(r => r.data),
+
+  getSettings:    () => axios.get(url('settings'), cfg()).then(r => r.data),
+  updateSettings: (data) => axios.put(url('settings'), data, cfg()).then(r => r.data),
 
   getBrands: () => axios.get(url('brands'), cfg()).then(r => r.data),
 

@@ -61,7 +61,9 @@ export default function Categories() {
   else if (offersMode) { bannerH1 = '🏷️ Best Offers'; bannerP = 'Products with the biggest discounts'; }
   else if (activeCat)  { bannerH1 = `${activeCat.icon || '📦'} ${activeCat.name}`; bannerP = isParent ? `Browse subcategories of ${activeCat.name}` : `All products in ${activeCat.name}`; }
 
-  // Load products when needed
+  // Reset page when URL params change
+  useEffect(() => { setPage(1); }, [catId, catSlug, search, offersMode]);
+
   useEffect(() => {
     if (!showProducts) { setProducts([]); setTotal(0); return; }
     loadProducts();

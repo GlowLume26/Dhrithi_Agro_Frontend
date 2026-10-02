@@ -78,10 +78,10 @@ export default function Footer() {
           <div className="footer-col">
             <h4>Categories</h4>
             <ul>
-              <li><Link to="/categories?category_slug=irrigation">💧 Irrigation</Link></li>
-              <li><Link to="/categories?category_slug=gardening">🌿 Gardening</Link></li>
-              <li><Link to="/categories?category_slug=cattle-bird-care">🐄 Cattle & Bird Care</Link></li>
+              <li><Link to="/categories">🌾 All Categories</Link></li>
               <li><Link to="/categories?offers=1">🏷️ Best Offers</Link></li>
+              <li><Link to="/categories">🔥 Best Sellers</Link></li>
+              <li><Link to="/categories">🆕 New Arrivals</Link></li>
             </ul>
           </div>
           <div className="footer-col">

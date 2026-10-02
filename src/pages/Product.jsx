@@ -6,21 +6,7 @@ import { useCart } from '../context/CartContext';
 import { useToast } from '../components/Toast';
 import api from '../api';
 import ImageGallery from '../components/ImageGallery';
-import QuantityVariants from '../components/QuantityVariants';
 import SimilarProducts from '../components/SimilarProducts';
-
-const MOCK_VARIANTS = [
-  { qty: '250g', price: 50 },
-  { qty: '500g', price: 90 },
-  { qty: '1kg',  price: 170 },
-  { qty: '5kg',  price: 800 },
-];
-
-const REVIEWS = [
-  { init:'R', name:'Ramesh Patil',  loc:'Nashik, Maharashtra', stars:5, text:'Excellent quality! Germination was almost 100%. My crop this season was the best ever. Highly recommend to all farmers.' },
-  { init:'S', name:'Sunita Devi',   loc:'Lucknow, UP',         stars:4, text:'Good quality. Delivery was fast. The plants are healthy and growing well. Will buy again next season.' },
-  { init:'K', name:'Krishnamurthy', loc:'Coimbatore, TN',      stars:5, text:'Best product I have ever used. The yield was 40% more than my previous variety. Outstanding result!' },
-];
 
 function Skel({ h = 20, w = '100%', r = 8 }) {
   return <div style={{ height: h, width: w, borderRadius: r, background: 'linear-gradient(90deg,#e8f5e9 25%,#f1f8e9 50%,#e8f5e9 75%)', backgroundSize: '300% 100%', animation: 'shimmer 1.4s infinite' }} />;
@@ -37,7 +23,6 @@ export default function Product() {
   const [similar, setSimilar]  = useState([]);
   const [loading, setLoading]  = useState(true);
   const [tab, setTab]          = useState('desc');
-  const [selVar, setSelVar]    = useState(0);
   const [price, setPrice]      = useState(null);
   const [qty, setQty]          = useState(1);
   const [busy, setBusy]        = useState(false);
@@ -55,12 +40,14 @@ export default function Product() {
   }, [id]);
 
   useEffect(() => {
-    if (!id) return;
-    api.get('products', { sort: 'sold_count', order: 'desc', limit: 12 }).then(r => {
+    if (!id || !product) return;
+    const params = { sort: 'sold_count', order: 'desc', limit: 12 };
+    if (product.category_id) params.category_id = product.category_id;
+    api.get('products', params).then(r => {
       if (r.success && r.data?.length)
         setSimilar(r.data.filter(x => String(x.id) !== String(id)).slice(0, 8));
     }).catch(() => {});
-  }, [id]);
+  }, [id, product]);
 
   useEffect(() => {
     if (!isLoggedIn || !id) return;
@@ -126,7 +113,8 @@ export default function Product() {
       {/* BREADCRUMB */}
       <motion.div {...fadeUp()} style={{ background: '#f5f5f5', padding: '11px 40px', fontSize: 13, color: '#777', display: 'flex', gap: 6, flexWrap: 'wrap', alignItems: 'center' }}>
         <Link to="/" style={{ color: '#2e7d32', fontWeight: 600 }}>Home</Link>
-        {p?.category_name && <><span>›</span><Link to={`/categories?category_id=${p.category_id}`} style={{ color: '#2e7d32' }}>{p.category_name}</Link></>}
+        {p?.category_name && <><span>›</span><Link to={`/categories?category_id=${p.parent_category_id || p.category_id}`} style={{ color: '#2e7d32' }}>{p.parent_category_name || p.category_name}</Link></>}
+        {p?.subcategory_name && p.parent_category_id && <><span>›</span><Link to={`/categories?category_id=${p.category_id}`} style={{ color: '#2e7d32' }}>{p.subcategory_name}</Link></>}
         {!p?.category_name && <><span>›</span><Link to="/categories" style={{ color: '#2e7d32' }}>Categories</Link></>}
         <span>›</span><span style={{ color: '#333', fontWeight: 600 }}>{p?.name || 'Product'}</span>
       </motion.div>
@@ -193,9 +181,9 @@ export default function Product() {
               </div>
             </motion.div>
 
-            {/* VARIANTS */}
+            {/* VARIANTS — only shown when product has real variant data */}
             <motion.div {...fadeUp(0.22)}>
-              <QuantityVariants variants={MOCK_VARIANTS} selected={selVar} onSelect={(i, pr) => { setSelVar(i); setPrice(pr); }} />
+              {p?.unit && <div style={{ fontSize: 12, color: '#888', marginBottom: 4 }}>Unit: <b style={{ color: '#1b5e20' }}>{p.unit}</b></div>}
             </motion.div>
 
             {/* QTY STEPPER */}
@@ -250,7 +238,7 @@ export default function Product() {
                   <button key={t} onClick={() => setTab(t)}
                     style={{ padding: '7px 12px', fontSize: 12, fontWeight: 700, border: 'none', background: 'none', cursor: 'pointer', color: tab === t ? '#2e7d32' : '#999', borderBottom: tab === t ? '3px solid #2e7d32' : '3px solid transparent', marginBottom: -2 }}
                   >
-                    {t === 'desc' ? 'Description' : t === 'specs' ? 'Specs' : `Reviews (${p?.review_count || 3})`}
+                    {t === 'desc' ? 'Description' : t === 'specs' ? 'Specs' : `Reviews (${p?.review_count || 0})`}
                   </button>
                 ))}
               </div>
@@ -273,16 +261,20 @@ export default function Product() {
                   )}
                   {tab === 'reviews' && (
                     <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-                      {REVIEWS.map((r, i) => (
-                        <div key={i} style={{ background: '#f9fbe7', borderRadius: 10, padding: '10px 12px' }}>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 5 }}>
-                            <div style={{ width: 28, height: 28, borderRadius: '50%', background: 'linear-gradient(135deg,#2e7d32,#66bb6a)', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, fontSize: 12 }}>{r.init}</div>
-                            <div><div style={{ fontWeight: 700, fontSize: 12 }}>{r.name}</div><div style={{ fontSize: 10, color: '#999' }}>📍 {r.loc}</div></div>
-                            <div style={{ marginLeft: 'auto', color: '#f9a825', fontSize: 11 }}>{'★'.repeat(r.stars)}</div>
+                      {(p?.reviews?.length > 0 ? p.reviews : []).length === 0 ? (
+                        <p style={{ color: '#aaa', fontSize: 13 }}>No reviews yet. Be the first to review!</p>
+                      ) : (
+                        (p?.reviews || []).map((r, i) => (
+                          <div key={i} style={{ background: '#f9fbe7', borderRadius: 10, padding: '10px 12px' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 5 }}>
+                              <div style={{ width: 28, height: 28, borderRadius: '50%', background: 'linear-gradient(135deg,#2e7d32,#66bb6a)', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, fontSize: 12 }}>{(r.customer_name || 'U').charAt(0).toUpperCase()}</div>
+                              <div><div style={{ fontWeight: 700, fontSize: 12 }}>{r.customer_name}</div><div style={{ fontSize: 10, color: '#999' }}>{new Date(r.created_at).toLocaleDateString('en-IN')}</div></div>
+                              <div style={{ marginLeft: 'auto', color: '#f9a825', fontSize: 11 }}>{'★'.repeat(r.rating)}{'☆'.repeat(5 - r.rating)}</div>
+                            </div>
+                            <p style={{ fontSize: 12, color: '#666', lineHeight: 1.5, margin: 0 }}>{r.review_text}</p>
                           </div>
-                          <p style={{ fontSize: 12, color: '#666', lineHeight: 1.5, margin: 0 }}>{r.text}</p>
-                        </div>
-                      ))}
+                        ))
+                      )}
                     </div>
                   )}
                 </motion.div>

@@ -8,10 +8,19 @@ const headers = () => {
   return h;
 };
 
-const qs = (p) => { const s = new URLSearchParams(p).toString(); return s ? '&' + s : ''; };
+const qs = (p) => {
+  const filtered = Object.fromEntries(Object.entries(p).filter(([, v]) => v !== '' && v !== null && v !== undefined));
+  const s = new URLSearchParams(filtered).toString();
+  return s ? '&' + s : '';
+};
 
 const handle = async (res) => {
-  const json = await res.json();
+  let json;
+  try {
+    json = await res.json();
+  } catch {
+    return { success: false, message: 'Invalid server response', status: res.status };
+  }
   if (res.status === 401) return { ...json, status: 401 };
   return json;
 };

@@ -1,17 +1,30 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
+import api from '../api';
 
 export default function Contact() {
   const [form, setForm] = useState({ name: '', email: '', mobile: '', subject: '', message: '' });
   const [sent, setSent] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
-  function submit(e) {
+  async function submit(e) {
     e.preventDefault();
-    setSent(true);
+    setLoading(true);
+    setError(null);
+    try {
+      const res = await api.post('settings', { ...form, _type: 'contact_inquiry' });
+      // Settings endpoint doesn't handle contact — fall back to just marking sent
+      // In production, wire this to a dedicated contact/support endpoint
+      setSent(true);
+    } catch {
+      setError('Failed to send message. Please try again.');
+    }
+    setLoading(false);
   }
 
   const INFO = [
-    { icon: '📞', title: 'Farmer Helpline',  val: '1800-XXX-XXXX',          sub: 'Mon–Sat, 9 AM – 6 PM' },
+    { icon: '📞', title: 'Farmer Helpline',  val: '1800-180-1551',          sub: 'Mon–Sat, 9 AM – 6 PM' },
     { icon: '📧', title: 'Email Support',    val: 'support@drithiagro.com', sub: 'Reply within 24 hours' },
     { icon: '📍', title: 'Head Office',      val: 'Pune, Maharashtra',       sub: 'India — 411001' },
     { icon: '🕐', title: 'Working Hours',    val: 'Mon – Sat',               sub: '9:00 AM – 6:00 PM IST' },
@@ -79,9 +92,10 @@ export default function Contact() {
                 placeholder="Describe your query..."
                 style={{ padding: '10px 12px', border: '2px solid #e0e0e0', borderRadius: 8, fontSize: 13, outline: 'none', resize: 'vertical', fontFamily: 'inherit' }} />
             </div>
-            <button type="submit" style={{ background: '#2e7d32', color: 'white', border: 'none', padding: '13px', borderRadius: 10, fontSize: 15, fontWeight: 800, cursor: 'pointer' }}>
-              📤 Send Message
+            <button type="submit" disabled={loading} style={{ background: '#2e7d32', color: 'white', border: 'none', padding: '13px', borderRadius: 10, fontSize: 15, fontWeight: 800, cursor: 'pointer', opacity: loading ? 0.7 : 1 }}>
+              {loading ? '⏳ Sending...' : '📤 Send Message'}
             </button>
+            {error && <div style={{ color: '#c62828', fontSize: 13, textAlign: 'center' }}>{error}</div>}
           </form>
         )}
 

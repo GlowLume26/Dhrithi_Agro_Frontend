@@ -29,7 +29,7 @@ export default function Orders() {
 
   async function cancelOrder(orderId) {
     if (!confirm('Are you sure you want to cancel this order?')) return;
-    const res = await api.put('orders', { action: 'cancel' }, { id: orderId });
+    const res = await api.put('orders', {}, { id: orderId });
     if (res.success) { toast('✅ Order cancelled successfully.'); loadOrders(statusFilter); }
     else toast('❌ ' + (res.message || 'Could not cancel order.'));
   }
@@ -90,7 +90,7 @@ export default function Orders() {
               </div>
               <div className="order-card-footer">
                 <div>
-                  <div className="order-total">Total: ₹{Number(o.total_amount).toLocaleString('en-IN')}</div>
+                  <div className="order-total">Total: ₹{Number(o.final_amount || o.total_amount).toLocaleString('en-IN')}</div>
                   <div style={{ fontSize: 12, color: '#888', marginTop: 2 }}>{o.payment_status}</div>
                 </div>
                 <div className="order-actions">

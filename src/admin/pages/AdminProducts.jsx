@@ -49,16 +49,12 @@ export default function AdminProducts() {
 
   async function load() {
     setLoading(true);
-    try {
-      const params = { page, limit, search };
-      if (filterSub)      params.category_id = filterSub;
-      else if (filterCat) params.category_id = filterCat;
-      const res = await adminApi.getProducts(params);
-      if (res.success) { setProducts(res.data); setTotal(res.meta?.total || 0); }
-    } catch {
-      setProducts(MOCK_PRODUCTS.slice((page-1)*limit, page*limit) ?? []);
-      setTotal(MOCK_PRODUCTS.length ?? 0);
-    }
+    const params = { page, limit, search };
+    if (filterSub)      params.category_id = filterSub;
+    else if (filterCat) params.category_id = filterCat;
+    const res = await adminApi.getProducts(params);
+    if (res.success) { setProducts(res.data || []); setTotal(res.meta?.total || 0); }
+    else { setProducts([]); setTotal(0); }
     setLoading(false);
   }
 
@@ -350,10 +346,3 @@ export default function AdminProducts() {
   );
 }
 
-const MOCK_PRODUCTS = [
-  { id:1, name:'Hybrid Tomato Seeds F1 (10g)', brand_name:'Syngenta', category_name:'Seeds', subcategory_name:'Vegetable Seeds', selling_price:299, stock_qty:48, sku:'SYN-TOM-F1', is_active:true, primary_image:'' },
-  { id:2, name:'NPK 19:19:19 Fertilizer 1kg', brand_name:'IFFCO', category_name:'Fertilizers', subcategory_name:'Water Soluble', selling_price:185, stock_qty:8, sku:'IFFCO-NPK', is_active:true, primary_image:'' },
-  { id:3, name:'Neem Oil 10000 PPM 1L', brand_name:'Anand Agro', category_name:'Organic', subcategory_name:'Bio Pesticides', selling_price:840, stock_qty:32, sku:'AA-NEEM', is_active:true, primary_image:'' },
-  { id:4, name:'Imidacloprid 17.8% SL 500ml', brand_name:'Bayer', category_name:'Pesticides', subcategory_name:'Insecticides', selling_price:420, stock_qty:0, sku:'BAY-IMI', is_active:false, primary_image:'' },
-  { id:5, name:'Drip Irrigation Kit 1 Acre', brand_name:'Jain Irrigation', category_name:'Irrigation', subcategory_name:'Drip Systems', selling_price:3499, stock_qty:3, sku:'JI-DRIP', is_active:true, primary_image:'' },
-];

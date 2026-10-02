@@ -8,8 +8,8 @@ const FALLBACK = 'https://images.unsplash.com/photo-1574943320219-553eb213f72d?w
 
 const HERO_SLIDES = [
   { bg: 'linear-gradient(135deg,#1b5e20,#2e7d32)', img: 'https://images.unsplash.com/photo-1625246333195-78d9c38ad449?w=1400&q=80', tag: '🌾 Kharif Season 2025', h2: 'Grow More,\nEarn More', p: 'Premium quality seeds, fertilizers & farm tools delivered right to your doorstep. Trusted by 5 lakh+ farmers.', btn1: ['🛒 Shop Now', '/categories'], btn2: ['📱 Join Free', '/login'] },
-  { bg: 'linear-gradient(135deg,#33691e,#558b2f)', img: 'https://images.unsplash.com/photo-1464226184884-fa280b87c399?w=1400&q=80', tag: '🌿 Organic Collection', h2: 'Go Organic,\nGo Healthy', p: '100% certified organic fertilizers and bio-pesticides for healthier crops and better yields.', btn1: ['🌿 Explore Organic', '/categories?category_id=2'], btn2: ['Learn More', '/about'] },
-  { bg: 'linear-gradient(135deg,#004d40,#00695c)', img: 'https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=1400&q=80', tag: '🔧 Farm Equipment', h2: 'Smart Tools\nfor Smart Farmers', p: 'Modern irrigation systems, sprayers, and precision farming tools to maximize your productivity.', btn1: ['🔧 View Tools', '/categories?category_id=1'], btn2: ['Get Expert Advice', '/contact'] },
+  { bg: 'linear-gradient(135deg,#33691e,#558b2f)', img: 'https://images.unsplash.com/photo-1464226184884-fa280b87c399?w=1400&q=80', tag: '🌿 Organic Collection', h2: 'Go Organic,\nGo Healthy', p: '100% certified organic fertilizers and bio-pesticides for healthier crops and better yields.', btn1: ['🌿 Explore Organic', '/categories'], btn2: ['Learn More', '/about'] },
+  { bg: 'linear-gradient(135deg,#004d40,#00695c)', img: 'https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=1400&q=80', tag: '🔧 Farm Equipment', h2: 'Smart Tools\nfor Smart Farmers', p: 'Modern irrigation systems, sprayers, and precision farming tools to maximize your productivity.', btn1: ['🔧 View Tools', '/categories'], btn2: ['Get Expert Advice', '/contact'] },
 ];
 
 const TESTIMONIALS = [
@@ -62,7 +62,7 @@ export default function Home() {
     api.get('categories', { parent_only: 1 }).then(r => r.success && setCategories(r.data.slice(0, 8)));
     api.get('products', { sort: 'sold_count', order: 'desc', limit: 4 }).then(r => r.success && setProducts(r.data));
     api.get('brands').then(r => setBrands(r.success && r.data?.length ? r.data : FALLBACK_BRANDS));
-    api.get('admin&section=offers').then(r => {
+    api.get('admin', { section: 'offers' }).then(r => {
       if (r.success) setBanners((r.data ?? []).filter(b => b.is_active));
     }).catch(() => {});
   }, []);
@@ -90,7 +90,7 @@ export default function Home() {
         <span>🌿 New Season Products Now Available!</span>
         <span>💰 Up to <b>40% OFF</b> on selected items</span>
         <span>🎁 Buy 2 Get 1 Free on selected products</span>
-        <span>📞 Farmer Helpline: <b>1800-XXX-XXXX</b></span>
+        <span>📞 Farmer Helpline: <b>1800-180-1551</b></span>
       </div>
 
       {/* HERO SLIDER */}

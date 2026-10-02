@@ -68,7 +68,7 @@ export default function Cart() {
   const items = cartData?.items || [];
   const isEmpty = items.length === 0;
   const savings = cartData?.savings || 0;
-  const freeDeliveryThreshold = 499;
+  const freeDeliveryThreshold = cartData?.free_threshold ?? 499;
   const remaining = freeDeliveryThreshold - (cartData?.subtotal || 0);
 
   return (

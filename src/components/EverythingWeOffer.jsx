@@ -4,8 +4,8 @@ import { useNavigate } from 'react-router-dom';
 const CARDS = [
   {
     id: 0,
-    badge: 'For Farmers',
-    badgeIcon: '🌾',
+    badge: '🛒 Explore Products',
+    badgeIcon: null,
     ribbon: null,
     icon: '🛒',
     title: 'Buy With Us',

@@ -1,71 +1,45 @@
 import { Link } from 'react-router-dom';
 
-const TEAM = [
-  { init: 'A', name: 'Arjun Mehta',   role: 'CEO & Co-Founder',      bio: 'Visionary leader with 15+ years in agri-tech. Passionate about empowering Indian farmers through technology.' },
-  { init: 'P', name: 'Priya Nair',    role: 'CTO & Co-Founder',      bio: "Full-stack engineer and AI enthusiast. Built Drithi Agro's platform from the ground up to serve millions of farmers." },
-  { init: 'S', name: 'Suresh Reddy',  role: 'Head of Agronomy',      bio: 'PhD in Agricultural Sciences. Guides farmers with expert crop advice and leads our agri-consultation team.' },
-  { init: 'M', name: 'Meera Joshi',   role: 'Head of Operations',    bio: 'Supply chain expert ensuring on-time delivery across 28 states. Obsessed with farmer satisfaction.' },
-];
-
-const STATS = [
-  { num: '5L+',    lbl: 'Happy Farmers' },
-  { num: '10,000+',lbl: 'Products' },
-  { num: '28',     lbl: 'States Covered' },
-  { num: '500+',   lbl: 'Trusted Brands' },
-];
-
-const VALUES = [
-  { icon: '🌾', title: 'Farmer First',      desc: 'Every decision we make is centred around what is best for the Indian farmer.' },
-  { icon: '✅', title: 'Quality Assured',   desc: 'All products are verified and sourced directly from authorised manufacturers.' },
-  { icon: '💰', title: 'Fair Pricing',      desc: 'We ensure farmers always get the best market prices without middlemen.' },
-  { icon: '🚚', title: 'Reliable Delivery', desc: 'Fast, dependable delivery across 28 states in 2–5 business days.' },
-  { icon: '🌿', title: 'Sustainability',    desc: 'We promote eco-friendly farming practices and organic products.' },
-  { icon: '🤝', title: 'Community',         desc: 'Building a strong network of farmers, vendors and agri-experts together.' },
-];
-
 export default function About() {
   return (
     <div style={{ paddingTop: 56 }}>
       {/* Hero */}
       <div style={{ background: 'linear-gradient(135deg,#1b5e20,#2e7d32)', padding: '60px 40px', color: 'white', textAlign: 'center' }}>
-        <div style={{ fontSize: 60, marginBottom: 16 }}>🌾</div>
-        <h1 style={{ fontSize: 36, fontWeight: 900, marginBottom: 12 }}>About Drithi Agro</h1>
-        <p style={{ fontSize: 16, opacity: 0.85, maxWidth: 600, margin: '0 auto 24px', lineHeight: 1.7 }}>
-          India's most trusted agri-commerce platform — connecting farmers with quality products, expert advice and fair markets since 2022.
+        <div style={{ fontSize: 60, marginBottom: 16 }}>🌱</div>
+        <h1 style={{ fontSize: 36, fontWeight: 900, marginBottom: 12 }}>Welcome to Dhriti Mart</h1>
+        <p style={{ fontSize: 16, opacity: 0.85, maxWidth: 680, margin: '0 auto 24px', lineHeight: 1.8 }}>
+          Dhriti Mart is a B2B agricultural marketplace designed to simplify the way businesses source and purchase agricultural products.
         </p>
         <Link to="/categories" style={{ background: '#f9a825', color: '#1b5e20', padding: '12px 28px', borderRadius: 30, fontWeight: 800, fontSize: 15, textDecoration: 'none', display: 'inline-block' }}>
-          🛒 Shop Now
+          🛒 Explore Products
         </Link>
       </div>
 
-      {/* Stats */}
-      <div style={{ background: '#f9a825', padding: '24px 40px', display: 'flex', justifyContent: 'space-around', flexWrap: 'wrap', gap: 16 }}>
-        {STATS.map(s => (
-          <div key={s.lbl} style={{ textAlign: 'center' }}>
-            <div style={{ fontSize: 28, fontWeight: 900, color: '#1b5e20' }}>{s.num}</div>
-            <div style={{ fontSize: 13, color: '#555', fontWeight: 600 }}>{s.lbl}</div>
-          </div>
-        ))}
-      </div>
-
-      {/* Mission */}
-      <section style={{ padding: '60px 40px', maxWidth: 900, margin: '0 auto' }} id="mission">
-        <h2 style={{ fontSize: 28, fontWeight: 900, color: '#1b5e20', marginBottom: 16, textAlign: 'center' }}>Our Mission</h2>
+      {/* What We Do */}
+      <section style={{ padding: '60px 40px', maxWidth: 900, margin: '0 auto' }}>
+        <h2 style={{ fontSize: 28, fontWeight: 900, color: '#1b5e20', marginBottom: 16, textAlign: 'center' }}>What We Do</h2>
         <div style={{ width: 60, height: 4, background: '#f9a825', borderRadius: 2, margin: '0 auto 28px' }} />
-        <p style={{ fontSize: 15, color: '#555', lineHeight: 1.8, textAlign: 'center', maxWidth: 700, margin: '0 auto 20px' }}>
-          🌱 Founded in 2022, Drithi Agro was born from a simple belief: <strong>every Indian farmer deserves access to quality inputs at fair prices.</strong>
+        <p style={{ fontSize: 15, color: '#555', lineHeight: 1.9, textAlign: 'center', maxWidth: 720, margin: '0 auto 20px' }}>
+          We connect <strong>retailers, dealers, distributors, agricultural businesses, and other industry partners</strong> with quality agricultural products through a convenient digital platform.
         </p>
-        <p style={{ fontSize: 15, color: '#555', lineHeight: 1.8, textAlign: 'center', maxWidth: 700, margin: '0 auto' }}>
-          We bridge the gap between farmers and manufacturers — cutting out middlemen, reducing costs and ensuring genuine products reach the people who grow our food.
+        <p style={{ fontSize: 15, color: '#555', lineHeight: 1.9, textAlign: 'center', maxWidth: 720, margin: '0 auto' }}>
+          From fertilizers and crop-care products to seeds and other farming essentials, Dhriti Mart helps businesses discover products, place orders, manage purchases, and streamline their agricultural supply needs.
         </p>
       </section>
 
-      {/* Values */}
+      {/* Features */}
       <section style={{ padding: '50px 40px', background: '#f9fbe7' }}>
-        <h2 style={{ fontSize: 28, fontWeight: 900, color: '#1b5e20', marginBottom: 8, textAlign: 'center' }}>Our Values</h2>
+        <h2 style={{ fontSize: 28, fontWeight: 900, color: '#1b5e20', marginBottom: 8, textAlign: 'center' }}>Why Dhriti Mart</h2>
         <div style={{ width: 60, height: 4, background: '#f9a825', borderRadius: 2, margin: '0 auto 36px' }} />
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px,1fr))', gap: 20, maxWidth: 1100, margin: '0 auto' }}>
-          {VALUES.map(v => (
+          {[
+            { icon: '🤝', title: 'B2B Focused', desc: 'Built exclusively for retailers, dealers, distributors, and agricultural businesses.' },
+            { icon: '🌾', title: 'Quality Products', desc: 'Fertilizers, crop-care products, seeds, and farming essentials from trusted sources.' },
+            { icon: '📦', title: 'Order Management', desc: 'Discover products, place orders, and manage purchases all in one place.' },
+            { icon: '⚡', title: 'Streamlined Sourcing', desc: 'Simplify your agricultural supply chain with our digital platform.' },
+            { icon: '🔍', title: 'Easy Discovery', desc: 'Find the right products quickly with smart search and category filters.' },
+            { icon: '🚀', title: 'Future B2C', desc: 'Expanding into B2C services to bring Dhriti Mart closer to individual farmers.' },
+          ].map(v => (
             <div key={v.title} style={{ background: 'white', borderRadius: 16, padding: '24px 20px', boxShadow: '0 4px 20px rgba(0,0,0,0.07)', textAlign: 'center' }}>
               <div style={{ fontSize: 38, marginBottom: 12 }}>{v.icon}</div>
               <h4 style={{ fontSize: 16, fontWeight: 800, color: '#1b5e20', marginBottom: 8 }}>{v.title}</h4>
@@ -75,29 +49,68 @@ export default function About() {
         </div>
       </section>
 
-      {/* Team */}
-      <section style={{ padding: '60px 40px', maxWidth: 1000, margin: '0 auto' }} id="team">
-        <h2 style={{ fontSize: 28, fontWeight: 900, color: '#1b5e20', marginBottom: 8, textAlign: 'center' }}>Our Team</h2>
-        <div style={{ width: 60, height: 4, background: '#f9a825', borderRadius: 2, margin: '0 auto 36px' }} />
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(220px,1fr))', gap: 20 }}>
-          {TEAM.map(m => (
-            <div key={m.name} style={{ background: 'white', borderRadius: 16, padding: '28px 20px', boxShadow: '0 4px 20px rgba(0,0,0,0.07)', textAlign: 'center' }}>
-              <div style={{ width: 64, height: 64, borderRadius: '50%', background: 'linear-gradient(135deg,#1b5e20,#43a047)', color: 'white', fontSize: 26, fontWeight: 900, display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 14px' }}>{m.init}</div>
-              <h4 style={{ fontSize: 16, fontWeight: 800, color: '#1a1a1a', marginBottom: 4 }}>{m.name}</h4>
-              <div style={{ fontSize: 12, color: '#2e7d32', fontWeight: 700, marginBottom: 10 }}>{m.role}</div>
-              <p style={{ fontSize: 13, color: '#666', lineHeight: 1.6 }}>{m.bio}</p>
+      {/* Our Goal */}
+      <section style={{ padding: '60px 40px', maxWidth: 900, margin: '0 auto', textAlign: 'center' }}>
+        <h2 style={{ fontSize: 28, fontWeight: 900, color: '#1b5e20', marginBottom: 16 }}>Our Goal</h2>
+        <div style={{ width: 60, height: 4, background: '#f9a825', borderRadius: 2, margin: '0 auto 28px' }} />
+        <p style={{ fontSize: 16, color: '#555', lineHeight: 1.9, maxWidth: 700, margin: '0 auto', fontStyle: 'italic' }}>
+          "To make B2B agricultural commerce simpler, faster, more transparent, and more efficient."
+        </p>
+        <p style={{ fontSize: 14, color: '#888', marginTop: 20, lineHeight: 1.8, maxWidth: 680, margin: '20px auto 0' }}>
+          We are currently focused on B2B solutions, with plans to expand into B2C services in the future, bringing Dhriti Mart closer to individual farmers and customers.
+        </p>
+      </section>
+
+      {/* Powered by Chandhu Tech */}
+      <section style={{ padding: '60px 40px', background: 'linear-gradient(135deg,#1b5e20,#2e7d32)', color: 'white' }}>
+        <div style={{ maxWidth: 900, margin: '0 auto' }}>
+          <div style={{ textAlign: 'center', marginBottom: 40 }}>
+            <div style={{ fontSize: 48, marginBottom: 12 }}>⚡</div>
+            <h2 style={{ fontSize: 28, fontWeight: 900, marginBottom: 12 }}>Powered by Chandhu Tech</h2>
+            <div style={{ width: 60, height: 4, background: '#f9a825', borderRadius: 2, margin: '0 auto 24px' }} />
+            <p style={{ fontSize: 15, opacity: 0.9, lineHeight: 1.8, maxWidth: 700, margin: '0 auto' }}>
+              Dhriti Mart is powered by <strong>Chandhu Tech</strong>, a technology company focused on building innovative digital solutions for modern businesses.
+            </p>
+          </div>
+
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(280px,1fr))', gap: 24, marginBottom: 40 }}>
+            <div style={{ background: 'rgba(255,255,255,0.1)', borderRadius: 16, padding: '28px 24px', backdropFilter: 'blur(10px)' }}>
+              <div style={{ fontSize: 32, marginBottom: 12 }}>🎯</div>
+              <h4 style={{ fontSize: 17, fontWeight: 800, marginBottom: 10 }}>Our Vision</h4>
+              <p style={{ fontSize: 14, opacity: 0.85, lineHeight: 1.7 }}>
+                To build technology that connects businesses, simplifies commerce, and creates meaningful digital experiences.
+              </p>
             </div>
-          ))}
+            <div style={{ background: 'rgba(255,255,255,0.1)', borderRadius: 16, padding: '28px 24px', backdropFilter: 'blur(10px)' }}>
+              <div style={{ fontSize: 32, marginBottom: 12 }}>🚀</div>
+              <h4 style={{ fontSize: 17, fontWeight: 800, marginBottom: 10 }}>Our Mission</h4>
+              <p style={{ fontSize: 14, opacity: 0.85, lineHeight: 1.7 }}>
+                To transform traditional business processes through reliable, scalable, and innovative technology.
+              </p>
+            </div>
+            <div style={{ background: 'rgba(255,255,255,0.1)', borderRadius: 16, padding: '28px 24px', backdropFilter: 'blur(10px)' }}>
+              <div style={{ fontSize: 32, marginBottom: 12 }}>💡</div>
+              <h4 style={{ fontSize: 17, fontWeight: 800, marginBottom: 10 }}>What We Believe</h4>
+              <p style={{ fontSize: 14, opacity: 0.85, lineHeight: 1.7 }}>
+                Technology should solve real-world problems and make business simpler, smarter, and more connected.
+              </p>
+            </div>
+          </div>
+
+          <div style={{ textAlign: 'center', borderTop: '1px solid rgba(255,255,255,0.2)', paddingTop: 32 }}>
+            <p style={{ fontSize: 18, fontWeight: 800, marginBottom: 6 }}>Dhriti Mart × Chandhu Tech</p>
+            <p style={{ fontSize: 14, opacity: 0.8 }}>Technology powering the future of agricultural commerce. 🌱</p>
+          </div>
         </div>
       </section>
 
       {/* CTA */}
-      <section style={{ padding: '50px 40px', background: 'linear-gradient(135deg,#1b5e20,#2e7d32)', textAlign: 'center', color: 'white' }}>
-        <h2 style={{ fontSize: 28, fontWeight: 900, marginBottom: 12 }}>Join the Drithi Agro Family</h2>
-        <p style={{ fontSize: 15, opacity: 0.85, marginBottom: 24 }}>Whether you're a farmer looking for quality inputs or a vendor wanting to grow your business.</p>
+      <section style={{ padding: '50px 40px', background: '#f9fbe7', textAlign: 'center' }}>
+        <h2 style={{ fontSize: 26, fontWeight: 900, color: '#1b5e20', marginBottom: 12 }}>Ready to Get Started?</h2>
+        <p style={{ fontSize: 15, color: '#666', marginBottom: 24 }}>Join Dhriti Mart and streamline your agricultural business today.</p>
         <div style={{ display: 'flex', gap: 14, justifyContent: 'center', flexWrap: 'wrap' }}>
-          <Link to="/categories" style={{ background: '#f9a825', color: '#1b5e20', padding: '12px 28px', borderRadius: 30, fontWeight: 800, fontSize: 15, textDecoration: 'none' }}>🛒 Shop Now</Link>
-          <Link to="/vendor/register" style={{ background: 'transparent', color: 'white', padding: '12px 28px', borderRadius: 30, fontWeight: 700, fontSize: 15, textDecoration: 'none', border: '2px solid white' }}>🏪 Become a Vendor</Link>
+          <Link to="/categories" style={{ background: '#2e7d32', color: 'white', padding: '12px 28px', borderRadius: 30, fontWeight: 800, fontSize: 15, textDecoration: 'none' }}>🛒 Browse Products</Link>
+          <Link to="/contact" style={{ background: 'white', color: '#2e7d32', border: '2px solid #2e7d32', padding: '12px 28px', borderRadius: 30, fontWeight: 700, fontSize: 15, textDecoration: 'none' }}>📞 Contact Us</Link>
         </div>
       </section>
     </div>

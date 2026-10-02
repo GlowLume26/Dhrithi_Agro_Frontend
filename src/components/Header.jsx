@@ -149,7 +149,7 @@ export default function Header() {
 
           {/* Action icons inside drawer */}
           <div className="drawer-actions">
-            <button className="drawer-action-btn sell" aria-label="Buy with us" onClick={() => { setBuyWithUsOpen(true); setDrawerOpen(false); }}>🤝 <span>Buy with us</span></button>
+            <button className="drawer-action-btn sell" aria-label="Products we sell" onClick={() => { setBuyWithUsOpen(true); setDrawerOpen(false); }}>🌾 <span>Products we sell (Demo)</span></button>
             <Link to="/contact" aria-label="Contact" className={`drawer-action-btn${isActive('/contact') ? ' hdr-active' : ''}`} onClick={() => setDrawerOpen(false)}>📞 <span>Contact</span></Link>
             <button
               className={`drawer-action-btn${notifOpen ? ' hdr-active' : ''}`}
@@ -202,9 +202,9 @@ export default function Header() {
           <div style={{ background:'white', borderRadius:20, padding:'36px 32px', maxWidth:440, width:'100%', boxShadow:'0 24px 80px rgba(0,0,0,0.2)' }}
             onClick={e => e.stopPropagation()}>
             <div style={{ textAlign:'center', marginBottom:28 }}>
-              <div style={{ fontSize:48, marginBottom:10 }}>🤝</div>
-              <h2 style={{ fontSize:22, fontWeight:900, color:'#1b5e20', marginBottom:6 }}>Join Drithi Agro</h2>
-              <p style={{ fontSize:13, color:'#888' }}>Choose how you want to get started</p>
+              <div style={{ fontSize:48, marginBottom:10 }}>🌾</div>
+              <h2 style={{ fontSize:22, fontWeight:900, color:'#1b5e20', marginBottom:6 }}>Products We Sell (Demo)</h2>
+              <p style={{ fontSize:13, color:'#888' }}>Explore our range of agricultural products</p>
             </div>
             <div style={{ display:'flex', flexDirection:'column', gap:14 }}>
               <button onClick={() => { setBuyWithUsOpen(false); navigate('/vendor/register?role=buyer'); }}

@@ -20,13 +20,43 @@ export default function Account() {
     return {
       full_name: stored.name || stored.full_name || '',
       email: stored.email || '',
-      dob: '',
       gender: '',
       occupation: '',
-      farm_size: '',
-      primary_crop: ''
+      state: '',
+      city: '',
     };
   });
+
+  const INDIAN_STATES = [
+    'Andhra Pradesh','Arunachal Pradesh','Assam','Bihar','Chhattisgarh','Goa','Gujarat',
+    'Haryana','Himachal Pradesh','Jharkhand','Karnataka','Kerala','Madhya Pradesh',
+    'Maharashtra','Manipur','Meghalaya','Mizoram','Nagaland','Odisha','Punjab',
+    'Rajasthan','Sikkim','Tamil Nadu','Telangana','Tripura','Uttar Pradesh',
+    'Uttarakhand','West Bengal','Delhi','Jammu & Kashmir','Ladakh',
+    'Andaman & Nicobar Islands','Chandigarh','Dadra & Nagar Haveli','Daman & Diu',
+    'Lakshadweep','Puducherry'
+  ];
+
+  const CITIES_BY_STATE = {
+    'Maharashtra': ['Mumbai','Pune','Nagpur','Nashik','Aurangabad','Solapur','Kolhapur','Amravati','Nanded','Sangli'],
+    'Uttar Pradesh': ['Lucknow','Kanpur','Agra','Varanasi','Meerut','Allahabad','Ghaziabad','Noida','Bareilly','Aligarh'],
+    'Karnataka': ['Bengaluru','Mysuru','Hubli','Mangaluru','Belagavi','Kalaburagi','Davanagere','Ballari','Vijayapura','Shivamogga'],
+    'Tamil Nadu': ['Chennai','Coimbatore','Madurai','Tiruchirappalli','Salem','Tirunelveli','Erode','Vellore','Thoothukudi','Dindigul'],
+    'Gujarat': ['Ahmedabad','Surat','Vadodara','Rajkot','Bhavnagar','Jamnagar','Junagadh','Gandhinagar','Anand','Nadiad'],
+    'Rajasthan': ['Jaipur','Jodhpur','Udaipur','Kota','Bikaner','Ajmer','Bhilwara','Alwar','Sikar','Bharatpur'],
+    'Punjab': ['Ludhiana','Amritsar','Jalandhar','Patiala','Bathinda','Mohali','Hoshiarpur','Gurdaspur','Firozpur','Moga'],
+    'Haryana': ['Faridabad','Gurugram','Panipat','Ambala','Yamunanagar','Rohtak','Hisar','Karnal','Sonipat','Panchkula'],
+    'Madhya Pradesh': ['Bhopal','Indore','Jabalpur','Gwalior','Ujjain','Sagar','Dewas','Satna','Ratlam','Rewa'],
+    'West Bengal': ['Kolkata','Howrah','Durgapur','Asansol','Siliguri','Bardhaman','Malda','Baharampur','Habra','Kharagpur'],
+    'Andhra Pradesh': ['Visakhapatnam','Vijayawada','Guntur','Nellore','Kurnool','Rajahmundry','Tirupati','Kakinada','Kadapa','Anantapur'],
+    'Telangana': ['Hyderabad','Warangal','Nizamabad','Karimnagar','Khammam','Ramagundam','Mahbubnagar','Nalgonda','Adilabad','Suryapet'],
+    'Bihar': ['Patna','Gaya','Bhagalpur','Muzaffarpur','Purnia','Darbhanga','Bihar Sharif','Arrah','Begusarai','Katihar'],
+    'Odisha': ['Bhubaneswar','Cuttack','Rourkela','Brahmapur','Sambalpur','Puri','Balasore','Bhadrak','Baripada','Jharsuguda'],
+    'Kerala': ['Thiruvananthapuram','Kochi','Kozhikode','Thrissur','Kollam','Palakkad','Alappuzha','Malappuram','Kannur','Kottayam'],
+    'Delhi': ['New Delhi','North Delhi','South Delhi','East Delhi','West Delhi','Central Delhi','Dwarka','Rohini','Janakpuri','Laxmi Nagar'],
+  };
+
+  const citiesForState = (state) => CITIES_BY_STATE[state] || [];
 
   const [addrForm, setAddrForm] = useState({
     full_name: '',
@@ -50,11 +80,10 @@ export default function Account() {
       setForm({
         full_name: d.full_name || '',
         email: d.email || '',
-        dob: d.dob || '',
         gender: d.gender || '',
         occupation: d.occupation || '',
-        farm_size: d.farm_size || '',
-        primary_crop: d.primary_crop || ''
+        state: d.state || '',
+        city: d.city || '',
       });
     });
     api.get('customer', { section: 'addresses' }).then(res => res.success && setAddresses(res.data || []));
@@ -66,11 +95,10 @@ export default function Account() {
       form.full_name,
       form.email,
       profile?.mobile || user?.mobile,
-      form.dob,
       form.gender,
       form.occupation,
-      form.farm_size,
-      form.primary_crop
+      form.state,
+      form.city,
     ];
     const filledFields = fields.filter(val => val !== null && val !== undefined && String(val).trim() !== '');
     return Math.round((filledFields.length / fields.length) * 100);
@@ -84,16 +112,14 @@ export default function Account() {
       if (res.data) {
         setProfile(res.data);
       } else {
-        // Safe UI fallback state sync if backend returns null
         setProfile(prev => ({
           ...prev,
           full_name: form.full_name,
           email: form.email,
-          dob: form.dob,
           gender: form.gender,
           occupation: form.occupation,
-          farm_size: form.farm_size,
-          primary_crop: form.primary_crop
+          state: form.state,
+          city: form.city,
         }));
       }
 
@@ -209,7 +235,6 @@ export default function Account() {
                 <div className="form-group"><label>Full Name</label><input type="text" value={form.full_name} onChange={e => setForm(f => ({ ...f, full_name: e.target.value }))} /></div>
                 <div className="form-group"><label>Mobile Number</label><input type="tel" value={'+91 ' + (profile?.mobile || user?.mobile || '')} readOnly /></div>
                 <div className="form-group"><label>Email Address</label><input type="email" value={form.email} onChange={e => setForm(f => ({ ...f, email: e.target.value }))} /></div>
-                <div className="form-group"><label>Date of Birth</label><input type="date" value={form.dob} onChange={e => setForm(f => ({ ...f, dob: e.target.value }))} /></div>
                 <div className="form-group"><label>Gender</label>
                   <select value={form.gender?.toLowerCase() || ''} onChange={e => setForm(f => ({ ...f, gender: e.target.value }))}>
                     <option value="">Select gender</option>
@@ -219,11 +244,26 @@ export default function Account() {
                 <div className="form-group"><label>Occupation</label>
                   <select value={form.occupation || ''} onChange={e => setForm(f => ({ ...f, occupation: e.target.value }))}>
                     <option value="">Select occupation</option>
-                    <option value="Farmer">Farmer</option><option value="Agri Dealer">Agri Dealer</option><option value="Agronomist">Agronomist</option><option value="Other">Other</option>
+                    <option value="Retailer">Retailer</option><option value="Dealer">Dealer</option><option value="Distributor">Distributor</option><option value="Agri Business">Agri Business</option><option value="Other">Other</option>
                   </select>
                 </div>
-                <div className="form-group"><label>Farm Size (Acres)</label><input type="text" value={form.farm_size || ''} onChange={e => setForm(f => ({ ...f, farm_size: e.target.value }))} /></div>
-                <div className="form-group"><label>Primary Crop</label><input type="text" value={form.primary_crop || ''} onChange={e => setForm(f => ({ ...f, primary_crop: e.target.value }))} /></div>
+                <div className="form-group"><label>State</label>
+                  <select value={form.state || ''} onChange={e => setForm(f => ({ ...f, state: e.target.value, city: '' }))}>
+                    <option value="">Select state</option>
+                    {INDIAN_STATES.map(s => <option key={s} value={s}>{s}</option>)}
+                  </select>
+                </div>
+                <div className="form-group"><label>City</label>
+                  {citiesForState(form.state).length > 0
+                    ? <select value={form.city || ''} onChange={e => setForm(f => ({ ...f, city: e.target.value }))}>
+                        <option value="">Select city</option>
+                        {citiesForState(form.state).map(c => <option key={c} value={c}>{c}</option>)}
+                      </select>
+                    : <select value={form.city || ''} onChange={e => setForm(f => ({ ...f, city: e.target.value }))} disabled={!form.state}>
+                        <option value="">{form.state ? 'Select city' : 'Select state first'}</option>
+                      </select>
+                  }
+                </div>
               </div>
               <button className="save-btn" disabled={saving} onClick={saveProfile}>{saving ? '⏳ Saving...' : '💾 Save Changes'}</button>
               {saveMsg && <div className="save-msg" style={{ display: 'block', background: saveMsg.t === 'ok' ? '#e8f5e9' : '#ffebee', color: saveMsg.t === 'ok' ? '#1b5e20' : '#c62828' }}>{saveMsg.m}</div>}
@@ -251,12 +291,29 @@ export default function Account() {
                 <div style={{ marginTop: 20, borderTop: '2px solid #e8f5e9', paddingTop: 20 }}>
                   <h4 style={{ fontSize: 15, fontWeight: 700, color: '#1b5e20', marginBottom: 14 }}>New Address</h4>
                   <div className="form-grid">
-                    {[['Full Name', 'full_name', 'text'], ['Mobile', 'mobile', 'tel'], ['Address Line 1', 'address_line1', 'text'], ['Address Line 2', 'address_line2', 'text'], ['City', 'city', 'text'], ['State', 'state', 'text'], ['Pincode', 'pincode', 'text']].map(([l, k, t]) => (
+                    {[['Full Name', 'full_name', 'text'], ['Mobile', 'mobile', 'tel'], ['Address Line 1', 'address_line1', 'text'], ['Address Line 2', 'address_line2', 'text'], ['Pincode', 'pincode', 'text']].map(([l, k, t]) => (
                       <div key={k} className={'form-group' + (['address_line1', 'address_line2'].includes(k) ? ' full' : '')}>
                         <label>{l}</label>
                         <input type={t} value={addrForm[k]} onChange={e => setAddrForm(f => ({ ...f, [k]: e.target.value }))} />
                       </div>
                     ))}
+                    <div className="form-group">
+                      <label>State</label>
+                      <select value={addrForm.state} onChange={e => setAddrForm(f => ({ ...f, state: e.target.value, city: '' }))}>
+                        <option value="">Select state</option>
+                        {INDIAN_STATES.map(s => <option key={s} value={s}>{s}</option>)}
+                      </select>
+                    </div>
+                    <div className="form-group">
+                      <label>City</label>
+                      {citiesForState(addrForm.state).length > 0
+                        ? <select value={addrForm.city} onChange={e => setAddrForm(f => ({ ...f, city: e.target.value }))}>
+                            <option value="">Select city</option>
+                            {citiesForState(addrForm.state).map(c => <option key={c} value={c}>{c}</option>)}
+                          </select>
+                        : <input type="text" placeholder="Enter city" value={addrForm.city} onChange={e => setAddrForm(f => ({ ...f, city: e.target.value }))} />
+                      }
+                    </div>
                     <div className="form-group"><label>Address Type</label>
                       <select value={addrForm.address_type} onChange={e => setAddrForm(f => ({ ...f, address_type: e.target.value }))}>
                         <option value="HOME">🏠 Home</option><option value="WORK">💼 Work</option><option value="OTHER">📍 Other</option>

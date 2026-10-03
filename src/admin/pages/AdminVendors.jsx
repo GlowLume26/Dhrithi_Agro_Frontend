@@ -43,7 +43,7 @@ export default function AdminVendors() {
   useEffect(() => { load(); }, [page, limit, statusF, vendorTab]);
 
   useEffect(() => {
-    if (mainTab === 'commission' && commRates.length === 0) loadCommission();
+    if (mainTab === 'commission' && Object.keys(commSettings).length === 0) loadCommission();
   }, [mainTab]);
 
   async function load() {

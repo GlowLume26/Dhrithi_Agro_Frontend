@@ -25,10 +25,20 @@ export default function AdminVendors() {
   const [actionBusy, setActionBusy]     = useState(false);
   const [err, setErr]                   = useState('');
   // Commission
-  const [commRates, setCommRates]       = useState([]);
+  const [commSettings, setCommSettings] = useState({});
   const [commLoading, setCommLoading]   = useState(false);
-  const [editingRate, setEditingRate]   = useState({}); // { [id]: newRate }
-  const [savingId, setSavingId]         = useState(null);
+  const [editingComm, setEditingComm]   = useState({});
+  const [savingKey, setSavingKey]       = useState(null);
+
+  const COMM_KEYS = [
+    { key: 'commission_rate_seeds',        label: 'Seeds & Planting',          gst: 18 },
+    { key: 'commission_rate_fertilizers',  label: 'Fertilizers & Nutrients',   gst: 18 },
+    { key: 'commission_rate_pesticides',   label: 'Pesticides & Herbicides',   gst: 18 },
+    { key: 'commission_rate_organic',      label: 'Organic Farming',           gst: 18 },
+    { key: 'commission_rate_equipment',    label: 'Farm Equipment',            gst: 18 },
+    { key: 'commission_rate_irrigation',   label: 'Irrigation Systems',        gst: 18 },
+    { key: 'commission_rate_default',      label: 'Default (All Others)',      gst: 18 },
+  ];
 
   useEffect(() => { load(); }, [page, limit, statusF, vendorTab]);
 
@@ -49,24 +59,25 @@ export default function AdminVendors() {
   async function loadCommission() {
     setCommLoading(true);
     try {
-      const res = await adminApi.getCommissionRates();
-      if (res.success) setCommRates(res.data || []);
+      const res = await adminApi.getSettings();
+      if (res.success && res.data) setCommSettings(res.data);
     } catch {}
     setCommLoading(false);
   }
 
-  async function saveRate(id) {
-    const rate = parseFloat(editingRate[id]);
-    if (!rate || rate <= 0 || rate > 100) return;
-    setSavingId(id);
+  async function saveCommRate(key) {
+    const val = editingComm[key];
+    const rate = parseFloat(val);
+    if (isNaN(rate) || rate < 0 || rate > 100) return;
+    setSavingKey(key);
     try {
-      const res = await adminApi.updateCommissionRate(id, rate);
+      const res = await adminApi.updateSettings({ [key]: rate });
       if (res.success) {
-        setCommRates(rs => rs.map(r => r.id === id ? { ...r, rate } : r));
-        setEditingRate(e => { const n = { ...e }; delete n[id]; return n; });
+        setCommSettings(prev => ({ ...prev, [key]: rate }));
+        setEditingComm(prev => { const n = { ...prev }; delete n[key]; return n; });
       }
     } catch {}
-    setSavingId(null);
+    setSavingKey(null);
   }
 
   async function approve(id) {
@@ -124,49 +135,48 @@ export default function AdminVendors() {
               <tbody>
                 {commLoading
                   ? [0,1,2,3,4].map(i => <tr key={i}><td colSpan={6}><Skel h={36} /></td></tr>)
-                  : commRates.length === 0
-                  ? <tr><td colSpan={6}><Empty icon="💰" title="No commission rates found" /></td></tr>
-                  : commRates.map((r, i) => {
-                      const rate = parseFloat(editingRate[r.id] ?? r.rate);
-                      const comm = (1000 * rate) / 100;
-                      const gst  = comm * (parseFloat(r.gst_on_comm) / 100);
-                      const isEditing = r.id in editingRate;
+                  : COMM_KEYS.map((item, i) => {
+                      const currentRate = parseFloat(commSettings[item.key] ?? 5);
+                      const displayRate = item.key in editingComm ? editingComm[item.key] : currentRate;
+                      const isEditing   = item.key in editingComm;
+                      const comm = (1000 * currentRate) / 100;
+                      const gst  = comm * (item.gst / 100);
                       return (
-                        <tr key={r.id}>
+                        <tr key={item.key}>
                           <td style={{ color: 'var(--atx3)', fontWeight: 600, textAlign: 'center' }}>{i + 1}</td>
-                          <td style={{ fontWeight: 600 }}>{r.category}</td>
+                          <td style={{ fontWeight: 600 }}>{item.label}</td>
                           <td>
                             {isEditing ? (
-                              <input type="number" min="0.1" max="100" step="0.1"
-                                value={editingRate[r.id]}
-                                onChange={e => setEditingRate(prev => ({ ...prev, [r.id]: e.target.value }))}
+                              <input type="number" min="0" max="100" step="0.1"
+                                value={editingComm[item.key]}
+                                onChange={e => setEditingComm(prev => ({ ...prev, [item.key]: e.target.value }))}
                                 style={{ width: 70, padding: '4px 8px', border: '1.5px solid var(--apri)', borderRadius: 7, fontSize: 13, fontWeight: 700, outline: 'none' }}
                               />
                             ) : (
                               <span style={{ background: '#e8f5e9', color: '#1b5e20', fontWeight: 800, padding: '3px 12px', borderRadius: 20, fontSize: 13, cursor: 'pointer' }}
-                                onClick={() => setEditingRate(prev => ({ ...prev, [r.id]: r.rate }))}>
-                                {r.rate}%
+                                onClick={() => setEditingComm(prev => ({ ...prev, [item.key]: currentRate }))}>
+                                {currentRate}%
                               </span>
                             )}
                           </td>
-                          <td style={{ color: 'var(--atx2)', fontSize: 13 }}>{r.gst_on_comm}%</td>
+                          <td style={{ color: 'var(--atx2)', fontSize: 13 }}>{item.gst}%</td>
                           <td style={{ fontSize: 13, color: 'var(--atx2)' }}>
                             Comm: <b>₹{comm.toFixed(2)}</b> + GST: <b>₹{gst.toFixed(2)}</b> = Payout: <b style={{ color: '#1b5e20' }}>₹{(1000 - comm - gst).toFixed(2)}</b>
                           </td>
                           <td>
                             {isEditing ? (
                               <div style={{ display: 'flex', gap: 6 }}>
-                                <button className="a-btn a-btn-sm a-btn-pri" disabled={savingId === r.id} onClick={() => saveRate(r.id)}>
-                                  {savingId === r.id ? '⏳' : '✅ Save'}
+                                <button className="a-btn a-btn-sm a-btn-pri" disabled={savingKey === item.key} onClick={() => saveCommRate(item.key)}>
+                                  {savingKey === item.key ? '⏳' : '✅ Save'}
                                 </button>
                                 <button className="a-btn a-btn-sm a-btn-sec"
-                                  onClick={() => setEditingRate(prev => { const n = { ...prev }; delete n[r.id]; return n; })}>
+                                  onClick={() => setEditingComm(prev => { const n = { ...prev }; delete n[item.key]; return n; })}>
                                   Cancel
                                 </button>
                               </div>
                             ) : (
                               <button className="a-btn a-btn-sm a-btn-sec"
-                                onClick={() => setEditingRate(prev => ({ ...prev, [r.id]: r.rate }))}>
+                                onClick={() => setEditingComm(prev => ({ ...prev, [item.key]: currentRate }))}>
                                 ✏️ Edit
                               </button>
                             )}

@@ -78,6 +78,15 @@ export default function Header() {
             <div className="logo-icon">🌿</div>
             <div className="logo-text"><h1>Drithi Agro</h1><span>Farm to Future</span></div>
           </Link>
+          {/* Sticky search bar */}
+          <div className="header-search">
+            <input
+              type="text" placeholder="Search seeds, fertilizers, tools..."
+              value={search} onChange={e => setSearch(e.target.value)}
+              onKeyDown={e => { if (e.key === 'Enter') doSearch(); }}
+            />
+            <button onClick={doSearch} aria-label="Search">🔍</button>
+          </div>
         </div>
 
         {/* Notification Panel */}

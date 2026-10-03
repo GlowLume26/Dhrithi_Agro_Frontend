@@ -19,10 +19,8 @@ const TESTIMONIALS = [
 ];
 
 const ORG_TEAM = [
-  { init: 'A', name: 'Arjun Mehta', role: 'CEO & Co-Founder', bio: 'Visionary leader with 15+ years in agri-tech. Passionate about empowering Indian farmers through technology.' },
-  { init: 'P', name: 'Priya Nair', role: 'CTO & Co-Founder', bio: "Full-stack engineer and AI enthusiast. Built Drithi Agro's platform from the ground up to serve millions of farmers." },
-  { init: 'S', name: 'Suresh Reddy', role: 'Head of Agronomy', bio: 'PhD in Agricultural Sciences. Guides farmers with expert crop advice and leads our agri-consultation team.' },
-  { init: 'M', name: 'Meera Joshi', role: 'Head of Operations', bio: 'Supply chain expert ensuring on-time delivery across 28 states. Obsessed with farmer satisfaction.' },
+  { init: 'S', name: 'Sindhu Raj', role: 'Owner — Dhriti Mart', bio: 'Visionary entrepreneur driving the mission to transform B2B agricultural commerce in India through technology and innovation.' },
+  { init: 'V', name: 'V Chandrakanth Jain', role: 'CEO — Chandhu Tech', bio: 'Technology leader and founder of Chandhu Tech, architecting the digital platform that powers Dhriti Mart with scalable, innovative solutions.' },
 ];
 
 const FALLBACK_BRANDS = [
@@ -51,7 +49,7 @@ export default function Home() {
   const navigate = useNavigate();
   const [heroCur, heroGo] = useAutoSlide(3, 4000);
   const [testiCur, testiGo] = useAutoSlide(3, 4500);
-  const [orgCur, orgGo] = useAutoSlide(4, 4000);
+  const [orgCur, orgGo] = useAutoSlide(2, 4000);
   const [categories, setCategories] = useState([]);
   const [products, setProducts] = useState([]);
   const [brands, setBrands] = useState([]);
@@ -321,7 +319,7 @@ export default function Home() {
               </div>
             </div>
             <div className="org-dots">
-              {[0, 1, 2, 3].map(i => <button key={i} className={'org-dot' + (orgCur === i ? ' active' : '')} onClick={() => orgGo(i)} />)}
+              {[0, 1].map(i => <button key={i} className={'org-dot' + (orgCur === i ? ' active' : '')} onClick={() => orgGo(i)} />)}
             </div>
             <Link to="/about" className="org-link">View Full Profile →</Link>
           </div>
@@ -332,11 +330,10 @@ export default function Home() {
       <section className="section">
         <div className="app-banner">
           <div>
-            <h2>📱 Download Drithi Agro App</h2>
-            <p>Get exclusive app-only deals, track your orders, and chat with agri-experts on the go.</p>
+            <h2>📱 Download Dhriti Mart App</h2>
+            <p>Get exclusive app-only deals, track your orders, and manage your B2B purchases on the go.</p>
             <div className="app-btns">
-              <div className="app-btn">🍎 App Store</div>
-              <div className="app-btn">🤖 Google Play</div>
+              <a href="https://play.google.com/store" target="_blank" rel="noreferrer" className="app-btn">🤖 Google Play</a>
             </div>
           </div>
           <div className="app-phone">📲</div>

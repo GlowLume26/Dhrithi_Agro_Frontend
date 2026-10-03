@@ -30,7 +30,52 @@ header {
   padding: 8px 24px; gap: 12px;
 }
 
-/* HAMBURGER */
+/* HEADER STICKY SEARCH */
+.header-search {
+  flex: 1; max-width: 480px; margin: 0 12px;
+  display: flex; align-items: center;
+  background: rgba(255,255,255,0.15);
+  border: 1.5px solid rgba(255,255,255,0.25);
+  border-radius: 30px; overflow: hidden;
+  transition: background 0.2s, border-color 0.2s;
+}
+.header-search:focus-within {
+  background: rgba(255,255,255,0.22);
+  border-color: rgba(249,168,37,0.7);
+}
+.header-search input {
+  flex: 1; padding: 8px 14px; border: none; outline: none;
+  font-size: 13px; background: transparent; color: white;
+  font-family: inherit;
+}
+.header-search input::placeholder { color: rgba(255,255,255,0.6); }
+.header-search button {
+  background: var(--yellow); border: none; padding: 8px 14px;
+  cursor: pointer; font-size: 14px; color: var(--green-dark);
+  flex-shrink: 0; transition: background 0.2s;
+}
+.header-search button:hover { background: #f57f17; }
+@media (max-width: 600px) {
+  .header-search { display: none; }
+}
+
+/* FLOATING CALL & WHATSAPP */
+.float-btns {
+  position: fixed; bottom: 84px; right: 20px;
+  display: flex; flex-direction: column; gap: 10px; z-index: 998;
+}
+.float-btn {
+  width: 48px; height: 48px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 22px; text-decoration: none;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.25);
+  transition: transform 0.2s, box-shadow 0.2s;
+  border: none; cursor: pointer;
+}
+.float-btn:hover { transform: scale(1.12); box-shadow: 0 8px 24px rgba(0,0,0,0.3); }
+.float-call { background: #2e7d32; }
+.float-wa   { background: #25d366; }
+
 .hamburger {
   background: rgba(255,255,255,0.15); border: none; color: white;
   font-size: 20px; cursor: pointer; padding: 7px 11px;

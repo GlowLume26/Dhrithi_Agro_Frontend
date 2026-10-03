@@ -158,6 +158,16 @@ export default function Footer() {
         className={'scroll-top' + (showTop ? ' show' : '')}
         onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
       >↑</button>
+
+      {/* Floating Call & WhatsApp */}
+      <div className="float-btns">
+        <a href="tel:+911800180551" className="float-btn float-call" title="Call Us" aria-label="Call Us">
+          📞
+        </a>
+        <a href="https://wa.me/911800180551" target="_blank" rel="noreferrer" className="float-btn float-wa" title="WhatsApp" aria-label="WhatsApp">
+          💬
+        </a>
+      </div>
     </>
   );
 }
